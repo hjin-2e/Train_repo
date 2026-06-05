@@ -206,3 +206,27 @@ resource "aws_db_subnet_group" "main" {
   }
 }
 
+# 레디스 서브넷
+resource "aws_elasticache_subnet_group" "main" {
+  name       = "${var.project_name}-redis-subnet-group"
+  subnet_ids = [aws_subnet.db_a.id, aws_subnet.db_c.id] 
+
+  tags = {
+    Name        = "${var.project_name}-redis-subnet-group"
+    Environment = var.environment
+  }
+}
+
+
+#dms 복제 서브넷 그룹
+resource "aws_dms_replication_subnet_group" "main" {
+  replication_subnet_group_id          = "${var.project_name}-dms-subnet-group"
+  replication_subnet_group_description = "DMS Replication Subnet Group sharing DB private subnets"
+  subnet_ids                           = [aws_subnet.db_a.id, aws_subnet.db_c.id] # DB방에 같이 입주!
+
+  tags = {
+    Name        = "${var.project_name}-dms-subnet-group"
+    Environment = var.environment
+  }
+}
+

@@ -1,11 +1,11 @@
 # CloudFront용 인증서 (us-east-1 필수)
 resource "aws_acm_certificate" "main" {
   provider          = aws.us_east_1
-  domain_name       = "teamkorail.cloud"
+  domain_name       = "team-train.cloud"
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "*.teamkorail.cloud"
+    "*.team-train.cloud"
   ]
 
   tags = {
@@ -29,7 +29,7 @@ resource "aws_acm_certificate_validation" "main" {
 
 # ALB용 인증서 (ap-northeast-2)
 resource "aws_acm_certificate" "alb" {
-  domain_name       = "api.teamkorail.cloud"
+  domain_name       = "api.team-train.cloud"
   validation_method = "DNS"
 
   tags = {

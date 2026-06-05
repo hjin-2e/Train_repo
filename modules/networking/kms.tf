@@ -1,17 +1,17 @@
 # Aurora DB 암호화 키
 resource "aws_kms_key" "aurora" {
   description             = "Aurora DB encryption key"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
+  deletion_window_in_days = 7 #키 삭제 7일 대기
+  enable_key_rotation     = true #1년마다 키 자동 교페
 
   tags = {
-    Name        = "${var.project_name}-aurora-kms"
+    Name        = "${var.project_name}-aurora-kms" 
     Environment = var.environment
   }
 }
 
 resource "aws_kms_alias" "aurora" {
-  name          = "alias/${var.project_name}-aurora"
+  name          = "alias/${var.project_name}-aurora"  #키 이름 지정
   target_key_id = aws_kms_key.aurora.key_id
 }
 

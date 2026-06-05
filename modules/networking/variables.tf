@@ -8,6 +8,12 @@ variable "environment" {
   type        = string
 }
 
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+  default     = "ap-northeast-2"
+}
+
 variable "developer_ips" {
   description = "List of developer IP addresses"
   type        = list(string)
@@ -58,6 +64,7 @@ variable "bastion_public_key_path" {
 variable "public_subnet_ids" {
   description = "List of public subnet IDs"
   type        = list(string)
+  default     = []
   # 앞서 network 모듈에서 만든 public_a, public_c 서브넷 ID가 들어옴
 }
 
@@ -65,4 +72,103 @@ variable "public_subnet_ids" {
 variable "bastion_sg_id" {
   description = "Bastion Security Group ID"
   type        = string
+  default     = "" 
+}
+
+
+#iam + kms 
+variable "aurora_kms_key_arn" {
+  description = "Aurora KMS Key ARN"
+  type        = string
+  default     = ""
+}
+
+variable "eks_oidc_provider_arn" {
+  description = "EKS OIDC Provider ARN"
+  type        = string
+  default     = ""
+}
+
+variable "eks_oidc_provider" {
+  description = "EKS OIDC Provider URL"
+  type        = string
+  default     = ""
+}
+
+# ==================
+# CloudTrail 관련 변수
+# ==================
+variable "cloudtrail_retention_days" {
+  description = "Retention period for CloudTrail logs in days" 
+  type        = number
+  default     = 90
+}
+
+variable "cloudtrail_enable_log_validation" {
+  description = "Whether to enable log file integrity validation for CloudTrail" 
+  type        = bool
+  default     = true
+}
+
+variable "cloudtrail_multi_region" {
+  description = "Whether the CloudTrail is created for multi-region" 
+  default     = true
+}
+
+
+# ==================
+# EKS 관련 변수 (EKS Connection Settings)
+# ==================
+variable "eks_cluster_name" {
+  description = "The name of the EKS cluster"
+  type        = string
+  default     = ""  # Will be provided after EKS cluster is created
+}
+
+variable "eks_cluster_endpoint" {
+  description = "The endpoint URL for the EKS cluster API server"
+  type        = string
+  default     = ""  # Will be provided after EKS cluster is created
+}
+
+variable "eks_cluster_ca" {
+  description = "The base64 encoded certificate authority data for the EKS cluster"
+  type        = string
+  default     = ""  # Will be provided after EKS cluster is created
+}
+
+variable "eks_cluster_token" {
+  description = "The authentication token to access the EKS cluster API"
+  type        = string
+  default     = ""  # Will be provided after EKS cluster is created
+}
+
+# ==================
+# IRSA Pod Role ARN 변수
+# ==================
+variable "booking_pod_role_arn" {
+  description = "IAM Role ARN for the Booking Service Pod"
+  type        = string
+  default     = ""
+}
+
+variable "user_pod_role_arn" {
+  description = "IAM Role ARN for the User Service Pod"
+  type        = string
+  default     = ""
+}
+
+variable "payment_pod_role_arn" {
+  description = "IAM Role ARN for the Payment Service Pod"
+  type        = string
+  default     = ""
+}
+
+# ==================
+# DB & Redis Subnet 변수
+# ==================
+variable "db_subnet_ids" {
+  description = "List of subnet IDs for DB and ElastiCache subnet groups"
+  type        = list(string)
+  default     = []
 }

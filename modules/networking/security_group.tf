@@ -4,7 +4,6 @@ resource "aws_security_group" "alb" {
   description = "ALB Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # 인바운드: HTTP 허용
   ingress {
     from_port   = 80
     to_port     = 80
@@ -13,7 +12,6 @@ resource "aws_security_group" "alb" {
     description = "Allow HTTP"
   }
 
-  # 인바운드: HTTPS 허용
   ingress {
     from_port   = 443
     to_port     = 443
@@ -22,13 +20,12 @@ resource "aws_security_group" "alb" {
     description = "Allow HTTPS"
   }
 
-  # 아웃바운드: EKS로만 허용
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description     = "Allow all outbound to EKS"
+    description = "Allow all outbound to EKS"
   }
 
   tags = {
@@ -43,7 +40,6 @@ resource "aws_security_group" "eks" {
   description = "EKS Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # 인바운드: ALB에서만 허용
   ingress {
     from_port       = 0
     to_port         = 0
@@ -52,16 +48,14 @@ resource "aws_security_group" "eks" {
     description     = "Allow all inbound from ALB"
   }
 
-  # 인바운드: 내부 통신 허용
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
     description = "Allow internal EKS communication"
   }
 
-  # 아웃바운드: 전체 허용
   egress {
     from_port   = 0
     to_port     = 0
@@ -82,7 +76,7 @@ resource "aws_security_group" "aurora" {
   description = "Aurora Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # 인바운드: EKS에서만 허용
+  # EKS 접근 허용
   ingress {
     from_port       = 3306
     to_port         = 3306
@@ -91,7 +85,7 @@ resource "aws_security_group" "aurora" {
     description     = "Allow MySQL from EKS"
   }
 
-  # 인바운드: Bastion에서만 허용
+  # Bastion 접근 허용
   ingress {
     from_port       = 3306
     to_port         = 3306
@@ -100,12 +94,22 @@ resource "aws_security_group" "aurora" {
     description     = "Allow MySQL from Bastion"
   }
 
-  # 아웃바운드는 외부 허용을 막기 위해 cidr 수정했습니다
+  # DMS 접근 허용 
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.dms.id]
+    description     = "Allow MySQL from DMS"
+  }
+
+  # VPC 내부로만 아웃바운드 제한 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["10.0.0.0/16"]
+    description = "Allow outbound within VPC only"
   }
 
   tags = {
@@ -120,7 +124,6 @@ resource "aws_security_group" "redis" {
   description = "Redis Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # 인바운드: EKS에서만 허용
   ingress {
     from_port       = 6379
     to_port         = 6379
@@ -129,12 +132,12 @@ resource "aws_security_group" "redis" {
     description     = "Allow Redis from EKS"
   }
 
-  # 아웃바운드: 없음
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound"
   }
 
   tags = {
@@ -149,7 +152,6 @@ resource "aws_security_group" "bastion" {
   description = "Bastion Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # 인바운드: 개발자 IP만 SSH 허용
   ingress {
     from_port   = 22
     to_port     = 22
@@ -158,16 +160,47 @@ resource "aws_security_group" "bastion" {
     description = "Allow SSH from developer IPs only"
   }
 
-  # 아웃바운드: Aurora, Redis, EKS 접근
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound"
   }
 
   tags = {
     Name        = "${var.project_name}-bastion-sg"
+    Environment = var.environment
+  }
+}
+
+# DMS Security Group
+resource "aws_security_group" "dms" {
+  name        = "${var.project_name}-dms-sg"
+  description = "DMS Security Group for Azure Disaster Recovery Backup"
+  vpc_id      = aws_vpc.main.id
+
+  # DMS 내부 통신 허용 
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+    description = "Allow DMS internal communication"
+  }
+
+  # Aurora + Azure MySQL 아웃바운드
+  # Azure DB IP 확정 후 수정 예정
+  egress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound to Aurora and Azure DR Database"
+  }
+
+  tags = {
+    Name        = "${var.project_name}-dms-sg"
     Environment = var.environment
   }
 }
