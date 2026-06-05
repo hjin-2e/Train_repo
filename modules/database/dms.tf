@@ -1,10 +1,3 @@
-# DMS용 서브넷 그룹
-resource "aws_dms_replication_subnet_group" "dms_subnet" {
-  replication_subnet_group_id          = "trail-dms-subnet-group"
-  replication_subnet_group_description = "DMS Subnet Group"
-  subnet_ids                           = var.dms_subnet_ids
-}
-
 # DMS 복제 인스턴스
 resource "aws_dms_replication_instance" "dms_worker" {
   replication_instance_id    = "trail-dms-instance"
@@ -13,7 +6,7 @@ resource "aws_dms_replication_instance" "dms_worker" {
   publicly_accessible        = false # 퍼블릭 IP (Nat gateway타고 전달해야하기 때문에)
 
   vpc_security_group_ids      = [var.dms_sg_id]
-  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_subnet.id
+  replication_subnet_group_id = var.dms_subnet_group_name
 }
 
 # Source 엔드포인트 (출발지: 우리가 방금 만든 Aurora)

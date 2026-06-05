@@ -3,17 +3,17 @@ variable "vpc_id" {
   description = "우리가 쓸 메인 VPC ID"
   type        = string
 }
-variable "db_subnet_ids" {
-  description = "DB가 숨어있을 프라이빗 서브넷 ID 리스트"
-  type        = list(string)
+variable "db_subnet_group_name" {
+  type        = string
+  description = "네트워크 모듈에서 생성한 RDS 서브넷 그룹 이름"
 }
-variable "private_subnet_ids" {
-  description = "Redis가 숨어있을 프라이빗 서브넷 ID 리스트"
-  type        = list(string)
+variable "redis_subnet_group_name" {
+  type        = string
+  description = "네트워크 모듈에서 생성한 Redis 서브넷 그룹 이름"
 }
-variable "dms_subnet_ids" {
-  description = "DMS 복제 인스턴스가 위치할 프라이빗 서브넷 ID 리스트"
-  type        = list(string)
+variable "dms_subnet_group_name" {
+  type        = string
+  description = "네트워크 모듈에서 생성한 DMS 서브넷 그룹 ID"
 }
 variable "dms_sg_id" {
   description = "네트워크 모듈에서 넘겨줄 DMS 보안그룹 ID"

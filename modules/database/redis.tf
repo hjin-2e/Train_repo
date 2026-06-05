@@ -1,10 +1,4 @@
-# Redis 프라이빗 서브넷 그룹
-resource "aws_elasticache_subnet_group" "redis_subnet" {
-  name       = "trail-redis-subnet-group"
-  subnet_ids = var.private_subnet_ids
-}
-
-# 3. Redis 복제 그룹 (실제 서버 생성)
+# Redis 복제 그룹 (실제 서버 생성)
 resource "aws_elasticache_replication_group" "redis" {
   replication_group_id = "trail-redis-cluster"
   description          = "Redis cluster for trail Ticketing PoC"
@@ -15,7 +9,7 @@ resource "aws_elasticache_replication_group" "redis" {
   port           = 6379
 
   # 네트워크 및 보안 연결
-  subnet_group_name          = aws_elasticache_subnet_group.redis_subnet.name
+  subnet_group_name          = var.redis_subnet_group_name
   security_group_ids         = [var.redis_sg_id]
   at_rest_encryption_enabled = true
 

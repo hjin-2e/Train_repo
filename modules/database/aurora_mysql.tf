@@ -1,10 +1,3 @@
-# DB용 서브넷 그룹 (프라이빗 망)
-resource "aws_db_subnet_group" "aurora_subnet" {
-  name       = "trail-aurora-subnet-group"
-  subnet_ids = var.db_subnet_ids
-  tags       = { Name = "trail-aurora-subnet-group" }
-}
-
 # 파라미터 그룹 생성
 resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
   name        = "trail-aurora-cluster-pg"
@@ -49,7 +42,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
 
   storage_type = "aurora-iopt1"
 
-  db_subnet_group_name   = aws_db_subnet_group.aurora_subnet.name
+  db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = [var.aurora_sg_id]
 
   # 파라미터 그룹을 클러스터에 연결
