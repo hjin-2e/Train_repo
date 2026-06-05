@@ -1,0 +1,23 @@
+# 뒷부분 DB 적재 Worker (3~5대 고정)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-db-worker
+  namespace: default
+spec:
+  replicas: 3 # 3대 고정 (조율에 따라 3~5로 지정)
+  selector:
+    matchLabels:
+      app: train-worker
+  template:
+    metadata:
+      labels:
+        app: train-worker
+    spec:
+      containers:
+      - name: worker-container
+        image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-worker:latest
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"

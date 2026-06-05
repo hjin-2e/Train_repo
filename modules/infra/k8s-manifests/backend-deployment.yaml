@@ -1,0 +1,45 @@
+# 백엔드 API 배포 및 서비스
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train-backend
+  namespace: default
+  labels:
+    app: train-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: train-backend
+  template:
+    metadata:
+      labels:
+        app: train-backend
+    spec:
+      containers:
+      - name: backend-container
+        image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-backend:latest
+        ports:
+        - containerPort: 8080
+        # HPA 연동을 위해 필요한 부분
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: train-backend-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: train-backend
