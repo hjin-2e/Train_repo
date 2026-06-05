@@ -19,7 +19,7 @@ resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
   parameter {
     name         = "lower_case_table_names"
     value        = "1"
-    apply_method = "pending-reboot" # 이 설정은 DB 재부팅이 필요합니다 
+    apply_method = "pending-reboot"
   }
   parameter {
     name  = "character_set_server"
