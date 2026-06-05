@@ -60,21 +60,6 @@ variable "bastion_public_key_path" {
   default     = "~/.ssh/id_rsa.pub"  # 로컬 PC의 공개키 기본 경로
 }
 
-# Bastion을 퍼블릭 서브넷에 올리기 var.public_subnet_ids[0]로 설정해놨음 
-variable "public_subnet_ids" {
-  description = "List of public subnet IDs"
-  type        = list(string)
-  default     = []
-  # 앞서 network 모듈에서 만든 public_a, public_c 서브넷 ID가 들어옴
-}
-
-#  Bastion에 적용할 보안그룹 ID
-variable "bastion_sg_id" {
-  description = "Bastion Security Group ID"
-  type        = string
-  default     = "" 
-}
-
 
 #iam + kms 
 variable "aurora_kms_key_arn" {

@@ -1,4 +1,4 @@
-# SSH 키 페어 생성
+# SSH 키 페어
 resource "aws_key_pair" "bastion" {
   key_name   = "${var.project_name}-bastion-key"
   public_key = file(var.bastion_public_key_path)
@@ -11,20 +11,20 @@ resource "aws_key_pair" "bastion" {
 
 # Bastion Server EC2
 resource "aws_instance" "bastion" {
-  ami                    = "ami-0aef7d1237f8a3805"  # Amazon Linux 2023 (서울)
-  instance_type          = "t3.micro"
-  subnet_id              = var.public_subnet_ids[0] # Public Subnet AZ-a
-  key_name               = aws_key_pair.bastion.key_name
-  vpc_security_group_ids = [var.bastion_sg_id]
+  ami                         = "ami-0c9c942bd7bf113a2"
+  instance_type               = "t2.micro"
 
-  # 퍼블릭 IP 자동 할당
-  associate_public_ip_address = false
+  # 변수 대신 직접 참조 
+  subnet_id                   = aws_subnet.public_a.id
+  vpc_security_group_ids      = [aws_security_group.bastion.id]
 
-  # 기본 설정 스크립트
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.bastion.key_name
+
   user_data = <<-EOF
     #!/bin/bash
-    dnf update -y
-    dnf install -y mariadb105  # Aurora 접속용 MySQL 클라이언트
+    yum update -y
+    yum install -y mysql
   EOF
 
   tags = {
@@ -33,7 +33,7 @@ resource "aws_instance" "bastion" {
   }
 }
 
-# Bastion EIP (고정 IP)
+# Bastion EIP
 resource "aws_eip" "bastion" {
   instance = aws_instance.bastion.id
   domain   = "vpc"

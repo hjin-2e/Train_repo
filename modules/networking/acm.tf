@@ -18,12 +18,12 @@ resource "aws_acm_certificate" "main" {
   }
 }
 
-# 인증서 검증 완료 대기
+# CloudFront 인증서 검증 완료 대기
 resource "aws_acm_certificate_validation" "main" {
   provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [
-    for record in aws_route53_record.acm_validation : record.fqdn
+    for record in aws_route53_record.acm_validation_main : record.fqdn
   ]
 }
 
@@ -40,4 +40,12 @@ resource "aws_acm_certificate" "alb" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# ALB 인증서 검증 완료 대기 
+resource "aws_acm_certificate_validation" "alb" {
+  certificate_arn         = aws_acm_certificate.alb.arn
+  validation_record_fqdns = [
+    for record in aws_route53_record.acm_validation_alb : record.fqdn
+  ]
 }
