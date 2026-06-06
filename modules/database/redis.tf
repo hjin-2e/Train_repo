@@ -14,11 +14,13 @@ resource "aws_elasticache_replication_group" "redis" {
   at_rest_encryption_enabled = true
 
   # 구동 테스트용 간단 아키텍처
-  parameter_group_name = "default.redis7"
+  parameter_group_name = "default.redis7.cluster.on"
 
   node_type                  = "cache.t4g.micro"
   automatic_failover_enabled = false
-  num_cache_clusters         = 1
+  
+  num_node_groups         = 2  # 샤드 2개
+  replicas_per_node_group = 0  # 샤드 복제본 0개
 
   # 실제 아키텍쳐 세팅 (오버스펙)
   # parameter_group_name = "default.redis7.cluster.on"
@@ -26,8 +28,6 @@ resource "aws_elasticache_replication_group" "redis" {
   # node_type                  = "cache.r7g.large"
   # automatic_failover_enabled = true
 
-  # cluster_mode {
-  #   replicas_per_node_group = 2  # 샤드당 복제본 2개
-  #   num_node_groups         = 3  # 샤드 3개 (총 9대 생성)
-  # }
+  # replicas_per_node_group = 2  # 샤드당 복제본 2개
+  # num_node_groups         = 3  # 샤드 3개 (총 9대 생성)
 }
