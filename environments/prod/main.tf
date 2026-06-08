@@ -5,8 +5,8 @@ provider "aws" {
   version = ">= 5.50, < 6.0"
 }
 
-module "network" {
-  source       = "../../modules/network"
+module "networking" {
+  source       = "../../modules/networking"
   project_name = var.project_name
   environment  = var.environment
 }
@@ -17,5 +17,11 @@ module "eks-cluster" {
   environment   = var.environment
   developer_ips = var.developer_ips
 
-  depends_on = [module.network]
+  depends_on = [module.networking]
+}
+
+module "cognito" {
+  source       = "../../modules/infra/cognito"
+  project_name = var.project_name
+  environment  = var.environment
 }

@@ -46,13 +46,15 @@ module "eks-cluster" {
     fixed_node_group = {
       ami_type       = "AL2023_x86_64_STANDARD"
       instance_types = ["t3.medium"] 
-
-      # Cluster Autoscaler(CA) 자동 확장 연동 범위 설정
       min_size     = 2  
       max_size     = 8 
       desired_size = 3  
-
       vpc_security_group_ids = [data.aws_security_group.eks.id]
+
+      # Autoscaler 권한 부여
+      iam_role_additional_policies = {
+        AmazonEKSClusterAutoscalerPolicy = aws_iam_policy.eks_cluster_autoscaler.arn
+      }
     }
   }
 
