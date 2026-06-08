@@ -22,12 +22,12 @@ module "cognito" {
 
 # module "database" {
 #   source                  = "../../modules/database"
-#   db_subnet_group_name    = module.network.db_subnet_group_name
-#   redis_subnet_group_name = module.network.redis_subnet_group_name
-#   dms_subnet_group_name   = module.network.dms_replication_subnet_group_id
-#   dms_sg_id               = module.network.dms_sg_id
-#   aurora_sg_id            = module.network.aurora_sg_id
-#   redis_sg_id             = module.network.redis_sg_id
+#   db_subnet_group_name    = module.networking.db_subnet_group_name
+#   redis_subnet_group_name = module.networking.redis_subnet_group_name
+#   dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
+#   dms_sg_id               = module.networking.dms_sg_id
+#   aurora_sg_id            = module.networking.aurora_sg_id
+#   redis_sg_id             = module.networking.redis_sg_id
   
 #   db_admin_user           = var.db_admin_user
 #   db_admin_password       = var.db_admin_password

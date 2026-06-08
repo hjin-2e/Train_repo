@@ -12,7 +12,7 @@ module "networking" {
 }
 
 module "eks-cluster" {
-  source        = "../../infra"
+  source        = "../../modules/infra/eks-cluster"
   project_name  = var.project_name
   environment   = var.environment
   developer_ips = var.developer_ips

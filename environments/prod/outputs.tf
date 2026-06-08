@@ -7,10 +7,10 @@ output "eks_kubeconfig_command" {
 # Ingress 설정에 필요한 ALB 보안그룹 ID
 output "alb_sg_id" {
   description = "Security Group ID for ALB"
-  value       = module.network.alb_sg_id
+  value       = module.networking.alb_sg_id
 }
 # Ingress 설정에 필요한 ALB ACM 인증서 ARN
 output "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB"
-  value       = module.network.acm_alb_certificate_arn
+  value       = module.networking.acm_alb_certificate_arn
 }
