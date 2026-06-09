@@ -34,3 +34,19 @@ module "cognito" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+module "database" {
+  source                  = "../../modules/database"
+  db_subnet_group_name    = module.networking.db_subnet_group_name
+  redis_subnet_group_name = module.networking.redis_subnet_group_name
+  dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
+  dms_sg_id               = module.networking.dms_sg_id
+  aurora_sg_id            = module.networking.aurora_sg_id
+  redis_sg_id             = module.networking.redis_sg_id
+
+  db_admin_user     = var.db_admin_user
+  db_admin_password = var.db_admin_password
+  azure_db_endpoint = var.azure_db_endpoint
+  azure_db_user     = var.azure_db_user
+  azure_db_password = var.azure_db_password
+}
