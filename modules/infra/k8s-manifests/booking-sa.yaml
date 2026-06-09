@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: booking-sa
-  namespace: default 
-  annotations:
-    # booking-pod-role의 ARN을 입력
-    eks.amazonaws.com/role-arn: arn:aws:iam::<본인의_AWS_ACCOUNT_ID>:role/<프로젝트명>-booking-pod-role
