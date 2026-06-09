@@ -21,6 +21,19 @@ resource "aws_route53_zone" "main" {
 #   }
 # }
 
+# www 도메인 → CloudFront (CloudFront 배포 완료 후 주석 해제)
+# resource "aws_route53_record" "www" {
+#   zone_id = aws_route53_zone.main.zone_id  
+#   name    = "www.team-train.cloud"
+#   type    = "A"
+#
+#   alias {
+#     name                   = aws_cloudfront_distribution.main.domain_name
+#     zone_id                = aws_cloudfront_distribution.main.hosted_zone_id
+#     evaluate_target_health = false
+#   }
+# }
+
 # # api 서브도메인 → ALB
 # resource "aws_route53_record" "api" {
 #   zone_id = aws_route53_zone.main.zone_id
