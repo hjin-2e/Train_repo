@@ -97,6 +97,7 @@ variable "cloudtrail_enable_log_validation" {
 
 variable "cloudtrail_multi_region" {
   description = "Whether the CloudTrail is created for multi-region" 
+  type        = bool
   default     = true
 }
 
