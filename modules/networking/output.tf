@@ -66,6 +66,11 @@ output "bastion_sg_id" {
   value       = aws_security_group.bastion.id
 }
 
+output "bastion_ssm_role_arn" {
+  description = "IAM Role ARN for Bastion SSM"
+  value       = aws_iam_role.bastion_ssm.arn
+}
+
 output "dms_sg_id" {
   description = "Security Group ID for DMS"
   value       = aws_security_group.dms.id

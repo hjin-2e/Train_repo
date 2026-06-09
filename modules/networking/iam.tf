@@ -136,6 +136,44 @@ resource "aws_iam_policy" "elasticache_access" {
   })
 }
 
+
+
+
+# ==================
+# Bastion SSM Role
+# ==================
+resource "aws_iam_role" "bastion_ssm" {
+  name = "${var.project_name}-bastion-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name        = "${var.project_name}-bastion-ssm-role"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.bastion_ssm.name
+}
+
+resource "aws_iam_instance_profile" "bastion_ssm" {
+  name = "${var.project_name}-bastion-profile"
+  role = aws_iam_role.bastion_ssm.name
+}
+
+
+
 # ==================
 # IRSA - Booking Pod
 # ==================

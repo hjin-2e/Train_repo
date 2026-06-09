@@ -14,3 +14,24 @@ output "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB"
   value       = module.networking.acm_alb_certificate_arn
 }
+
+
+
+# ==================
+# Bastion SSM outputs
+# ==================
+output "bastion_instance_id" {
+  description = "Bastion Instance ID for SSM connection"
+  value       = module.networking.bastion_instance_id
+}
+
+output "bastion_public_ip" {
+  description = "Bastion Public IP"
+  value       = module.networking.bastion_public_ip
+}
+
+# SSM 접속 명령어
+output "bastion_ssm_connect_command" {
+  description = "Command to connect Bastion via SSM"
+  value       = "aws ssm start-session --target ${module.networking.bastion_instance_id} --region ap-northeast-2"
+}

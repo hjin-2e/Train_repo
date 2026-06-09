@@ -53,13 +53,6 @@ variable "alb_zone_id" {
 # }
 
 
-# SSH 접속할 때 사용할 공개키 파일 경로
-variable "bastion_public_key_path" {
-  description = "Path to the Bastion SSH public key file"
-  type        = string
-  default     = "~/.ssh/id_rsa.pub"  # 로컬 PC의 공개키 기본 경로
-}
-
 
 #iam + kms 
 variable "aurora_kms_key_arn" {

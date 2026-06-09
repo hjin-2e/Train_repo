@@ -9,4 +9,3 @@ cloudfront_zone_id     = "Z2FDTNDATAQYW2"
 alb_dns_name           = "dummy-alb.ap-northeast-2.elb.amazonaws.com"
 alb_zone_id            = "Z3POXM214Y7URM"
 
-bastion_public_key_path = "C:/Users/USER/.ssh/id_rsa.pub"

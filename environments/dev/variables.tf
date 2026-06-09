@@ -46,11 +46,6 @@ variable "alb_zone_id" {
   default     = ""
 }
 
-# 공개키 값 경로를 절대경로로 지정 시 사용
-variable "bastion_public_key_path" {
-  description = "Path to the SSH public key for Bastion server"
-  type        = string
-}
 
 
 # DB 관련 변수 선언

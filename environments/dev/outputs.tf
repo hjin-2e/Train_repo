@@ -15,9 +15,3 @@ output "acm_alb_certificate_arn" {
   value       = module.networking.acm_alb_certificate_arn
 }
 
-# 키 페어
-# output "bastion_private_key" {
-#   description = "The private key data for Bastion host ssh access"
-#   value       = module.networking.bastion_private_key
-#   sensitive   = true
-# }

@@ -25,17 +25,6 @@ developer_ips = [
 # alb_zone_id            = ""
 # aurora_endpoint        = ""
 
-# ==================
-# Bastion 설정
-# ==================
-bastion_public_key_path = "~/.ssh/team-train-bastion.pub"
-
-
-# 키 생성
-# mkdir -p ~/.ssh
-# ssh-keygen -t rsa -b 4096 -f ~/.ssh/team-train-bastion.pub -N ""
-
-
 
 
 # ==================
