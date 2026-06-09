@@ -62,6 +62,5 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   engine_version     = aws_rds_cluster.aurora_cluster.engine_version
 
   performance_insights_enabled    = true
-  performance_insights_kms_key_id = "alias/aws/rds" # 성능 데이터 암호화 기본 키
   monitoring_interval             = 60
 }

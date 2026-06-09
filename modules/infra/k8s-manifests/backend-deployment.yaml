@@ -21,6 +21,11 @@ spec:
         image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-backend:latest
         ports:
         - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: train-config
+        - secretRef:
+            name: train-secret
         # HPA 연동을 위해 필요한 부분
         resources:
           requests:

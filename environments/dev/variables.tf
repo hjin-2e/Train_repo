@@ -47,29 +47,29 @@ variable "alb_zone_id" {
 }
 
 
-
 # DB 관련 변수 선언
-# variable "db_admin_user" {
-#   description = "admin user data"
-#   type        = string
-# }
+variable "db_admin_user" {
+  description = "admin user data"
+  type        = string
+}
 
-# variable "db_admin_password" {
-#   description = "admin user password"
-#   type        = string
-# }
+variable "db_admin_password" {
+  description = "admin user password"
+  type        = string
+}
 
-# variable "azure_db_endpoint" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+variable "azure_db_endpoint" {
+  description = "azure database endpoint"
+  type        = string
+}
 
-# variable "azure_db_user" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+variable "azure_db_user" {
+  description = "azure database user"
+  type        = string
+}
 
-# variable "azure_db_password" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+variable "azure_db_password" {
+  description = "azure database password"
+  type        = string
+  sensitive   = true
+}
