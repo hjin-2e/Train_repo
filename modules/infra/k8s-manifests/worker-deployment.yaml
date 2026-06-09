@@ -5,7 +5,7 @@ metadata:
   name: train-db-worker
   namespace: default
 spec:
-  replicas: 3 # 3대 고정 (조율에 따라 3~5로 지정)
+  replicas: 3
   selector:
     matchLabels:
       app: train-worker
@@ -14,6 +14,7 @@ spec:
       labels:
         app: train-worker
     spec:
+      serviceAccountName: booking-sa 
       containers:
       - name: worker-container
         image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-worker:latest
@@ -26,3 +27,6 @@ spec:
           requests:
             cpu: "200m"
             memory: "256Mi"
+          limits: 
+            cpu: "500m"
+            memory: "512Mi"

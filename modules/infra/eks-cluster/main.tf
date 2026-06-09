@@ -1,27 +1,12 @@
 # ==============================================================================
-# 1. VPC 및 서브넷 정보 동적 참조
+# 1. AWS 계정 정보 및 데이터 참조
 # ==============================================================================
+data "aws_caller_identity" "current" {}
+
+# 필요 시 주석 풀고 사용
 # data "aws_vpc" "selected" {
 #   tags = {
 #     Name = "${var.project_name}-vpc"
-#   }
-# }
-
-# data "aws_subnets" "private" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.selected.id]
-#   }
-#   filter {
-#     name   = "tag:Name"
-#     values = ["${var.project_name}-private-a", "${var.project_name}-private-c"]
-#   }
-# }
-
-# data "aws_security_group" "eks" {
-#   vpc_id = data.aws_vpc.selected.id
-#   tags = {
-#     Name = "${var.project_name}-eks-sg"
 #   }
 # }
 
@@ -44,11 +29,12 @@ module "eks-cluster" {
   # 클러스터 컨트롤 플레인 로깅 활성화
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  # AWS 콘솔 경고창 해결을 위한 Access Entry 역할 추가
+  # Access Entry 설정 하드코딩 제거
   access_entries = {
-    hajin_console_admin = {
+    admin_access = {
       kubernetes_groups = []
-      principal_arn     = "arn:aws:iam::682729125668:root" 
+      # 여기서 동적으로 현재 계정의 ID를 가져와서 사용
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" 
       
       policy_associations = {
         admin_policy = {
@@ -61,16 +47,16 @@ module "eks-cluster" {
     }
   }
 
-  # HPA + Cluster Autoscaler(CA) 요구사항을 반영한 노드 그룹 세팅
+  # HPA + Cluster Autoscaler(CA) 요구사항 반영
   eks_managed_node_groups = {
     fixed_node_group = {
       ami_type       = "AL2023_x86_64_STANDARD"
       instance_types = ["t3.medium"] 
-      min_size     = 2  
-      max_size     = 8 
-      desired_size = 3  
+      min_size       = 2  
+      max_size       = 8 
+      desired_size   = 3  
 
-      # eksctl 기반 노드가 가질 필수 IAM 관리형 정책 추가 (ECR, CNI, CloudWatch)
+      # 노드 역할 정책
       iam_role_additional_policies = {
         AmazonEKSClusterAutoscalerPolicy    = aws_iam_policy.eks_cluster_autoscaler.arn
         AmazonEC2ContainerRegistryPowerUser = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
