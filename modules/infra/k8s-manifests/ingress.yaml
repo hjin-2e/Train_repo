@@ -19,7 +19,7 @@ metadata:
     # 3. 테라폼이 생성한 ALB 전용 ACM SSL 인증서 ARN 주입
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:YOUR_ACCOUNT_ID:certificate/YOUR_ACM_ID"
     
-    # 4. 네트워크 담당자가 설계한 ALB 전용 보안 그룹 연동
+    # 4. alb_sg_id output 값
     alb.ingress.kubernetes.io/security-groups: "sg-xxxxxxxxxxxx"
 
 spec:

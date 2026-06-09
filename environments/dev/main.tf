@@ -35,6 +35,18 @@ module "cognito" {
   environment  = var.environment
 }
 
+module "alb_controller" {
+  source = "../../modules/infra/alb-controller"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  aws_region        = var.aws_region
+  vpc_id            = module.networking.vpc_id
+
+  cluster_name      = module.eks-cluster.cluster_name
+  oidc_provider_arn = module.eks-cluster.oidc_provider_arn
+}
+
 module "database" {
   source                  = "../../modules/database"
   db_subnet_group_name    = module.networking.db_subnet_group_name
@@ -50,3 +62,5 @@ module "database" {
   azure_db_user     = var.azure_db_user
   azure_db_password = var.azure_db_password
 }
+
+

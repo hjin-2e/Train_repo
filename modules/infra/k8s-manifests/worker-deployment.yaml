@@ -14,7 +14,7 @@ spec:
       labels:
         app: train-worker
     spec:
-      serviceAccountName: booking-sa 
+      serviceAccountName: train-worker-sa
       containers:
       - name: worker-container
         image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-worker:latest
