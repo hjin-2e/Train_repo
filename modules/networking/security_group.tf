@@ -149,23 +149,25 @@ resource "aws_security_group" "redis" {
 # Bastion Security Group
 resource "aws_security_group" "bastion" {
   name        = "${var.project_name}-bastion-sg"
-  description = "Bastion Security Group"
+  description = "Bastion Security Group (SSM only, no SSH)"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
+  # SSM Agent → AWS 엔드포인트 통신
+  egress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = var.developer_ips
-    description = "Allow SSH from developer IPs only"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS outbound for SSM Agent"
   }
 
+  # Bastion → Aurora DB 접근 (점프 서버 용도)
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+    description = "Allow MySQL outbound to Aurora in VPC"
   }
 
   tags = {
