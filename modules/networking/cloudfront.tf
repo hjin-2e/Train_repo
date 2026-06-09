@@ -55,9 +55,6 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   aliases             = ["team-train.cloud", "www.team-train.cloud"]
-#도메인 주소 수정 필요
-
-
 
   # 기본 캐시 동작 (프론트엔드)
   default_cache_behavior {
@@ -74,8 +71,8 @@ resource "aws_cloudfront_distribution" "main" {
     }
 
     min_ttl     = 0
-    default_ttl = 3600   # 1시간 캐싱
-    max_ttl     = 86400  # 최대 24시간
+    default_ttl = 3600
+    max_ttl     = 86400
   }
 
   # API 경로 캐시 동작 (백엔드)
@@ -88,14 +85,14 @@ resource "aws_cloudfront_distribution" "main" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Authorization"]  # Cognito JWT 토큰 전달
+      headers      = ["Authorization"]
       cookies {
         forward = "all"
       }
     }
 
     min_ttl     = 0
-    default_ttl = 0  # API는 캐싱 안함
+    default_ttl = 0
     max_ttl     = 0
   }
 
@@ -127,6 +124,11 @@ resource "aws_cloudfront_distribution" "main" {
       restriction_type = "none"
     }
   }
+
+  # ACM 인증서 검증 완료 후 생성 ✅
+  depends_on = [
+    aws_acm_certificate_validation.main
+  ]
 
   tags = {
     Name        = "${var.project_name}-cf"

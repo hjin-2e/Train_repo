@@ -67,14 +67,15 @@ resource "aws_route53_record" "acm_validation_main" {
     }
   }
 
-  zone_id = aws_route53_zone.main.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = 60
-  records = [each.value.record]
+  allow_overwrite = true
+  zone_id         = aws_route53_zone.main.zone_id
+  name            = each.value.name
+  type            = each.value.type
+  ttl             = 60
+  records         = [each.value.record]
 }
 
-# ALB ACM 인증서 검증 레코드 추가
+# ALB ACM 인증서 검증 레코드
 resource "aws_route53_record" "acm_validation_alb" {
   for_each = {
     for dvo in aws_acm_certificate.alb.domain_validation_options :
@@ -85,9 +86,10 @@ resource "aws_route53_record" "acm_validation_alb" {
     }
   }
 
-  zone_id = aws_route53_zone.main.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = 60
-  records = [each.value.record]
+  allow_overwrite = true
+  zone_id         = aws_route53_zone.main.zone_id
+  name            = each.value.name
+  type            = each.value.type
+  ttl             = 60
+  records         = [each.value.record]
 }

@@ -34,8 +34,7 @@ developer_ips = [
 eks_oidc_provider_arn = ""
 eks_oidc_provider     = ""
 
-# Aurora KMS 생성 후 채워넣기
-aurora_kms_key_arn = ""
+
 
 # ==================
 # CloudTrail 설정

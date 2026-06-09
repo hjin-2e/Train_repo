@@ -44,22 +44,29 @@ variable "alb_zone_id" {
   default     = ""
 }
 
-#엔드포인트 db 활성화되면 주석 해제 하기
 
-# variable "aurora_endpoint" {
-#   description = "Aurora cluster endpoint"
-#   type        = string
-#   default     = ""
-# }
-
-
-
-#iam + kms 
-variable "aurora_kms_key_arn" {
-  description = "Aurora KMS Key ARN"
+variable "db_admin_user" {
+  description = "Database admin username"
   type        = string
   default     = ""
 }
+
+variable "db_admin_password" {
+  description = "Database admin password"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "aurora_endpoint" {
+  description = "Aurora cluster endpoint"
+  type        = string
+  default     = ""
+}
+
+
+
+
 
 variable "eks_oidc_provider_arn" {
   description = "EKS OIDC Provider ARN"

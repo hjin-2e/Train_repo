@@ -95,7 +95,7 @@ resource "aws_iam_policy" "aurora_access" {
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
-        Resource = var.aurora_kms_key_arn
+        Resource = aws_kms_key.aurora.arn
       }
     ]
   })
@@ -135,6 +135,43 @@ resource "aws_iam_policy" "elasticache_access" {
     }]
   })
 }
+
+# ==================
+# Secrets manager
+# ==================
+
+
+# Secrets Manager 접근 정책
+resource "aws_iam_policy" "secrets_access" {
+  name = "${var.project_name}-secrets-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = aws_secretsmanager_secret.db.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = aws_kms_key.aurora.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "booking_secrets" {
+  policy_arn = aws_iam_policy.secrets_access.arn
+  role       = aws_iam_role.booking_pod.name
+}
+
 
 
 
@@ -426,7 +463,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
-        Resource = var.aurora_kms_key_arn
+        Resource = aws_kms_key.aurora.arn
       },
       # VPC 접근
       {
@@ -464,6 +501,39 @@ resource "aws_iam_role" "dms" {
     Environment = var.environment
   }
 }
+
+
+# DMS가 RDS 접근하기 위해 추가..
+resource "aws_iam_role_policy" "dms_rds_policy" {
+  name = "${var.project_name}-dms-rds-policy"
+  role = aws_iam_role.dms.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBClusters",
+          "rds:DescribeDBSubnetGroups"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = aws_kms_key.aurora.arn
+      }
+    ]
+  })
+}
+
+
+
 
 # DMS VPC 정책
 resource "aws_iam_role_policy_attachment" "dms_vpc_policy" {

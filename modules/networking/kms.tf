@@ -1,17 +1,17 @@
 # Aurora DB 암호화 키
 resource "aws_kms_key" "aurora" {
   description             = "Aurora DB encryption key"
-  deletion_window_in_days = 7 #키 삭제 7일 대기
-  enable_key_rotation     = true #1년마다 키 자동 교페
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
 
   tags = {
-    Name        = "${var.project_name}-aurora-kms" 
+    Name        = "${var.project_name}-aurora-kms"
     Environment = var.environment
   }
 }
 
 resource "aws_kms_alias" "aurora" {
-  name          = "alias/${var.project_name}-aurora"  #키 이름 지정
+  name          = "alias/${var.project_name}-aurora"
   target_key_id = aws_kms_key.aurora.key_id
 }
 
@@ -47,4 +47,28 @@ resource "aws_kms_key" "redis" {
 resource "aws_kms_alias" "redis" {
   name          = "alias/${var.project_name}-redis"
   target_key_id = aws_kms_key.redis.key_id
+}
+
+# ==================
+# Secrets Manager
+# ==================
+resource "aws_secretsmanager_secret" "db" {
+  name       = "${var.project_name}-db-secret"
+  kms_key_id = aws_kms_key.aurora.arn
+
+  tags = {
+    Name        = "${var.project_name}-db-secret"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db" {
+  secret_id = aws_secretsmanager_secret.db.id
+
+  secret_string = jsonencode({
+    DB_USER     = var.db_admin_user
+    DB_PASSWORD = var.db_admin_password
+    DB_HOST     = var.aurora_endpoint
+    DB_NAME     = "trail_db"
+  })
 }

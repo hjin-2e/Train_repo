@@ -200,6 +200,17 @@ output "payment_pod_role_arn" {
   value       = aws_iam_role.payment_pod.arn
 }
 
+
+# ==================
+# Secrets Manager
+# ==================
+
+output "db_secret_arn" {
+  description = "ARN of the DB Secrets Manager secret"
+  value       = aws_secretsmanager_secret.db.arn
+}
+
+
 # ==================
 # Component IAM Roles
 # ==================

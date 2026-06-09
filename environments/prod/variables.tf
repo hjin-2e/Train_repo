@@ -5,7 +5,7 @@ variable "aws_region" {
 }
 
 variable "project_name" {
-  description = "project name"
+  description = "Project name"
   type        = string
   default     = "team-train"
 }
@@ -13,7 +13,7 @@ variable "project_name" {
 variable "environment" {
   description = "Target deployment environment"
   type        = string
-  default     = "dev"
+  default     = "prod"  
 }
 
 variable "developer_ips" {
@@ -46,29 +46,42 @@ variable "alb_zone_id" {
   default     = ""
 }
 
+# DB 관련
+variable "db_admin_user" {
+  description = "Database admin username"
+  type        = string
+  default     = "admin"  
+}
 
-# DB 관련 변수 선언
-# variable "db_admin_user" {
-#   description = "admin user data"
-#   type        = string
-# }
+variable "db_admin_password" {
+  description = "Database admin password"
+  type        = string
+  sensitive   = true
+  default     = ""  
+}
 
-# variable "db_admin_password" {
-#   description = "admin user password"
-#   type        = string
-# }
+variable "aurora_endpoint" {
+  description = "Aurora cluster endpoint"
+  type        = string
+  default     = ""
+}
 
-# variable "azure_db_endpoint" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+# Azure 관련
+variable "azure_db_endpoint" {
+  description = "Azure database endpoint"
+  type        = string
+  default     = ""  
+}
 
-# variable "azure_db_user" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+variable "azure_db_user" {
+  description = "Azure database username"
+  type        = string
+  default     = ""  
+}
 
-# variable "azure_db_password" {
-#   description = "azure database endpoint"
-#   type        = string
-# }
+variable "azure_db_password" {
+  description = "Azure database password"
+  type        = string
+  sensitive   = true
+  default     = ""  
+}
