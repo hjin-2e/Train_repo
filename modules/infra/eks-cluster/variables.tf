@@ -14,3 +14,13 @@ variable "developer_ips" {
   description = "Developer IP addresses"
   type        = list(string)
 }
+
+variable "vpc_id" {
+  description = "VPC ID from networking module"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "List of Private Subnet IDs for EKS"
+  type        = list(string)
+}

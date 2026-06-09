@@ -1,29 +1,29 @@
 # ==============================================================================
 # 1. VPC 및 서브넷 정보 동적 참조
 # ==============================================================================
-data "aws_vpc" "selected" {
-  tags = {
-    Name = "${var.project_name}-vpc"
-  }
-}
+# data "aws_vpc" "selected" {
+#   tags = {
+#     Name = "${var.project_name}-vpc"
+#   }
+# }
 
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
-  }
-  filter {
-    name   = "tag:Name"
-    values = ["${var.project_name}-private-a", "${var.project_name}-private-c"]
-  }
-}
+# data "aws_subnets" "private" {
+#   filter {
+#     name   = "vpc-id"
+#     values = [data.aws_vpc.selected.id]
+#   }
+#   filter {
+#     name   = "tag:Name"
+#     values = ["${var.project_name}-private-a", "${var.project_name}-private-c"]
+#   }
+# }
 
-data "aws_security_group" "eks" {
-  vpc_id = data.aws_vpc.selected.id
-  tags = {
-    Name = "${var.project_name}-eks-sg"
-  }
-}
+# data "aws_security_group" "eks" {
+#   vpc_id = data.aws_vpc.selected.id
+#   tags = {
+#     Name = "${var.project_name}-eks-sg"
+#   }
+# }
 
 # ==============================================================================
 # 2. AWS EKS 클러스터 빌드
@@ -33,13 +33,33 @@ module "eks-cluster" {
   version = "~> 20.0"
 
   cluster_name    = "${var.project_name}-${var.environment}-eks"
-  cluster_version = "1.34"
+  cluster_version = "1.30"
 
-  vpc_id     = data.aws_vpc.selected.id
-  subnet_ids = data.aws_subnets.private.ids
+  vpc_id     = var.vpc_id
+  subnet_ids = var.subnet_ids
 
-  # 조작 및 관리를 위해 현재 테라폼을 실행하는 IAM Identity에 관리자 권한 부여
+  # IAM Identity에 관리자 권한 부여
   enable_cluster_creator_admin_permissions = true
+
+  # 클러스터 컨트롤 플레인 로깅 활성화
+  cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
+  # AWS 콘솔 경고창 해결을 위한 Access Entry 역할 추가
+  access_entries = {
+    hajin_console_admin = {
+      kubernetes_groups = []
+      principal_arn     = "arn:aws:iam::682729125668:root" 
+      
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
 
   # HPA + Cluster Autoscaler(CA) 요구사항을 반영한 노드 그룹 세팅
   eks_managed_node_groups = {
@@ -49,11 +69,18 @@ module "eks-cluster" {
       min_size     = 2  
       max_size     = 8 
       desired_size = 3  
-      vpc_security_group_ids = [data.aws_security_group.eks.id]
 
-      # Autoscaler 권한 부여
+      # eksctl 기반 노드가 가질 필수 IAM 관리형 정책 추가 (ECR, CNI, CloudWatch)
       iam_role_additional_policies = {
-        AmazonEKSClusterAutoscalerPolicy = aws_iam_policy.eks_cluster_autoscaler.arn
+        AmazonEKSClusterAutoscalerPolicy    = aws_iam_policy.eks_cluster_autoscaler.arn
+        AmazonEC2ContainerRegistryPowerUser = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+        AmazonEKS_CNI_Policy                = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+        CloudWatchAgentServerPolicy         = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+      }
+
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled" = "true"
+        "k8s.io/cluster-autoscaler/${var.project_name}-${var.environment}-eks" = "owned"
       }
     }
   }

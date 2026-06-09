@@ -9,30 +9,30 @@ resource "aws_route53_zone" "main" {
 }
 
 # 메인 도메인 → CloudFront
-resource "aws_route53_record" "main" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "team-train.cloud"
-  type    = "A"
+# resource "aws_route53_record" "main" {
+#   zone_id = aws_route53_zone.main.zone_id
+#   name    = "team-train.cloud"
+#   type    = "A"
 
-  alias {
-    name                   = var.cloudfront_domain_name
-    zone_id                = var.cloudfront_zone_id
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = var.cloudfront_domain_name
+#     zone_id                = var.cloudfront_zone_id
+#     evaluate_target_health = false
+#   }
+# }
 
-# api 서브도메인 → ALB
-resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "api.team-train.cloud"
-  type    = "A"
+# # api 서브도메인 → ALB
+# resource "aws_route53_record" "api" {
+#   zone_id = aws_route53_zone.main.zone_id
+#   name    = "api.team-train.cloud"
+#   type    = "A"
 
-  alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = var.alb_dns_name
+#     zone_id                = var.alb_zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 # DB 장애 전환용 레코드
 # resource "aws_route53_record" "db" {
