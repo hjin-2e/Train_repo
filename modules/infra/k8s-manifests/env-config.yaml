@@ -8,7 +8,7 @@ metadata:
 data:
   # 기본 및 네트워킹 설정
   PORT: "8080"
-  ALLOWED_ORIGINS: "http://api.team-train.cloud"
+  ALLOWED_ORIGINS: "https://team-train.cloud,https://www.team-train.cloud"
 
   # AWS 인프라 리전 및 SQS 정보
   AWS_REGION: "ap-northeast-2"
