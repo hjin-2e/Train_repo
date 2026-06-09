@@ -94,23 +94,23 @@ output "route53_zone_name" {
   value       = aws_route53_zone.main.name
 }
 
-output "acm_certificate_domain_validation_options" {
-  description = "The domain validation options for the ACM certificate"
-  value       = aws_acm_certificate.main.domain_validation_options
-}
+# output "acm_certificate_domain_validation_options" {
+#   description = "The domain validation options for the ACM certificate"
+#   value       = aws_acm_certificate.main.domain_validation_options
+# }
 
 # ==================
 # ACM outputs
 # ==================
-output "acm_certificate_arn" {
-  description = "ACM Certificate ARN for CloudFront"
-  value       = aws_acm_certificate.main.arn
-}
+# output "acm_certificate_arn" {
+#   description = "ACM Certificate ARN for CloudFront"
+#   value       = aws_acm_certificate.main.arn
+# }
 
-output "acm_alb_certificate_arn" {
-  description = "ACM Certificate ARN for ALB"
-  value       = aws_acm_certificate.alb.arn
-}
+# output "acm_alb_certificate_arn" {
+#   description = "ACM Certificate ARN for ALB"
+#   value       = aws_acm_certificate.alb.arn
+# }
 
 # ==================
 # CloudFront outputs
@@ -314,3 +314,5 @@ output "dms_replication_subnet_group_id" {
   description = "The ID of the DMS Replication Subnet Group"
   value       = aws_dms_replication_subnet_group.main.replication_subnet_group_id
 }
+
+

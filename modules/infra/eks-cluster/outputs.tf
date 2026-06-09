@@ -17,3 +17,8 @@ output "oidc_provider_arn" {
   description = "The ARN of the OIDC Provider associated with the EKS cluster"
   value       = module.eks-cluster.oidc_provider_arn
 }
+
+output "oidc_provider" {
+  description = "The OIDC Provider URL associated with the EKS cluster"
+  value       = module.eks-cluster.oidc_provider
+}

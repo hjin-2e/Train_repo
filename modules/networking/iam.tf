@@ -142,7 +142,6 @@ resource "aws_iam_policy" "elasticache_access" {
 # Secrets manager
 # ==================
 
-
 # Secrets Manager 접근 정책
 resource "aws_iam_policy" "secrets_access" {
   name = "${var.project_name}-secrets-access"
@@ -156,7 +155,7 @@ resource "aws_iam_policy" "secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = aws_secretsmanager_secret.db.arn
+        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-secret*"
       },
       {
         Effect = "Allow"
@@ -168,15 +167,6 @@ resource "aws_iam_policy" "secrets_access" {
     ]
   })
 }
-
-resource "aws_iam_role_policy_attachment" "booking_secrets" {
-  policy_arn = aws_iam_policy.secrets_access.arn
-  role       = aws_iam_role.booking_pod.name
-}
-
-
-
-
 
 # ==================
 # Bastion SSM Role
@@ -211,124 +201,130 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
   role = aws_iam_role.bastion_ssm.name
 }
 
-
-
 # ==================
 # IRSA - Booking Pod
+# EKS 생성 후 주석 해제
 # ==================
-resource "aws_iam_role" "booking_pod" {
-  name = "${var.project_name}-booking-pod-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = var.eks_oidc_provider_arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:booking-sa"
-        }
-      }
-    }]
-  })
-
-  tags = {
-    Name        = "${var.project_name}-booking-pod-role"
-    Environment = var.environment
-  }
-}
-
-# Booking Pod: Aurora + SQS + ElastiCache
-resource "aws_iam_role_policy_attachment" "booking_aurora" {
-  policy_arn = aws_iam_policy.aurora_access.arn
-  role       = aws_iam_role.booking_pod.name
-}
-
-resource "aws_iam_role_policy_attachment" "booking_sqs" {
-  policy_arn = aws_iam_policy.sqs_access.arn
-  role       = aws_iam_role.booking_pod.name
-}
-
-resource "aws_iam_role_policy_attachment" "booking_elasticache" {
-  policy_arn = aws_iam_policy.elasticache_access.arn
-  role       = aws_iam_role.booking_pod.name
-}
+# resource "aws_iam_role" "booking_pod" {
+#   name = "${var.project_name}-booking-pod-role"
+#
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Federated = var.eks_oidc_provider_arn
+#       }
+#       Action = "sts:AssumeRoleWithWebIdentity"
+#       Condition = {
+#         StringEquals = {
+#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:booking-sa"
+#         }
+#       }
+#     }]
+#   })
+#
+#   tags = {
+#     Name        = "${var.project_name}-booking-pod-role"
+#     Environment = var.environment
+#   }
+# }
+#
+# # Booking Pod: Aurora + SQS + ElastiCache
+# resource "aws_iam_role_policy_attachment" "booking_aurora" {
+#   policy_arn = aws_iam_policy.aurora_access.arn
+#   role       = aws_iam_role.booking_pod.name
+# }
+#
+# resource "aws_iam_role_policy_attachment" "booking_sqs" {
+#   policy_arn = aws_iam_policy.sqs_access.arn
+#   role       = aws_iam_role.booking_pod.name
+# }
+#
+# resource "aws_iam_role_policy_attachment" "booking_elasticache" {
+#   policy_arn = aws_iam_policy.elasticache_access.arn
+#   role       = aws_iam_role.booking_pod.name
+# }
+#
+# resource "aws_iam_role_policy_attachment" "booking_secrets" {
+#   policy_arn = aws_iam_policy.secrets_access.arn
+#   role       = aws_iam_role.booking_pod.name
+# }
 
 # ==================
 # IRSA - User Pod
+# EKS 생성 후 주석 해제
 # ==================
-resource "aws_iam_role" "user_pod" {
-  name = "${var.project_name}-user-pod-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = var.eks_oidc_provider_arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:user-sa"
-        }
-      }
-    }]
-  })
-
-  tags = {
-    Name        = "${var.project_name}-user-pod-role"
-    Environment = var.environment
-  }
-}
-
-# User Pod: Aurora만
-resource "aws_iam_role_policy_attachment" "user_aurora" {
-  policy_arn = aws_iam_policy.aurora_access.arn
-  role       = aws_iam_role.user_pod.name
-}
+# resource "aws_iam_role" "user_pod" {
+#   name = "${var.project_name}-user-pod-role"
+#
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Federated = var.eks_oidc_provider_arn
+#       }
+#       Action = "sts:AssumeRoleWithWebIdentity"
+#       Condition = {
+#         StringEquals = {
+#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:user-sa"
+#         }
+#       }
+#     }]
+#   })
+#
+#   tags = {
+#     Name        = "${var.project_name}-user-pod-role"
+#     Environment = var.environment
+#   }
+# }
+#
+# # User Pod: Aurora만
+# resource "aws_iam_role_policy_attachment" "user_aurora" {
+#   policy_arn = aws_iam_policy.aurora_access.arn
+#   role       = aws_iam_role.user_pod.name
+# }
 
 # ==================
 # IRSA - Payment Pod
+# EKS 생성 후 주석 해제
 # ==================
-resource "aws_iam_role" "payment_pod" {
-  name = "${var.project_name}-payment-pod-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = var.eks_oidc_provider_arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:payment-sa"
-        }
-      }
-    }]
-  })
-
-  tags = {
-    Name        = "${var.project_name}-payment-pod-role"
-    Environment = var.environment
-  }
-}
-
-# Payment Pod: Aurora + SQS (ElastiCache 차단)
-resource "aws_iam_role_policy_attachment" "payment_aurora" {
-  policy_arn = aws_iam_policy.aurora_access.arn
-  role       = aws_iam_role.payment_pod.name
-}
-
-resource "aws_iam_role_policy_attachment" "payment_sqs" {
-  policy_arn = aws_iam_policy.sqs_access.arn
-  role       = aws_iam_role.payment_pod.name
-}
+# resource "aws_iam_role" "payment_pod" {
+#   name = "${var.project_name}-payment-pod-role"
+#
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Federated = var.eks_oidc_provider_arn
+#       }
+#       Action = "sts:AssumeRoleWithWebIdentity"
+#       Condition = {
+#         StringEquals = {
+#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:payment-sa"
+#         }
+#       }
+#     }]
+#   })
+#
+#   tags = {
+#     Name        = "${var.project_name}-payment-pod-role"
+#     Environment = var.environment
+#   }
+# }
+#
+# # Payment Pod: Aurora + SQS (ElastiCache 차단)
+# resource "aws_iam_role_policy_attachment" "payment_aurora" {
+#   policy_arn = aws_iam_policy.aurora_access.arn
+#   role       = aws_iam_role.payment_pod.name
+# }
+#
+# resource "aws_iam_role_policy_attachment" "payment_sqs" {
+#   policy_arn = aws_iam_policy.sqs_access.arn
+#   role       = aws_iam_role.payment_pod.name
+# }
 
 # ==================
 # CloudWatch Role
@@ -353,7 +349,7 @@ resource "aws_iam_role" "cloudwatch" {
   }
 }
 
-# CloudWatch 정책 
+# CloudWatch 정책
 resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchActionsEC2Access"
   role       = aws_iam_role.cloudwatch.name
@@ -504,8 +500,7 @@ resource "aws_iam_role" "dms" {
   }
 }
 
-
-# DMS가 RDS 접근하기 위해 추가..
+# DMS가 RDS 접근하기 위해 추가
 resource "aws_iam_role_policy" "dms_rds_policy" {
   name = "${var.project_name}-dms-rds-policy"
   role = aws_iam_role.dms.id
@@ -534,16 +529,13 @@ resource "aws_iam_role_policy" "dms_rds_policy" {
   })
 }
 
-
-
-
 # DMS VPC 정책
 resource "aws_iam_role_policy_attachment" "dms_vpc_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
   role       = aws_iam_role.dms.name
 }
 
-# DMS 로그 정책 
+# DMS 로그 정책
 resource "aws_iam_role_policy_attachment" "dms_logs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms.name

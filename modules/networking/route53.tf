@@ -57,39 +57,39 @@ resource "aws_route53_zone" "main" {
 # }
 
 # CloudFront ACM 인증서 검증 레코드 
-resource "aws_route53_record" "acm_validation_main" {
-  for_each = {
-    for dvo in aws_acm_certificate.main.domain_validation_options :
-    dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
+# resource "aws_route53_record" "acm_validation_main" {
+#   for_each = {
+#     for dvo in aws_acm_certificate.main.domain_validation_options :
+#     dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       record = dvo.resource_record_value
+#       type   = dvo.resource_record_type
+#     }
+#   }
 
-  allow_overwrite = true
-  zone_id         = aws_route53_zone.main.zone_id
-  name            = each.value.name
-  type            = each.value.type
-  ttl             = 60
-  records         = [each.value.record]
-}
+#   allow_overwrite = true
+#   zone_id         = aws_route53_zone.main.zone_id
+#   name            = each.value.name
+#   type            = each.value.type
+#   ttl             = 60
+#   records         = [each.value.record]
+# }
 
-# ALB ACM 인증서 검증 레코드
-resource "aws_route53_record" "acm_validation_alb" {
-  for_each = {
-    for dvo in aws_acm_certificate.alb.domain_validation_options :
-    dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
+# # ALB ACM 인증서 검증 레코드
+# resource "aws_route53_record" "acm_validation_alb" {
+#   for_each = {
+#     for dvo in aws_acm_certificate.alb.domain_validation_options :
+#     dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       record = dvo.resource_record_value
+#       type   = dvo.resource_record_type
+#     }
+#   }
 
-  allow_overwrite = true
-  zone_id         = aws_route53_zone.main.zone_id
-  name            = each.value.name
-  type            = each.value.type
-  ttl             = 60
-  records         = [each.value.record]
-}
+#   allow_overwrite = true
+#   zone_id         = aws_route53_zone.main.zone_id
+#   name            = each.value.name
+#   type            = each.value.type
+#   ttl             = 60
+#   records         = [each.value.record]
+# }

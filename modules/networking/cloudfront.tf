@@ -54,7 +54,8 @@ resource "aws_cloudfront_distribution" "main" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  aliases             = ["team-train.cloud", "www.team-train.cloud"]
+  # aliases = ["team-train.cloud", "www.team-train.cloud"]
+  # ACM 검증 완료 후 주석 해제
 
   # 기본 캐시 동작 (프론트엔드)
   default_cache_behavior {
@@ -100,10 +101,16 @@ resource "aws_cloudfront_distribution" "main" {
   web_acl_id = aws_wafv2_web_acl.main.arn
 
   # SSL 인증서
+  # ACM 검증 완료 후 아래 주석 해제
+  # viewer_certificate {
+  #   acm_certificate_arn      = aws_acm_certificate.main.arn
+  #   ssl_support_method       = "sni-only"
+  #   minimum_protocol_version = "TLSv1.2_2021"
+  # }
+
+  # 임시 기본 인증서 사용
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.main.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    cloudfront_default_certificate = true
   }
 
   # SPA 라우팅 (React)
@@ -125,10 +132,10 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # ACM 인증서 검증 완료 후 생성 ✅
-  depends_on = [
-    aws_acm_certificate_validation.main
-  ]
+  # ACM 검증 완료 후 주석 해제
+  # depends_on = [
+  #   aws_acm_certificate_validation.main
+  # ]
 
   tags = {
     Name        = "${var.project_name}-cf"
@@ -160,3 +167,19 @@ resource "aws_s3_bucket_policy" "frontend" {
     ]
   })
 }
+
+
+# #배포를 위해 일단 주석처리 하였는데 나중에 가비아 진행할 때는
+#  # 이거 삭제 
+# viewer_certificate {
+#   cloudfront_default_certificate = true
+# }
+
+# # 이거 주석 해제 
+# viewer_certificate {
+#   acm_certificate_arn      = aws_acm_certificate.main.arn
+#   ssl_support_method       = "sni-only"
+#   minimum_protocol_version = "TLSv1.2_2021"
+# }
+
+# 나머지 주석처리한것들은 주석해제

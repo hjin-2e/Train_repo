@@ -13,6 +13,8 @@ module "networking" {
   alb_zone_id            = var.alb_zone_id
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
 
+
+  
   providers = {
     aws.us_east_1 = aws.us_east_1
   }
@@ -49,6 +51,9 @@ module "alb_controller" {
 
 module "database" {
   source                  = "../../modules/database"
+
+  project_name            = var.project_name
+  environment             = var.environment
   db_subnet_group_name    = module.networking.db_subnet_group_name
   redis_subnet_group_name = module.networking.redis_subnet_group_name
   dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id

@@ -49,3 +49,22 @@ variable "azure_db_password" {
   type      = string
   sensitive = true
 }
+
+
+# 프로젝트 이름과 환경 변수 추가
+variable "project_name" {
+  description = "Project name"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment (dev/prod)"
+  type        = string
+}
+
+
+variable "aurora_endpoint" {
+  description = "Aurora Cluster Endpoint"
+  type        = string
+  default     = ""  
+}

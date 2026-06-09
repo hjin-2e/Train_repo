@@ -17,7 +17,7 @@ variable "aws_region" {
 variable "developer_ips" {
   description = "List of developer IP addresses"
   type        = list(string)
-  default     = ["0.0.0.0/0"]  # 나중에 실제 IP로 변경
+  default     = ["0.0.0.0/0"]
 }
 
 variable "cloudfront_domain_name" {
@@ -44,29 +44,25 @@ variable "alb_zone_id" {
   default     = ""
 }
 
+# Aurora 완성 후 주석 해제
+# variable "db_admin_user" {
+#   description = "Database admin username"
+#   type        = string
+#   default     = ""
+# }
 
-variable "db_admin_user" {
-  description = "Database admin username"
-  type        = string
-  default     = ""
-}
+# variable "db_admin_password" {
+#   description = "Database admin password"
+#   type        = string
+#   sensitive   = true
+#   default     = ""
+# }
 
-variable "db_admin_password" {
-  description = "Database admin password"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-variable "aurora_endpoint" {
-  description = "Aurora cluster endpoint"
-  type        = string
-  default     = ""
-}
-
-
-
-
+# variable "aurora_endpoint" {
+#   description = "Aurora cluster endpoint"
+#   type        = string
+#   default     = ""
+# }
 
 variable "eks_oidc_provider_arn" {
   description = "EKS OIDC Provider ARN"
@@ -84,77 +80,79 @@ variable "eks_oidc_provider" {
 # CloudTrail 관련 변수
 # ==================
 variable "cloudtrail_retention_days" {
-  description = "Retention period for CloudTrail logs in days" 
+  description = "Retention period for CloudTrail logs in days"
   type        = number
   default     = 90
 }
 
 variable "cloudtrail_enable_log_validation" {
-  description = "Whether to enable log file integrity validation for CloudTrail" 
+  description = "Whether to enable log file integrity validation for CloudTrail"
   type        = bool
   default     = true
 }
 
 variable "cloudtrail_multi_region" {
-  description = "Whether the CloudTrail is created for multi-region" 
+  description = "Whether the CloudTrail is created for multi-region"
   type        = bool
   default     = true
 }
 
-
 # ==================
-# EKS 관련 변수 (EKS Connection Settings)
+# EKS 관련 변수
+# EKS 생성 후 주석 해제
 # ==================
 variable "eks_cluster_name" {
   description = "The name of the EKS cluster"
   type        = string
-  default     = ""  # Will be provided after EKS cluster is created
-}
-
-variable "eks_cluster_endpoint" {
-  description = "The endpoint URL for the EKS cluster API server"
-  type        = string
-  default     = ""  # Will be provided after EKS cluster is created
-}
-
-variable "eks_cluster_ca" {
-  description = "The base64 encoded certificate authority data for the EKS cluster"
-  type        = string
-  default     = ""  # Will be provided after EKS cluster is created
-}
-
-variable "eks_cluster_token" {
-  description = "The authentication token to access the EKS cluster API"
-  type        = string
-  default     = ""  # Will be provided after EKS cluster is created
-}
-
-# ==================
-# IRSA Pod Role ARN 변수
-# ==================
-variable "booking_pod_role_arn" {
-  description = "IAM Role ARN for the Booking Service Pod"
-  type        = string
   default     = ""
 }
 
-variable "user_pod_role_arn" {
-  description = "IAM Role ARN for the User Service Pod"
-  type        = string
-  default     = ""
-}
+# variable "eks_cluster_endpoint" {
+#   description = "The endpoint URL for the EKS cluster API server"
+#   type        = string
+#   default     = ""
+# }
 
-variable "payment_pod_role_arn" {
-  description = "IAM Role ARN for the Payment Service Pod"
-  type        = string
-  default     = ""
-}
+# variable "eks_cluster_ca" {
+#   description = "The base64 encoded certificate authority data for the EKS cluster"
+#   type        = string
+#   default     = ""
+# }
+
+# variable "eks_cluster_token" {
+#   description = "The authentication token to access the EKS cluster API"
+#   type        = string
+#   default     = ""
+# }
 
 # ==================
-# DB & Redis Subnet 변수
+# IRSA Pod Role ARN
+# EKS 생성 후 주석 해제
 # ==================
-variable "db_subnet_ids" {
-  description = "List of subnet IDs for DB and ElastiCache subnet groups"
-  type        = list(string)
-  default     = []
-}
+# variable "booking_pod_role_arn" {
+#   description = "IAM Role ARN for the Booking Service Pod"
+#   type        = string
+#   default     = ""
+# }
+
+# variable "user_pod_role_arn" {
+#   description = "IAM Role ARN for the User Service Pod"
+#   type        = string
+#   default     = ""
+# }
+
+# variable "payment_pod_role_arn" {
+#   description = "IAM Role ARN for the Payment Service Pod"
+#   type        = string
+#   default     = ""
+# }
+
+# ==================
+# DB & Redis Subnet
+# EKS 생성 후 주석 해제
+# ==================
+# variable "db_subnet_ids" {
+#   description = "List of subnet IDs for DB and ElastiCache subnet groups"
+#   type        = list(string)
+#   default     = []
+# }

@@ -64,3 +64,26 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   performance_insights_enabled    = true
   monitoring_interval             = 60
 }
+
+
+
+# aurora.tf 파일 맨 아래에 추가
+resource "aws_secretsmanager_secret" "db" {
+  name = "${var.project_name}-db-secret"
+
+  tags = {
+    Name        = "${var.project_name}-db-secret"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db" {
+  secret_id = aws_secretsmanager_secret.db.id
+
+  secret_string = jsonencode({
+    DB_USER     = var.db_admin_user
+    DB_PASSWORD = var.db_admin_password
+    DB_HOST     = aws_rds_cluster.aurora_cluster.endpoint
+    DB_NAME     = aws_rds_cluster.aurora_cluster.database_name
+  })
+}
