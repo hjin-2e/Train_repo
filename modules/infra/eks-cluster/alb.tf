@@ -2,11 +2,11 @@ resource "aws_lb_target_group" "app_tg" {
   name        = "${var.project_name}-${var.environment}-app-tg"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id  
   target_type = "ip"
 
   health_check {
-    path                = "/healthz"
+    path                = "/health"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 15
@@ -17,7 +17,7 @@ resource "aws_lb_target_group" "app_tg" {
 }
 
 resource "aws_lb_listener_rule" "routing_rule" {
-  listener_arn = aws_lb_listener.front_http.arn 
+  listener_arn = aws_lb_listener.front_http.arn
   priority     = 100
 
   action {

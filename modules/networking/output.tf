@@ -76,40 +76,19 @@ output "dms_sg_id" {
   value       = aws_security_group.dms.id
 }
 
-# ==================
-# Route53 outputs
-# ==================
-output "route53_zone_id" {
-  description = "The ID of the Route53 Hosted Zone"
-  value       = aws_route53_zone.main.zone_id
-}
 
-output "route53_nameservers" {
-  description = "Domain name servers for Route53 zone"
-  value       = aws_route53_zone.main.name_servers
-}
-
-output "route53_zone_name" {
-  description = "The Domain Name of the Route53 Hosted Zone"
-  value       = aws_route53_zone.main.name
-}
-
-# output "acm_certificate_domain_validation_options" {
-#   description = "The domain validation options for the ACM certificate"
-#   value       = aws_acm_certificate.main.domain_validation_options
-# }
 
 # ==================
 # ACM outputs
 # ==================
 output "acm_certificate_arn" {
   description = "ACM Certificate ARN for CloudFront"
-  value       = aws_acm_certificate.main.arn
+  value       = var.environment == "prod" ? aws_acm_certificate.main[0].arn : ""
 }
 
 output "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB"
-  value       = aws_acm_certificate.alb.arn
+  value       = var.environment == "prod" ? aws_acm_certificate.alb[0].arn : ""
 }
 
 # ==================

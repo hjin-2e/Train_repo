@@ -58,11 +58,11 @@ variable "alb_zone_id" {
 #   default     = ""
 # }
 
-# variable "aurora_endpoint" {
-#   description = "Aurora cluster endpoint"
-#   type        = string
-#   default     = ""
-# }
+variable "aurora_endpoint" {
+  description = "Aurora cluster endpoint"
+  type        = string
+  default     = ""
+}
 
 variable "eks_oidc_provider_arn" {
   description = "EKS OIDC Provider ARN"
