@@ -169,18 +169,7 @@ output "redis_kms_key_arn" {
   value       = aws_kms_key.redis.arn
 }
 
-# ==================
-# EKS IAM Roles
-# ==================
-output "eks_cluster_role_arn" {
-  description = "IAM Role ARN for the EKS Cluster"
-  value       = aws_iam_role.eks_cluster.arn
-}
 
-output "eks_node_role_arn" {
-  description = "IAM Role ARN for the EKS Worker Nodes"
-  value       = aws_iam_role.eks_node.arn
-}
 
 # ==================
 # IRSA Pod Roles

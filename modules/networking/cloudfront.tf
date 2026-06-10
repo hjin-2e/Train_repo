@@ -20,6 +20,7 @@ resource "aws_s3_bucket_public_access_block" "frontend" {
 
 # CloudFront OAC (S3 접근 제어)
 resource "aws_cloudfront_origin_access_control" "main" {
+  provider = aws.us_east_1
   name                              = "${var.project_name}-oac"
   description                       = "S3 OAC"
   origin_access_control_origin_type = "s3"
@@ -33,7 +34,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   # S3 오리진 (프론트엔드)
   origin {
-    domain_name              = aws_s3_bucket.frontend.bucket_domain_name
+    domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
     origin_id                = "S3-frontend"
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
