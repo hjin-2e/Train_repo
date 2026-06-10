@@ -71,6 +71,11 @@ module "eks-cluster" {
     }
   }
 
+  # 추후 ALB까지 배포 할 수 있도록
+  # cluster_endpoint_public_access           = true
+  # cluster_endpoint_public_access_cidrs     = var.developer_ips
+  # cluster_endpoint_private_access          = true
+
   tags = {
     Name        = "${var.project_name}-${var.environment}-eks-cluster"
     Environment = var.environment
