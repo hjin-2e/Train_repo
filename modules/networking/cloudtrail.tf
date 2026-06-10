@@ -1,6 +1,4 @@
-# ==============================================================================
 # CloudTrail 로그 저장용 S3 버킷
-# ==============================================================================
 resource "aws_s3_bucket" "cloudtrail" {
   bucket        = "${var.project_name}-cloudtrail-logs"
   force_destroy = true
@@ -11,6 +9,7 @@ resource "aws_s3_bucket" "cloudtrail" {
   }
 }
 
+# S3 버킷 퍼블릭 접근 차단
 resource "aws_s3_bucket_public_access_block" "cloudtrail" {
   bucket = aws_s3_bucket.cloudtrail.id
 
@@ -20,6 +19,7 @@ resource "aws_s3_bucket_public_access_block" "cloudtrail" {
   restrict_public_buckets = true
 }
 
+# S3 버킷 암호화 (KMS)
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
   bucket = aws_s3_bucket.cloudtrail.id
 
@@ -31,6 +31,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
   }
 }
 
+# S3 버킷 정책 (CloudTrail만 접근 허용)
 resource "aws_s3_bucket_policy" "cloudtrail" {
   bucket = aws_s3_bucket.cloudtrail.id
 
@@ -40,29 +41,31 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
       {
         Sid    = "AWSCloudTrailAclCheck"
         Effect = "Allow"
-        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
         Action   = "s3:GetBucketAcl"
         Resource = aws_s3_bucket.cloudtrail.arn
       },
       {
         Sid    = "AWSCloudTrailWrite"
         Effect = "Allow"
-        Principal = { Service = "cloudtrail.amazonaws.com" }
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
         Action   = "s3:PutObject"
         Resource = "${aws_s3_bucket.cloudtrail.arn}/AWSLogs/*"
         Condition = {
-          StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" }
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
         }
       }
     ]
   })
 }
 
-# ==============================================================================
-# KMS 및 CloudTrail 설정
-# ==============================================================================
-data "aws_caller_identity" "current" {}
-
+# CloudTrail KMS 키 정책
 resource "aws_kms_key_policy" "cloudtrail" {
   key_id = aws_kms_key.s3.id
 
@@ -72,21 +75,32 @@ resource "aws_kms_key_policy" "cloudtrail" {
       {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
-        Principal = { AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" }
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
         Action   = "kms:*"
         Resource = "*"
       },
       {
         Sid    = "Allow CloudTrail to encrypt logs"
         Effect = "Allow"
-        Principal = { Service = "cloudtrail.amazonaws.com" }
-        Action   = ["kms:GenerateDataKey*", "kms:Decrypt"]
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
         Resource = "*"
       }
     ]
   })
 }
 
+# 현재 AWS 계정 정보
+data "aws_caller_identity" "current" {}
+
+# CloudTrail 생성
 resource "aws_cloudtrail" "main" {
   name                          = "${var.project_name}-trail"
   s3_bucket_name                = aws_s3_bucket.cloudtrail.id
@@ -95,23 +109,18 @@ resource "aws_cloudtrail" "main" {
   is_multi_region_trail         = var.cloudtrail_multi_region
   enable_log_file_validation    = var.cloudtrail_enable_log_validation
 
-  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
-  cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail.arn
+  # =========================================================================
+  # [비용 절감] CloudWatch 이중 전송 해제 (필요할 때만 주석을 풀고 사용하세요)
+  # =========================================================================
+  # cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+  # cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail.arn
 
+  # =========================================================================
+  # [비용 최적화] 관리 이벤트(Management)만 남기고 데이터 이벤트(S3, Lambda) 제거
+  # =========================================================================
   event_selector {
     read_write_type           = "All"
     include_management_events = true
-
-    data_resource {
-      type   = "AWS::S3::Object"
-      values = ["${aws_s3_bucket.frontend.arn}/"]
-    }
-
-    # 특정 리전의 모든 람다를 추적할 때 사용하는 패턴
-    # data_resource {
-    #   type   = "AWS::Lambda::Function"
-    #   values = ["arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:"]
-    # }    -> 람다부분 수정 필요 
   }
 
   tags = {
@@ -119,15 +128,20 @@ resource "aws_cloudtrail" "main" {
     Environment = var.environment
   }
 
-  depends_on = [aws_s3_bucket_policy.cloudtrail]
+  depends_on = [
+    aws_s3_bucket_policy.cloudtrail
+  ]
 }
 
-resource "aws_cloudwatch_log_group" "cloudtrail" {
-  name              = "/aws/cloudtrail/${var.project_name}"
-  retention_in_days = var.cloudtrail_retention_days
-
-  tags = {
-    Name        = "${var.project_name}-cloudtrail-logs"
-    Environment = var.environment
-  }
-}
+# =========================================================================
+# [비용 절감] CloudWatch 연동을 안 할 경우 아래 Log Group 리소스도 제외 가능합니다.
+# =========================================================================
+# resource "aws_cloudwatch_log_group" "cloudtrail" {
+#   name              = "/aws/cloudtrail/${var.project_name}"
+#   retention_in_days = var.cloudtrail_retention_days
+#
+#   tags = {
+#     Name        = "${var.project_name}-cloudtrail-logs"
+#     Environment = var.environment
+#   }
+# }

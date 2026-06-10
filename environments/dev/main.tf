@@ -61,3 +61,39 @@ module "database" {
   azure_db_user     = var.azure_db_user
   azure_db_password = var.azure_db_password
 }
+# ==============================================================================
+# 2. Logging 모듈 (개발 로그 S3 버킷 + WAF CloudWatch 로그 그룹/설정)
+# ==============================================================================
+module "logging" {
+  source       = "../../modules/infra/logging"
+  project_name = var.project_name
+  environment  = var.environment
+
+  # WAF Web ACL ARN: networking 모듈이 먼저 생성된 뒤 주입됩니다.
+  waf_web_acl_arn    = module.networking.waf_arn
+  log_retention_days = 7 # dev 환경: 7일 보존
+
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+}
+
+# ==============================================================================
+# 3. Frontend CI/CD Pipeline 모듈
+#    GitHub Actions(CI) → S3 → CodePipeline → CodeBuild(CD) 파이프라인
+# ==============================================================================
+module "frontend-pipeline" {
+  source       = "../../modules/infra/frontend-pipeline"
+  project_name = var.project_name
+  environment  = var.environment
+
+  # networking 모듈이 생성한 프론트엔드 S3 버킷과 CloudFront ID를 주입합니다.
+  frontend_bucket_name       = module.networking.s3_frontend_bucket
+  cloudfront_distribution_id = module.networking.cloudfront_distribution_id
+
+  # ?? 실제 GitHub 레포 경로로 변경하세요 (예: "your-org/your-frontend-repo")
+  github_repo = "your-org/your-repo"
+
+  # dev 환경에서는 OIDC Provider 생성 (처음 한 번만)
+  create_github_oidc_provider = true
+}
