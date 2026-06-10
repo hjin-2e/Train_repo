@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: dev
+  labels:
+    app: backend-app
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80       
+      targetPort: 8080 
+      protocol: TCP
+  selector:
+    app: backend-app  
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: backend-targetgroup-binding
+  namespace: dev
+spec:
+  # 타겟 그룹의 ARN
+  targetGroupArn: arn:aws:elasticloadbalancing:ap-northeast-2:123456789012:targetgroup/trail-dev-backend-tg/abc123xyz
+  
+  serviceRef:
+    name: backend-service
+    port: 80              
