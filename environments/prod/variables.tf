@@ -4,12 +4,6 @@ variable "aws_region" {
   default     = "ap-northeast-2"
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
-  type        = string
-}
-
-
 variable "project_name" {
   description = "Project name"
   type        = string

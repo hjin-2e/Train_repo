@@ -20,7 +20,7 @@ resource "aws_s3_bucket_public_access_block" "frontend" {
 
 # CloudFront OAC (S3 접근 제어)
 resource "aws_cloudfront_origin_access_control" "main" {
-  provider = aws.us_east_1
+  provider                          = aws.us_east_1
   name                              = "${var.project_name}-oac"
   description                       = "S3 OAC"
   origin_access_control_origin_type = "s3"
@@ -55,8 +55,12 @@ resource "aws_cloudfront_distribution" "main" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  # aliases = ["team-train.cloud", "www.team-train.cloud"]
-  # ACM 검증 완료 후 주석 해제
+
+  # prod만 도메인 연결 ✅
+  aliases = var.environment == "prod" ? [
+    "team-train.cloud",
+    "www.team-train.cloud"
+  ] : []
 
   # 기본 캐시 동작 (프론트엔드)
   default_cache_behavior {
@@ -101,17 +105,12 @@ resource "aws_cloudfront_distribution" "main" {
   # WAF 연동
   web_acl_id = aws_wafv2_web_acl.main.arn
 
-  # SSL 인증서
-  # ACM 검증 완료 후 아래 주석 해제
-  # viewer_certificate {
-  #   acm_certificate_arn      = aws_acm_certificate.main.arn
-  #   ssl_support_method       = "sni-only"
-  #   minimum_protocol_version = "TLSv1.2_2021"
-  # }
-
-  # 임시 기본 인증서 사용
+  # SSL 인증서 (prod만 ACM, dev는 기본 인증서) 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn            = var.environment == "prod" ? aws_acm_certificate.main[0].arn : null
+    ssl_support_method             = var.environment == "prod" ? "sni-only" : null
+    minimum_protocol_version       = var.environment == "prod" ? "TLSv1.2_2021" : null
+    cloudfront_default_certificate = var.environment == "prod" ? false : true
   }
 
   # SPA 라우팅 (React)
@@ -133,7 +132,7 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # ACM 검증 완료 후 주석 해제
+  # prod만 ACM 검증 후 생성
   # depends_on = [
   #   aws_acm_certificate_validation.main
   # ]
@@ -168,19 +167,3 @@ resource "aws_s3_bucket_policy" "frontend" {
     ]
   })
 }
-
-
-# #배포를 위해 일단 주석처리 하였는데 나중에 가비아 진행할 때는
-#  # 이거 삭제 
-# viewer_certificate {
-#   cloudfront_default_certificate = true
-# }
-
-# # 이거 주석 해제 
-# viewer_certificate {
-#   acm_certificate_arn      = aws_acm_certificate.main.arn
-#   ssl_support_method       = "sni-only"
-#   minimum_protocol_version = "TLSv1.2_2021"
-# }
-
-# 나머지 주석처리한것들은 주석해제
