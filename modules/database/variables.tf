@@ -66,5 +66,5 @@ variable "environment" {
 variable "aurora_endpoint" {
   description = "Aurora Cluster Endpoint"
   type        = string
-  default     = ""  
+  default     = ""
 }

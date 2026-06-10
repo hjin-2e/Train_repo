@@ -12,3 +12,9 @@ output "aurora_writer_endpoint" {
 output "redis_primary_endpoint" {
   value       = aws_elasticache_replication_group.redis.primary_endpoint_address
 }
+
+# Secrets Manager Secret ARN
+output "db_secret_arn" {
+  description = "ARN of the DB Secrets Manager secret"
+  value       = aws_secretsmanager_secret.db.arn
+}

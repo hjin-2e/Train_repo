@@ -14,7 +14,7 @@ module "networking" {
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
 
 
-  
+
   providers = {
     aws.us_east_1 = aws.us_east_1
   }
@@ -40,32 +40,32 @@ module "cognito" {
 module "alb_controller" {
   source = "../../modules/infra/alb-controller"
 
-  project_name      = var.project_name
-  environment       = var.environment
-  aws_region        = var.aws_region
-  vpc_id            = module.networking.vpc_id
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+  vpc_id       = module.networking.vpc_id
 
   cluster_name      = module.eks-cluster.cluster_name
   oidc_provider_arn = module.eks-cluster.oidc_provider_arn
 }
 
-module "database" {
-  source                  = "../../modules/database"
+# module "database" {
+#   source                  = "../../modules/database"
 
-  project_name            = var.project_name
-  environment             = var.environment
-  db_subnet_group_name    = module.networking.db_subnet_group_name
-  redis_subnet_group_name = module.networking.redis_subnet_group_name
-  dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
-  dms_sg_id               = module.networking.dms_sg_id
-  aurora_sg_id            = module.networking.aurora_sg_id
-  redis_sg_id             = module.networking.redis_sg_id
+#   project_name            = var.project_name
+#   environment             = var.environment
+#   db_subnet_group_name    = module.networking.db_subnet_group_name
+#   redis_subnet_group_name = module.networking.redis_subnet_group_name
+#   dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
+#   dms_sg_id               = module.networking.dms_sg_id
+#   aurora_sg_id            = module.networking.aurora_sg_id
+#   redis_sg_id             = module.networking.redis_sg_id
 
-  db_admin_user     = var.db_admin_user
-  db_admin_password = var.db_admin_password
-  azure_db_endpoint = var.azure_db_endpoint
-  azure_db_user     = var.azure_db_user
-  azure_db_password = var.azure_db_password
-}
+#   db_admin_user     = var.db_admin_user
+#   db_admin_password = var.db_admin_password
+#   azure_db_endpoint = var.azure_db_endpoint
+#   azure_db_user     = var.azure_db_user
+#   azure_db_password = var.azure_db_password
+# }
 
 

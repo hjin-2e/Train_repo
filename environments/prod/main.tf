@@ -14,9 +14,9 @@ module "networking" {
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
 
   # Secrets Manager용 (kms.tf에서 사용)
-  db_admin_user     = var.db_admin_user
-  db_admin_password = var.db_admin_password
-  aurora_endpoint   = var.aurora_endpoint   # prod/variables.tf에 추가 필요
+  # db_admin_user     = var.db_admin_user
+  # db_admin_password = var.db_admin_password
+  # aurora_endpoint   = var.aurora_endpoint # prod/variables.tf에 추가 필요
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -40,18 +40,20 @@ module "cognito" {
   environment  = var.environment
 }
 
-module "database" {
-  source                  = "../../modules/database"
-  db_subnet_group_name    = module.networking.db_subnet_group_name
-  redis_subnet_group_name = module.networking.redis_subnet_group_name
-  dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
-  dms_sg_id               = module.networking.dms_sg_id
-  aurora_sg_id            = module.networking.aurora_sg_id
-  redis_sg_id             = module.networking.redis_sg_id
+# module "database" {
+#   source                  = "../../modules/database"
+#   project_name            = var.project_name
+#   environment             = var.environment
+#   db_subnet_group_name    = module.networking.db_subnet_group_name
+#   redis_subnet_group_name = module.networking.redis_subnet_group_name
+#   dms_subnet_group_name   = module.networking.dms_replication_subnet_group_id
+#   dms_sg_id               = module.networking.dms_sg_id
+#   aurora_sg_id            = module.networking.aurora_sg_id
+#   redis_sg_id             = module.networking.redis_sg_id
 
-  db_admin_user     = var.db_admin_user
-  db_admin_password = var.db_admin_password
-  azure_db_endpoint = var.azure_db_endpoint
-  azure_db_user     = var.azure_db_user
-  azure_db_password = var.azure_db_password
-}
+#   db_admin_user     = var.db_admin_user
+#   db_admin_password = var.db_admin_password
+#   azure_db_endpoint = var.azure_db_endpoint
+#   azure_db_user     = var.azure_db_user
+#   azure_db_password = var.azure_db_password
+# }

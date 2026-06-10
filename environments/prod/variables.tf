@@ -13,7 +13,7 @@ variable "project_name" {
 variable "environment" {
   description = "Target deployment environment"
   type        = string
-  default     = "prod"  
+  default     = "prod"
 }
 
 variable "developer_ips" {
@@ -50,14 +50,14 @@ variable "alb_zone_id" {
 variable "db_admin_user" {
   description = "Database admin username"
   type        = string
-  default     = "admin"  
+  default     = "admin"
 }
 
 variable "db_admin_password" {
   description = "Database admin password"
   type        = string
   sensitive   = true
-  default     = ""  
+  default     = ""
 }
 
 variable "aurora_endpoint" {
@@ -70,18 +70,18 @@ variable "aurora_endpoint" {
 variable "azure_db_endpoint" {
   description = "Azure database endpoint"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "azure_db_user" {
   description = "Azure database username"
   type        = string
-  default     = ""  
+  default     = ""
 }
 
 variable "azure_db_password" {
   description = "Azure database password"
   type        = string
   sensitive   = true
-  default     = ""  
+  default     = ""
 }

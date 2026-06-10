@@ -102,15 +102,15 @@ output "route53_zone_name" {
 # ==================
 # ACM outputs
 # ==================
-# output "acm_certificate_arn" {
-#   description = "ACM Certificate ARN for CloudFront"
-#   value       = aws_acm_certificate.main.arn
-# }
+output "acm_certificate_arn" {
+  description = "ACM Certificate ARN for CloudFront"
+  value       = aws_acm_certificate.main.arn
+}
 
-# output "acm_alb_certificate_arn" {
-#   description = "ACM Certificate ARN for ALB"
-#   value       = aws_acm_certificate.alb.arn
-# }
+output "acm_alb_certificate_arn" {
+  description = "ACM Certificate ARN for ALB"
+  value       = aws_acm_certificate.alb.arn
+}
 
 # ==================
 # CloudFront outputs
@@ -185,30 +185,30 @@ output "eks_node_role_arn" {
 # ==================
 # IRSA Pod Roles
 # ==================
-output "booking_pod_role_arn" {
-  description = "IAM Role ARN for the Booking Service Pod"
-  value       = aws_iam_role.booking_pod.arn
-}
-
-output "user_pod_role_arn" {
-  description = "IAM Role ARN for the User Service Pod"
-  value       = aws_iam_role.user_pod.arn
-}
-
-output "payment_pod_role_arn" {
-  description = "IAM Role ARN for the Payment Service Pod"
-  value       = aws_iam_role.payment_pod.arn
-}
+# output "booking_pod_role_arn" {
+#   description = "IAM Role ARN for the Booking Service Pod"
+#   value       = aws_iam_role.booking_pod.arn
+# }
+# 
+# output "user_pod_role_arn" {
+#   description = "IAM Role ARN for the User Service Pod"
+#   value       = aws_iam_role.user_pod.arn
+# }
+# 
+# output "payment_pod_role_arn" {
+#   description = "IAM Role ARN for the Payment Service Pod"
+#   value       = aws_iam_role.payment_pod.arn
+# }
 
 
 # ==================
 # Secrets Manager
 # ==================
 
-output "db_secret_arn" {
-  description = "ARN of the DB Secrets Manager secret"
-  value       = aws_secretsmanager_secret.db.arn
-}
+# output "db_secret_arn" {
+#   description = "ARN of the DB Secrets Manager secret"
+#   value       = aws_secretsmanager_secret.db.arn
+# }
 
 
 # ==================

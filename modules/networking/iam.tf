@@ -113,8 +113,8 @@ resource "aws_iam_policy" "sqs_access" {
         "sqs:SendMessage",
         "sqs:GetQueueAttributes",
         "sqs:GetQueueUrl",
-        "sqs:ReceiveMessage",    # ← Worker용 추가
-        "sqs:DeleteMessage"      # ← Worker용 추가
+        "sqs:ReceiveMessage", # ← Worker용 추가
+        "sqs:DeleteMessage"   # ← Worker용 추가
       ]
       Resource = "*" #첫 배포시만 허용하고 나중에 특정 sqs arn으로 제한
     }]

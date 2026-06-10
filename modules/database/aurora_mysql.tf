@@ -61,11 +61,9 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   engine             = aws_rds_cluster.aurora_cluster.engine
   engine_version     = aws_rds_cluster.aurora_cluster.engine_version
 
-  performance_insights_enabled    = true
-  monitoring_interval             = 60
+  performance_insights_enabled = true
+  monitoring_interval          = 60
 }
-
-
 
 # aurora.tf 파일 맨 아래에 추가
 resource "aws_secretsmanager_secret" "db" {
