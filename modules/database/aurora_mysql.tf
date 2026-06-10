@@ -63,6 +63,31 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
 
   performance_insights_enabled = true
   monitoring_interval          = 60
+  monitoring_role_arn          = aws_iam_role.rds_monitoring.arn
+}
+
+# RDS 모니터링용 IAM Role 생성
+resource "aws_iam_role" "rds_monitoring" {
+  name = "${var.project_name}-rds-monitoring-role"
+
+  # RDS 모니터링 서비스만 이 Role 사용 가능
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "monitoring.rds.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+# AWS 관리형 정책 연결
+# CloudWatch Logs 전송 권한 포함
+resource "aws_iam_role_policy_attachment" "rds_monitoring" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+  role       = aws_iam_role.rds_monitoring.name
 }
 
 # aurora.tf 파일 맨 아래에 추가

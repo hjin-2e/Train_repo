@@ -17,10 +17,10 @@ resource "aws_elasticache_replication_group" "redis" {
   parameter_group_name = "default.redis7.cluster.on"
 
   node_type                  = "cache.t4g.micro"
-  automatic_failover_enabled = false
-  
-  num_node_groups         = 2  # 샤드 2개
-  replicas_per_node_group = 0  # 샤드 복제본 0개
+  automatic_failover_enabled = true
+
+  num_node_groups         = 2 # 샤드 2개
+  replicas_per_node_group = 1 # 샤드당 복제본 1개 (자동 장애조치 활성화를 위해 최소 1개 필수)
 
   # 실제 아키텍쳐 세팅 (오버스펙)
   # parameter_group_name = "default.redis7.cluster.on"

@@ -13,7 +13,7 @@ resource "aws_dms_replication_instance" "dms_worker" {
 resource "aws_dms_endpoint" "source_aurora" {
   endpoint_id   = "source-aurora-mysql"
   endpoint_type = "source"
-  engine_name   = "aurora"
+  engine_name   = "mysql"
   server_name   = aws_rds_cluster.aurora_cluster.endpoint
   port          = 3306
   database_name = "trail_db"
@@ -32,7 +32,7 @@ resource "aws_dms_endpoint" "target_azure" {
   database_name               = "trail_db"
   username                    = var.azure_db_user
   password                    = var.azure_db_password
-  extra_connection_attributes = "Initstmt=SET FOREIGN_KEY_CHECKS=0;"
+  extra_connection_attributes = "initstmt=SET FOREIGN_KEY_CHECKS=0;"
 }
 
 # 복제 작업 (Task) - 실시간 동기화(CDC)

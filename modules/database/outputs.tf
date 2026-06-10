@@ -10,7 +10,7 @@ output "aurora_writer_endpoint" {
 
 # ElastiCache Redis 엔드포인트 주소
 output "redis_primary_endpoint" {
-  value       = aws_elasticache_replication_group.redis.primary_endpoint_address
+  value       = aws_elasticache_replication_group.redis.configuration_endpoint_address
 }
 
 # Secrets Manager Secret ARN
