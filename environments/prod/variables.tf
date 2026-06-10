@@ -85,3 +85,4 @@ variable "azure_db_password" {
   sensitive   = true
   default     = ""
 }
+

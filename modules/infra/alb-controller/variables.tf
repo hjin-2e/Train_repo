@@ -27,3 +27,23 @@ variable "oidc_provider_arn" {
   description = "The ARN of the EKS OIDC provider for IAM Roles for Service Accounts (IRSA)"
   type        = string
 }
+
+variable "ops_logs_bucket_id" {
+  description = "S3 bucket ID for ALB access logs"
+  type        = string
+}
+
+variable "acm_alb_certificate_arn" {
+  description = "ACM Certificate ARN for ALB HTTPS"
+  type        = string
+}
+
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs for ALB"
+  type        = list(string)
+}
+
+variable "alb_sg_id" {
+  description = "Security Group ID for ALB"
+  type        = string
+}

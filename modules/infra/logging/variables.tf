@@ -22,12 +22,9 @@ variable "log_retention_days" {
 
 # ==================
 # WAF 의존성
+# [불필요] WAF logging configuration이 networking/waf.tf로 이동
 # ==================
-variable "waf_web_acl_arn" {
-  description = <<EOT
-WAF Web ACL ARN to attach logging configuration.
-Provided from module.networking.waf_arn (networking 모듈 output).
-WAF는 CloudFront 연동이므로 us-east-1 리전의 ARN이어야 합니다.
-EOT
-  type        = string
-}
+# variable "waf_web_acl_arn" {
+#   description = "WAF Web ACL ARN"
+#   type        = string
+# }

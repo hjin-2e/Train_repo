@@ -22,3 +22,18 @@ output "oidc_provider" {
   description = "The OIDC Provider URL associated with the EKS cluster"
   value       = module.eks-cluster.oidc_provider
 }
+
+output "alb_dns_name" {
+  description = "ALB DNS name"
+  value       = aws_lb.main.dns_name
+}
+
+output "alb_zone_id" {
+  description = "ALB Zone ID"
+  value       = aws_lb.main.zone_id
+}
+
+output "app_tg_arn" {
+  description = "App Target Group ARN for TargetGroupBinding"
+  value       = aws_lb_target_group.app_tg.arn
+}

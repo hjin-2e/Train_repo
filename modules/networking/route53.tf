@@ -3,6 +3,8 @@
 data "aws_route53_zone" "primary" {
   count = var.environment == "prod" ? 1 : 0
   name  = "team-train.cloud"
+  private_zone = false
+  # 배포 순서: domain/ → Gabia NS 업데이트 → networking/
 }
 
 # ACM 인증서 (prod만)
@@ -120,6 +122,7 @@ resource "aws_route53_record" "www" {
     evaluate_target_health = false
   }
 }
+
 
 
 

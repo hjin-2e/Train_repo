@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 5.50, < 6.0"
     }
     # EKS 생성 후 주석 해제
     # kubernetes = {

@@ -167,3 +167,33 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
     }
   }
 }
+
+
+
+# WAF가 CloudWatch Log Group에 로그를 쓸 수 있도록 리소스 정책 추가
+resource "aws_cloudwatch_log_resource_policy" "waf" {
+  provider    = aws.us_east_1
+  policy_name = "${var.project_name}-waf-log-policy"
+
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.waf.arn}:*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
+}
