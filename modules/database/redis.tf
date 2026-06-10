@@ -12,6 +12,7 @@ resource "aws_elasticache_replication_group" "redis" {
   subnet_group_name          = var.redis_subnet_group_name
   security_group_ids         = [var.redis_sg_id]
   at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
 
   # 구동 테스트용 간단 아키텍처
   parameter_group_name = "default.redis7.cluster.on"

@@ -40,7 +40,8 @@ resource "aws_rds_cluster" "aurora_cluster" {
   master_username    = var.db_admin_user
   master_password    = var.db_admin_password
 
-  storage_type = "aurora-iopt1"
+  storage_type      = "aurora-iopt1"
+  storage_encrypted = true
 
   db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = [var.aurora_sg_id]
