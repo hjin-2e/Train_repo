@@ -252,71 +252,75 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
 
 # ==================
 # CloudWatch Role
+# [비용 절감] CloudWatch 연동 시 주석 해제
 # ==================
-resource "aws_iam_role" "cloudwatch" {
-  name = "${var.project_name}-cloudwatch-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "cloudwatch.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-
-  tags = {
-    Name        = "${var.project_name}-cloudwatch-role"
-    Environment = var.environment
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchActionsEC2Access"
-  role       = aws_iam_role.cloudwatch.name
-}
+# resource "aws_iam_role" "cloudwatch" {
+#   name = "${var.project_name}-cloudwatch-role"
+#
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "cloudwatch.amazonaws.com"
+#       }
+#       Action = "sts:AssumeRole"
+#     }]
+#   })
+#
+#   tags = {
+#     Name        = "${var.project_name}-cloudwatch-role"
+#     Environment = var.environment
+#   }
+# }
+#
+# resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
+#   policy_arn = "arn:aws:iam::aws:policy/CloudWatchActionsEC2Access"
+#   role       = aws_iam_role.cloudwatch.name
+# }
 
 # ==================
 # CloudTrail Role
+# [비용 절감] CloudWatch 연동 시 주석 해제
 # ==================
-resource "aws_iam_role" "cloudtrail" {
-  name = "${var.project_name}-cloudtrail-role"
+# resource "aws_iam_role" "cloudtrail" {
+#   name = "${var.project_name}-cloudtrail-role"
+#
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "cloudtrail.amazonaws.com"
+#       }
+#       Action = "sts:AssumeRole"
+#     }]
+#   })
+#
+#   tags = {
+#     Name        = "${var.project_name}-cloudtrail-role"
+#     Environment = var.environment
+#   }
+# }
+#
+# resource "aws_iam_role_policy" "cloudtrail_policy" {
+#   name = "${var.project_name}-cloudtrail-to-cloudwatch-policy"
+#   role = aws_iam_role.cloudtrail.id
+#
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Action = [
+#         "logs:CreateLogStream",
+#         "logs:PutLogEvents"
+#       ]
+#       Resource = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+#     }]
+#   })
+# }
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "cloudtrail.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
 
-  tags = {
-    Name        = "${var.project_name}-cloudtrail-role"
-    Environment = var.environment
-  }
-}
-
-resource "aws_iam_role_policy" "cloudtrail_policy" {
-  name = "${var.project_name}-cloudtrail-to-cloudwatch-policy"
-  role = aws_iam_role.cloudtrail.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      Resource = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
-    }]
-  })
-}
 
 # ==================
 # Lambda Role

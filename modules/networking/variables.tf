@@ -77,6 +77,16 @@ variable "eks_oidc_provider" {
 }
 
 # ==================
+# waf 변수
+# ==================
+variable "log_retention_days" {
+  description = "CloudWatch Log Group retention period in days"
+  type        = number
+  default     = 7
+}
+
+
+# ==================
 # CloudTrail 관련 변수
 # ==================
 variable "cloudtrail_retention_days" {

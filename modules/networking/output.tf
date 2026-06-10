@@ -187,16 +187,6 @@ output "lambda_role_arn" {
   value       = aws_iam_role.lambda.arn
 }
 
-output "cloudwatch_role_arn" {
-  description = "IAM Role ARN for CloudWatch Logging"
-  value       = aws_iam_role.cloudwatch.arn
-}
-
-output "cloudtrail_role_arn" {
-  description = "IAM Role ARN for CloudTrail"
-  value       = aws_iam_role.cloudtrail.arn
-}
-
 output "dms_role_arn" {
   description = "IAM Role ARN for Database Migration Service"
   value       = aws_iam_role.dms.arn
@@ -220,15 +210,45 @@ output "cloudtrail_s3_bucket_arn" {
   value       = aws_s3_bucket.cloudtrail.arn
 }
 
-output "cloudtrail_log_group" {
-  description = "The name of the CloudWatch Log Group for CloudTrail"
-  value       = aws_cloudwatch_log_group.cloudtrail.name
+# ==================
+# Component IAM Roles
+# [비용 절감] CloudWatch 연동 시 주석 해제
+# ==================
+# output "cloudwatch_role_arn" {
+#   description = "IAM Role ARN for CloudWatch Logging"
+#   value       = aws_iam_role.cloudwatch.arn
+# }
+#
+# output "cloudtrail_role_arn" {
+#   description = "IAM Role ARN for CloudTrail"
+#   value       = aws_iam_role.cloudtrail.arn
+# }
+
+# ==================
+# CloudTrail Log Group outputs
+# [비용 절감] CloudWatch 연동 시 주석 해제
+# ==================
+# output "cloudtrail_log_group" {
+#   description = "The name of the CloudWatch Log Group for CloudTrail"
+#   value       = aws_cloudwatch_log_group.cloudtrail.name
+# }
+#
+# output "cloudtrail_log_group_arn" {
+#   description = "The ARN of the CloudWatch Log Group for CloudTrail"
+#   value       = aws_cloudwatch_log_group.cloudtrail.arn
+# }
+
+
+
+# ==================
+# WAF Log Group
+# ==================
+output "waf_log_group_name" {
+  description = "CloudWatch Log Group name for WAF logs (for Grafana integration)"
+  value       = aws_cloudwatch_log_group.waf.name
 }
 
-output "cloudtrail_log_group_arn" {
-  description = "The ARN of the CloudWatch Log Group for CloudTrail"
-  value       = aws_cloudwatch_log_group.cloudtrail.arn
-}
+
 
 # ==================
 # EKS Addon outputs
