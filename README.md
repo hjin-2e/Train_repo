@@ -36,4 +36,20 @@ git push origin main
 
 # 푸시가 완료되면 반드시 팀 톡방에 알림을 남겨주세요!
 
+# ✨ 브랜치 변경 후 배포해야합니다.
+# 1. dev 브랜치를 만들면서 동시에 그 브랜치로 이동합니다.
+git checkout -b dev
+
+# 2. 변경된 파일들을 올릴 준비를 합니다. (점 '.'은 모든 변경된 파일을 의미합니다)
+git add .
+
+# 3. 버전 기록 메시지(커밋)를 남깁니다.
+git commit -m "feat: dev 브랜치 생성 및 파일 추가"
+
+# 4. 원격 저장소(GitHub 등)에 dev 브랜치를 새로 만들며 코드를 올립니다.
+git push -u origin dev
+
+# main으로 다시 변경하고 싶은 경우
+git checkout main
+
 ```
