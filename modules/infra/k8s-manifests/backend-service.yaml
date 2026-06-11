@@ -22,7 +22,7 @@ metadata:
   namespace: default
 spec:
   # EKS 1단계 배포 완료 후 출력되는 실제 target group ARN으로 아래 값을 교체해야 합니다.
-  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:009152047332:targetgroup/team-train-20260611-dev-app-tg/a1916835a0e02a1c"
+  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:009152047332:targetgroup/team-train-dev-app-tg/a1916835a0e02a1c"
   
   serviceRef:
     name: backend-service

@@ -1,9 +1,3 @@
-# 🚂 Train Repo (인프라 및 배포 가이드)
-
-이 레포지토리는 KTX 다중구간 예매 시스템의 AWS 인프라(EKS 클러스터, Aurora MySQL, ElastiCache Redis, SQS) 및 Kubernetes 매니페스트 관리를 담당합니다.
-
----
-
 ## ⚙️ 테라폼 명령어 기본 가이드
 
 개발 환경을 구축하고 관리하기 위한 주요 테라폼 명령어 모음입니다.
@@ -70,7 +64,7 @@ graph TD
 
 ```powershell
 # 1. 테라폼 개발 환경 폴더로 이동
-cd c:\Users\soldesk\Desktop\team\Train_repo\environments\dev
+cd ../Train_repo/environments/dev
 
 # 2. AWS 타겟 계정 프로필 환경변수 설정 (필수)
 $env:AWS_PROFILE="team"
@@ -88,10 +82,10 @@ terraform apply -auto-approve
 ### 2단계: 쿠버네티스 환경변수 설정 (`env-config.yaml`)
 테라폼 배포가 완료되면 출력된 아웃풋 정보(혹은 AWS 콘솔)를 참고하여 쿠버네티스 ConfigMap 환경변수를 최신 엔드포인트 주소로 업데이트합니다.
 
-*   **수정할 파일 경로:** `c:\Users\soldesk\Desktop\team\Train_repo\modules\infra\k8s-manifests\env-config.yaml`
+*   **수정할 파일 경로:** `../Train_repo/modules/infra/k8s-manifests/env-config.yaml`
 
 ```yaml
-data:
+data:   
   AWS_REGION: "ap-northeast-2"
   
   # 1. 테라폼 결과로 나온 SQS Queue URL 입력
@@ -116,7 +110,7 @@ data:
 
 ```powershell
 # 1. EKS 매니페스트 폴더로 이동
-cd c:\Users\soldesk\Desktop\team\Train_repo\modules\infra\k8s-manifests
+cd ../Train_repo/modules/infra/k8s-manifests
 
 # 2. AWS EKS kubeconfig 갱신 (클러스터 인증 연동)
 $env:AWS_PROFILE="team"
@@ -132,6 +126,10 @@ kubectl apply -f .
 ### 4단계: 로컬 연동 테스트 환경 기동
 로컬 PC에서 데이터베이스 접근 및 Redis 캐시를 돌리기 위해 세션을 수동으로 엽니다.
 
+> 💡 **연동 아키텍처 안내:**
+> * **RDS DB:** 보안상 프라이빗 망에 존재하므로, 로컬 직접 접속 대신 AWS에 배포된 진짜 RDS DB를 포트포워딩(터널링)을 통해 연결해 사용합니다.
+> * **Redis:** 이중 터널링으로 인한 로컬 개발 피로도를 낮추기 위해, 로컬 PC에 standalone Redis를 가볍게 띄워 테스트 편의성을 확보합니다.
+
 #### ① RDS MySQL 포트 포워딩 터널 열기 (터미널 1)
 AWS SSM Session Manager를 통해 로컬의 3306 포트를 원격 RDS와 터널링합니다.
 ```powershell
@@ -145,8 +143,8 @@ aws ssm start-session --target i-0f61ca719d678c627 --document-name AWS-StartPort
 #### ② 로컬 standalone Redis 기동 (터미널 2)
 로컬 독립 실행형 Redis를 실행하여 백엔드 캐시 소켓을 받아 줍니다.
 ```powershell
-# 터미널 2을 열고 Backend의 redis-bin 폴더로 이동하여 실행
-cd c:\Users\soldesk\Desktop\team\Backend
+# 터미널 2을 열고 Backend_Train 폴더로 이동하여 실행
+cd ../Backend_Train
 .\redis-bin\redis-server.exe --bind 127.0.0.1
 ```
 
@@ -156,16 +154,16 @@ cd c:\Users\soldesk\Desktop\team\Backend
 
 #### ① 백엔드 API 서버 기동 (터미널 3)
 ```powershell
-cd c:\Users\soldesk\Desktop\team\Backend
+cd ../Backend_Train
 $env:AWS_PROFILE="team"
-npm run dev
+npm run app
 ```
 
 #### ② SQS 폴링 워커 기동 (터미널 4)
 ```powershell
-cd c:\Users\soldesk\Desktop\team\Backend
+cd ../Backend_Train
 $env:AWS_PROFILE="team"
-node src/worker.js
+npm run worker
 ```
 
 ---
@@ -188,7 +186,7 @@ node src/worker.js
 #### ① Kubernetes 리소스 선제 삭제 (터미널에서 먼저 실행)
 ALB 및 로드밸런서 타겟 그룹이 EKS 내부에서 정상 해제될 시간을 보장하기 위해 선제적으로 매니페스트를 삭제합니다.
 ```powershell
-cd c:\Users\soldesk\Desktop\team\Train_repo\modules\infra\k8s-manifests
+cd ../Train_repo/modules/infra/k8s-manifests
 $env:AWS_PROFILE="team"
 kubectl delete -f . --ignore-not-found
 ```
@@ -196,7 +194,7 @@ kubectl delete -f . --ignore-not-found
 
 #### ② 테라폼 인프라 파기 (Destroy)
 ```powershell
-cd c:\Users\soldesk\Desktop\team\Train_repo\environments\dev
+cd ../Train_repo/environments/dev
 $env:AWS_PROFILE="team"
 terraform destroy -auto-approve
 ```
