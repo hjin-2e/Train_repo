@@ -16,18 +16,11 @@ spec:
       labels:
         app: train-backend
     spec:
-      serviceAccountName: booking-sa 
       containers:
       - name: backend-container
-        image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-backend:latest
+        image: nginx:alpine
         ports:
         - containerPort: 8080
-        envFrom:
-        - configMapRef:
-            name: train-config
-        - secretRef:
-            name: train-secret
-        # HPA 연동을 위해 필요한 부분
         resources:
           requests:
             cpu: "200m"

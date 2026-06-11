@@ -27,3 +27,4 @@ output "github_actions_role_arn" {
 output "pipeline_artifact_bucket_name" {
   value = module.frontend-pipeline.pipeline_artifact_bucket_name
 }
+

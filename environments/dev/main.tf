@@ -24,7 +24,7 @@ module "logging" {
   }
 }
 
-module "eks-cluster" {
+module "eks—cluster" {
   source        = "../../modules/infra/eks-cluster"
   project_name  = var.project_name
   environment   = var.environment
@@ -46,7 +46,7 @@ module "cognito" {
   environment  = var.environment
 }
 
-# EKS 생성 후 주석 해제
+# EKS 생성 후 주석 해체
 # module "alb_controller" {
 #   source       = "../../modules/infra/alb-controller"
 #
