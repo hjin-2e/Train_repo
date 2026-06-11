@@ -3,6 +3,17 @@ output "sqs_queue_url" {
   value = aws_sqs_queue.queue.url
 }
 
+# notification 모듈 연동용
+output "sqs_queue_arn" {
+  description = "SQS 큐 ARN (Lambda 이벤트 트리거 연결용)"
+  value       = aws_sqs_queue.queue.arn
+}
+
+output "sqs_queue_name" {
+  description = "SQS 큐 이름 (CloudWatch 알람 메트릭 연결용)"
+  value       = aws_sqs_queue.queue.name
+}
+
 # Aurora MySQL 클러스터 엔드포인트 주소
 output "aurora_writer_endpoint" {
   value       = aws_rds_cluster.aurora_cluster.endpoint
