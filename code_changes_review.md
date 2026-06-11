@@ -88,42 +88,31 @@
 * **변경 이유:** 여러 작업자가 동일한 공용 AWS 계정에서 동시에 테스트 배포를 시도할 때 전역 리소스(S3 버킷 등) 중복 충돌 에러가 발생하는 것을 방지하기 위해 날짜 접미사를 추가하여 고유하게 세팅했습니다.
 
 ---
+## 4. 🛡️ [상용 아키텍처 규격 복구를 완료한 핵심 기능]
 
-## 4. ⚠️ [로컬 테스트 편의를 위해 기존 설계에서 임시 제외한 기능]
+기존 설계에 포함되었으나 로컬 테스트 및 초기 구동 편의상 제외했었던 핵심 리소스(KEDA, ESO, HTTPS Ingress, WAF, 장애 모니터링 알림)들을 개선본 브랜치(`origin/dev`)에 모두 통합 및 복구 완료했습니다. 각 리소스의 기능적 의의와 상용망 운영 시의 역할은 다음과 같습니다.
 
-원래 개발망(`dev`) 테스트를 위해 상용 규격(Production)을 고려하여 설계해 두셨던 구성을 기반으로 작업을 진행했으나, 로컬 연동 및 기능 테스트의 배포 속도를 높이고 편의성을 확보하기 위해 임시로 제외하거나 간소화한 기능들과 그 영향은 다음과 같습니다.
+### ① 데이터베이스 비밀번호의 중앙 보안 통제 및 자동 로테이션
+* **관련 파일:** [secret-store.yaml](./modules/infra/k8s-manifests/secret-store.yaml) (복구 완료)
+* **적용된 설계:** ESO(External Secrets Operator)를 활성화하여 AWS Secrets Manager의 `team-train-db-secret` 암호를 K8s 내부에 `train-secret`으로 안전하고 자동화된 방식으로 매핑합니다.
+* **역할 & 기대 효과:** 주기적인 패스워드 변경(Rotation)이 수행되어도 수동 재배포 없이 쿠버네티스 파드가 자동으로 갱신된 암호를 동기화하여 운영 안정성을 확보합니다.
 
-### ① 데이터베이스 비밀번호의 중앙 보안 통제 및 자동 로테이션 누락
-* **관련 파일:** 원래 `modules/infra/k8s-manifests/secret-store.yaml` (현재 임시 제외됨)
-* **우회된 설계:** ESO(External Secrets Operator)를 제거하고 `kubectl create secret` 명령을 통해 일반 평문 텍스트로 `train-secret` 비밀번호를 수동 기입하고 있습니다.
-* **빠진 기능 & 리스크:**
-  * AWS Secrets Manager에 등록된 DB 패스워드가 보안 정책에 의해 주기적으로 자동 변경(Rotation)되어도 쿠버네티스 파드가 이를 실시간으로 반영하지 못해 DB 연동 오류가 발생하게 됩니다.
-  * 개발자나 배포 스크립트 작성 시 수동 명령어(`kubectl`)가 선행되어야 하므로 CI/CD 배포 자동화에 장애 요소가 됩니다.
+### ② SQS 대기열(이벤트) 기반의 파드 오토스케일링 및 비용 최적화
+* **관련 파일:** [worker-scaledobject.yaml](./modules/infra/k8s-manifests/worker-scaledobject.yaml), [worker-hpa.yaml](./modules/infra/k8s-manifests/worker-hpa.yaml) (복구 완료)
+* **적용된 설계:** KEDA ScaledObject 및 HorizontalPodAutoscaler를 추가하여 SQS 큐에 적체된 예약 요청 메시지가 늘어날 때 백그라운드 워커 파드가 자동으로 확장(2개 $\rightarrow$ 최대 10개)되도록 구성했습니다.
+* **역할 & 기대 효과:** 트래픽 폭주 시 대기 시간을 감축하여 대량 예매 요청을 병목 없이 소화하고, 야간 등 대기열이 빌 때는 파드를 최소화하여 불필요한 컴퓨팅 과금을 차단합니다.
 
-### ② 이벤트(SQS 대기열) 기반의 파드 오토스케일링 및 비용 최적화 부재
-* **관련 파일:** 원래 `modules/infra/k8s-manifests/worker-scaledobject.yaml`, `worker-hpa.yaml` (현재 임시 제외됨)
-* **우회된 설계:** KEDA ScaledObject 및 HPA 설정을 삭제하여, SQS 대기열 길이에 반응하는 동적 오토스케일링 기능이 비활성화되었습니다. (이에 따라 파드가 Deployment에 정의된 정적 복제본 수(`replicas`)로만 고정되어 기동됩니다.)
-* **빠진 기능 & 리스크:**
-  * 열차 예약 요청이 몰려 SQS 대기열에 수천 개의 메시지가 급증해도, 백그라운드 워커가 자동으로 스케일아웃(2개 $\rightarrow$ 10개)하지 못해 예약 처리 속도가 장시간 지연(예매 대기 지연)되는 병목 현상이 발생합니다.
-  * 반대로 트래픽이 전혀 없는 야간 시간대에도 파드 개수가 최소화(예: 0개)되지 않고 고정되어 있어 불필요한 자원 낭비 및 AWS 과금 리스크가 생깁니다.
+### ③ 외부 구간 암호화 및 브라우저 혼합 콘텐츠 오류 방지 (HTTPS 활성화)
+* **관련 파일:** [ingress.yaml](./modules/infra/k8s-manifests/ingress.yaml) (복구 완료)
+* **적용된 설계:** Ingress의 HTTPS 443 리스너 포트를 추가하고, SSL 리다이렉트 어노테이션 및 ACM 인증서 바인딩 설정을 활성화했습니다.
+* **역할 & 기대 효과:** 전송 구간 암호화를 통해 주요 기밀 데이터를 보호하고, 프론트엔드가 HTTPS로 서빙될 때 발생하기 쉬운 브라우저 혼합 콘텐츠(Mixed Content) 통신 차단 문제를 미연에 방지합니다.
 
-### ③ 외부 구간 암호화 및 브라우저 혼합 콘텐츠 오류 (HTTPS 배제)
-* **관련 파일:** [ingress.yaml](./modules/infra/k8s-manifests/ingress.yaml) (수정됨)
-* **우회된 설계:** Ingress의 HTTPS 443 리스너와 ACM SSL 인증서 바인딩 어노테이션들을 모두 제거하고 HTTP 80 포트로 강제 고정했습니다.
-* **빠진 기능 & 리스크:**
-  * 사용자가 웹 브라우저를 통해 예매 서비스를 이용할 때 패킷이 암호화되지 않아, 로그인 패스워드나 결제/예약 정보가 네트워크상에서 평문으로 탈취될 보안 위협에 노출됩니다.
-  * 크롬 브라우저 등에서 '안전하지 않은 사이트' 경고가 발생하며, 프론트엔드가 HTTPS로 배포된 경우 비암호화 백엔드 API와의 통신 시 Mixed Content(혼합 콘텐츠) 브라우저 자체 보안 차단 에러가 발생해 연동이 마비됩니다.
+### ④ 웹 방화벽(WAF) 및 세밀한 ALB 인바운드 보안 통제
+* **관련 파일:** [ingress.yaml](./modules/infra/k8s-manifests/ingress.yaml) (어노테이션 설정), [cloudfront.tf](./modules/networking/cloudfront.tf) (WAF 연동)
+* **적용된 설계:** Ingress에 ALB 전용 보안 그룹 바인딩 어노테이션을 복구하고, CloudFront 단에서의 WAF 보호 정책을 활성화했습니다.
+* **역할 & 기대 효과:** SQL 인젝션, XSS, CSRF 등 악성 웹 해킹 공격 트래픽을 아키텍처 전면에서 무력화하여 웹 애플리케이션 보안 등급을 상용 수준으로 격상시킵니다.
 
-### ④ 웹 방화벽(WAF) 및 커스텀 보안 그룹을 통한 정밀 접근 통제 누락
-* **관련 파일:** [ingress.yaml](./modules/infra/k8s-manifests/ingress.yaml) (어노테이션 수정), [cloudfront.tf](./modules/networking/cloudfront.tf) (WAF 설정)
-* **우회된 설계:** Ingress에서 테라폼으로 제어하는 정밀한 ALB 보안그룹(`security-groups` 어노테이션) 및 WAF ACL 연동 설정을 제외했습니다.
-* **빠진 기능 & 리스크:**
-  * 외부로부터 유입되는 SQL 인젝션, XSS, 크로스 사이트 요청 위조(CSRF) 등 악의적인 웹 공격 트래픽을 EKS 진입 단계에서 사전에 차단해 주는 방화벽 보호막이 유실됩니다.
-  * ALB가 생성될 때 인바운드 보안 통제가 EKS 기본 규칙으로만 한정되어 세밀한 포트 통제가 어려워집니다.
-
-### ⑤ 실시간 인프라 장애 모니터링 및 경보 파이프라인 작동 정지
-* **관련 파일:** [main.tf](./environments/dev/main.tf) (수정됨 - 알림 모듈 호출부 주석 처리), [variables.tf](./environments/dev/variables.tf) (변수 정의), [notification](./modules/infra/notification) (모듈 폴더)
-* **우회된 설계:** 테라폼 개발 환경 배포 스크립트(`main.tf`)에서 알림 모듈(`module "notification"`) 호출부를 주석 처리해 두었습니다.
-* **빠진 기능 & 리스크:**
-  * 백엔드 서버나 DB, Redis가 먹통이 되거나 SQS 큐 대기열이 한계치 이상으로 적체되어 인프라가 마비되었을 때, 개발자/운영자에게 이메일이나 SNS로 실시간 장애 알림을 보내주는 기능이 작동하지 않습니다.
-  * 서비스 장애를 외부 사용자의 제보를 받기 전까지는 알 수 없는 운영상의 공백이 발생합니다.
+### ⑤ 실시간 인프라 장애 모니터링 및 경보 파이프라인 가동
+* **관련 파일:** [main.tf](./environments/dev/main.tf) (알림 모듈 복구), [variables.tf](./environments/dev/variables.tf), [terraform.tfvars](./environments/dev/terraform.tfvars) (설정 복구 완료)
+* **적용된 설계:** 테라폼 코드에서 `module "notification"` 호출부 주석을 제거하고, SES/SNS 알림에 필요한 이메일 변수 값을 복원했습니다.
+* **역할 & 기대 효과:** 백엔드 오류, DB/Redis 불능, SQS 대기열 지연 발생 시 운영자에게 즉시 실시간 이메일/알림이 발송되어 선제적인 장애 탐지 및 대응을 가능하게 만듭니다.

@@ -1,0 +1,23 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: train-worker-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: train-db-worker
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: External
+    external:
+      metric:
+        name: sqs_approximate_number_of_messages_visible
+        selector:
+          matchLabels:
+            QueueName: reservation-queue
+      target:
+        type: AverageValue
+        averageValue: "30"

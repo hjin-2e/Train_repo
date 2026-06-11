@@ -1,0 +1,21 @@
+# [역할] SQS 대기열 길이 기반 Worker Pod 자동 스케일링
+# [방식] KEDA ScaledObject — SQS Trigger 사용
+# [IRSA] booking-sa ServiceAccount에 sqs:GetQueueAttributes 권한 필요
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: train-worker-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: train-db-worker
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  cooldownPeriod: 60
+  triggers:
+  - type: aws-sqs-queue
+    metadata:
+      queueURL: https://sqs.ap-northeast-2.amazonaws.com/$(ACCOUNT_ID)/reservation-queue
+      queueLength: "30"
+      awsRegion: ap-northeast-2
+      identityOwner: pod
