@@ -74,3 +74,14 @@ variable "azure_db_password" {
   type        = string
   sensitive   = true
 }
+
+# 내부 알림용
+variable "notification_email" {
+  description = "CloudWatch Alarm Email"
+  type        = string
+}
+
+variable "verified_email_or_domain" {
+  description = "SES Sender Email"
+  type        = string
+}
