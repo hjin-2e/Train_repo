@@ -2,10 +2,8 @@ module "networking" {
   source       = "../../modules/networking"
   project_name = var.project_name
   environment  = var.environment
-
   cloudfront_domain_name = var.cloudfront_domain_name
   cloudfront_zone_id     = var.cloudfront_zone_id
-  alb_dns_name           = var.alb_dns_name
   alb_zone_id            = var.alb_zone_id
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
 
@@ -50,15 +48,18 @@ module "cognito" {
 
 # EKS 생성 후 주석 해제
 # module "alb_controller" {
-#   source = "../../modules/infra/alb-controller"
+#   source       = "../../modules/infra/alb-controller"
 #
-#   project_name      = var.project_name
-#   environment       = var.environment
-#   aws_region        = var.aws_region
-#   vpc_id            = module.networking.vpc_id
-#
-#   cluster_name      = module.eks-cluster.cluster_name
-#   oidc_provider_arn = module.eks-cluster.oidc_provider_arn
+#   project_name            = var.project_name
+#   environment             = var.environment
+#   aws_region              = var.aws_region
+#   vpc_id                  = module.networking.vpc_id
+#   cluster_name            = module.eks-cluster.cluster_name
+#   oidc_provider_arn       = module.eks-cluster.oidc_provider_arn
+#   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id      # 추가
+#   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn  # 추가
+#   public_subnet_ids       = module.networking.public_subnet_ids    # 추가
+#   alb_sg_id               = module.networking.alb_sg_id            # 추가
 # }
 
 module "database" {

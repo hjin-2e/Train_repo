@@ -32,23 +32,27 @@ resource "aws_cloudfront_origin_access_control" "main" {
 resource "aws_cloudfront_distribution" "main" {
   provider = aws.us_east_1
 
-  # S3 오리진 (프론트엔드)
+  # S3 오리진 (프론트엔드) - 항상 생성
   origin {
     domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
     origin_id                = "S3-frontend"
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
 
-  # ALB 오리진 (백엔드 API)
-  origin {
-    domain_name = var.alb_dns_name
-    origin_id   = "ALB-backend"
+  # ALB 오리진 (백엔드 API) - ALB DNS가 있을 때만 생성
+  dynamic "origin" {
+    for_each = var.alb_dns_name != "" ? [1] : []
+    content {
+      domain_name = var.alb_dns_name
+      origin_id   = "ALB-backend"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        # dev → http-only (ACM 없음), prod → https-only
+        origin_protocol_policy = var.environment == "prod" ? "https-only" : "http-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
     }
   }
 
@@ -56,13 +60,13 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
-  # prod만 도메인 연결 ✅
+  # prod만 도메인 연결
   aliases = var.environment == "prod" ? [
     "team-train.cloud",
     "www.team-train.cloud"
   ] : []
 
-  # 기본 캐시 동작 (프론트엔드)
+  # 기본 캐시 동작 (프론트엔드) - 항상 생성
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
@@ -81,31 +85,34 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 86400
   }
 
-  # API 경로 캐시 동작 (백엔드)
-  ordered_cache_behavior {
-    path_pattern           = "/api/*"
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "ALB-backend"
-    viewer_protocol_policy = "redirect-to-https"
+  # API 경로 캐시 동작 (백엔드) - ALB DNS가 있을 때만 생성
+  dynamic "ordered_cache_behavior" {
+    for_each = var.alb_dns_name != "" ? [1] : []
+    content {
+      path_pattern           = "/api/*"
+      allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = "ALB-backend"
+      viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values {
-      query_string = true
-      headers      = ["Authorization"]
-      cookies {
-        forward = "all"
+      forwarded_values {
+        query_string = true
+        headers      = ["Authorization"]
+        cookies {
+          forward = "all"
+        }
       }
-    }
 
-    min_ttl     = 0
-    default_ttl = 0
-    max_ttl     = 0
+      min_ttl     = 0
+      default_ttl = 0
+      max_ttl     = 0
+    }
   }
 
   # WAF 연동
   web_acl_id = aws_wafv2_web_acl.main.arn
 
-  # SSL 인증서 (prod만 ACM, dev는 기본 인증서) 
+  # SSL 인증서 (prod만 ACM, dev는 기본 인증서)
   viewer_certificate {
     acm_certificate_arn            = var.environment == "prod" ? aws_acm_certificate.main[0].arn : null
     ssl_support_method             = var.environment == "prod" ? "sni-only" : null
@@ -132,10 +139,8 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # prod만 ACM 검증 후 생성
-  # depends_on = [
-  #   aws_acm_certificate_validation.main
-  # ]
+  # prod 배포 시 ACM 검증 완료 후 생성되도록 주석 해제
+  # depends_on = [aws_acm_certificate_validation.main]
 
   tags = {
     Name        = "${var.project_name}-cf"

@@ -402,6 +402,90 @@ resource "aws_iam_role_policy" "lambda_policy" {
 # ==================
 # DMS Role
 # ==================
+# ==================
+# DMS Roles
+# AWS DMS가 자동으로 참조하는 고정 이름 역할 3개
+# ==================
+
+# 1. DMS VPC 관리 역할 (고정 이름 필수)
+resource "aws_iam_role" "dms_vpc_role" {
+  name = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name        = "dms-vpc-role"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
+  role       = aws_iam_role.dms_vpc_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+}
+
+# 2. DMS CloudWatch 로그 역할 (고정 이름 필수)
+resource "aws_iam_role" "dms_cloudwatch_role" {
+  name = "dms-cloudwatch-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name        = "dms-cloudwatch-role"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "dms_cloudwatch_role_attachment" {
+  role       = aws_iam_role.dms_cloudwatch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+}
+
+# 3. DMS 엔드포인트 접근 역할 (고정 이름 필수)
+resource "aws_iam_role" "dms_access_for_endpoint" {
+  name = "dms-access-for-endpoint"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name        = "dms-access-for-endpoint"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "dms_access_for_endpoint_attachment" {
+  role       = aws_iam_role.dms_access_for_endpoint.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
+}
+
+# 4. DMS RDS 접근 역할 (Aurora KMS 복호화 포함)
 resource "aws_iam_role" "dms" {
   name = "${var.project_name}-dms-role"
 
@@ -448,14 +532,4 @@ resource "aws_iam_role_policy" "dms_rds_policy" {
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "dms_vpc_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
-  role       = aws_iam_role.dms.name
-}
-
-resource "aws_iam_role_policy_attachment" "dms_logs_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
-  role       = aws_iam_role.dms.name
 }

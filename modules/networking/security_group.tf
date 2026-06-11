@@ -28,6 +28,10 @@ resource "aws_security_group" "alb" {
     description = "Allow all outbound to EKS"
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = {
     Name        = "${var.project_name}-alb-sg"
     Environment = var.environment
@@ -64,6 +68,10 @@ resource "aws_security_group" "eks" {
     description = "Allow all outbound"
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = {
     Name        = "${var.project_name}-eks-sg"
     Environment = var.environment
@@ -94,7 +102,7 @@ resource "aws_security_group" "aurora" {
     description     = "Allow MySQL from Bastion"
   }
 
-  # DMS 접근 허용 
+  # DMS 접근 허용
   ingress {
     from_port       = 3306
     to_port         = 3306
@@ -103,13 +111,17 @@ resource "aws_security_group" "aurora" {
     description     = "Allow MySQL from DMS"
   }
 
-  # VPC 내부로만 아웃바운드 제한 
+  # VPC 내부로만 아웃바운드 제한
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["10.0.0.0/16"]
     description = "Allow outbound within VPC only"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {
@@ -124,6 +136,7 @@ resource "aws_security_group" "redis" {
   description = "Redis Security Group"
   vpc_id      = aws_vpc.main.id
 
+  # EKS에서 Redis 접근
   ingress {
     from_port       = 6379
     to_port         = 6379
@@ -132,12 +145,25 @@ resource "aws_security_group" "redis" {
     description     = "Allow Redis from EKS"
   }
 
+  # Bastion에서 Redis 접근 (테스트용)
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+    description     = "Allow Redis from Bastion"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {
@@ -161,13 +187,26 @@ resource "aws_security_group" "bastion" {
     description = "Allow HTTPS outbound for SSM Agent"
   }
 
-  # Bastion → Aurora DB 접근 (점프 서버 용도)
+  # Bastion → Aurora DB 접근
   egress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/16"]
     description = "Allow MySQL outbound to Aurora in VPC"
+  }
+
+  # Bastion → Redis 접근
+  egress {
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+    description = "Allow Redis outbound in VPC"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {
@@ -182,7 +221,7 @@ resource "aws_security_group" "dms" {
   description = "DMS Security Group for Azure Disaster Recovery Backup"
   vpc_id      = aws_vpc.main.id
 
-  # DMS 내부 통신 허용 
+  # DMS 내부 통신 허용
   ingress {
     from_port   = 0
     to_port     = 0
@@ -199,6 +238,10 @@ resource "aws_security_group" "dms" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow outbound to Aurora and Azure DR Database"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {

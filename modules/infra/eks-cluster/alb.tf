@@ -19,24 +19,38 @@ resource "aws_lb" "main" {
   }
 }
 
-# HTTP → HTTPS 리다이렉트
+# HTTP 리스너
+# dev  → 80포트 그대로 Target Group으로 forward
+# prod → 443으로 리다이렉트
 resource "aws_lb_listener" "front_http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+  dynamic "default_action" {
+    for_each = var.environment == "prod" ? [1] : []
+    content {
+      type = "redirect"
+      redirect {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = var.environment == "dev" ? [1] : []
+    content {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.app_tg.arn
     }
   }
 }
 
-# HTTPS Listener
+# HTTPS 리스너 - prod만 생성
 resource "aws_lb_listener" "front_https" {
+  count             = var.environment == "prod" ? 1 : 0
   load_balancer_arn = aws_lb.main.arn
   port              = 443
   protocol          = "HTTPS"
@@ -49,7 +63,8 @@ resource "aws_lb_listener" "front_https" {
   }
 }
 
-# Target Group - TargetGroupBinding 방식으로 ALB Controller가 Pod IP 자동 등록
+# Target Group
+# TargetGroupBinding 방식으로 ALB Controller가 Pod IP 자동 등록
 resource "aws_lb_target_group" "app_tg" {
   name        = "${var.project_name}-${var.environment}-app-tg"
   port        = 80
@@ -72,6 +87,3 @@ resource "aws_lb_target_group" "app_tg" {
     Environment = var.environment
   }
 }
-
-# TargetGroupBinding 방식 사용으로 aws_lb_listener_rule 불필요 - 삭제
-# ALB Controller가 TargetGroupBinding CRD를 통해 자동으로 Pod IP 등록

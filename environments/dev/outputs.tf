@@ -15,3 +15,15 @@ output "acm_alb_certificate_arn" {
   value       = module.networking.acm_alb_certificate_arn
 }
 
+output "app_tg_arn" {
+  value = module.eks-cluster.app_tg_arn
+}
+output "cloudfront_domain_name" {
+  value = module.networking.cloudfront_domain_name
+}
+output "github_actions_role_arn" {
+  value = module.frontend-pipeline.github_actions_role_arn
+}
+output "pipeline_artifact_bucket_name" {
+  value = module.frontend-pipeline.pipeline_artifact_bucket_name
+}
