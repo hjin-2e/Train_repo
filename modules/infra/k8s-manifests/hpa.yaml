@@ -1,4 +1,5 @@
 # 백엔드 자동 확장(HPA) 규칙, 자동 오토스케일러
+# Redis 읽기 → SQS 전송 백엔드 스케일링
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -17,5 +18,5 @@ spec:
       name: cpu
       target:
         type: Utilization
-        # CPU 사용량 60% 기준으로 스케일링
+        # CPU 사용률 60% 초과 시 스케일아웃
         averageUtilization: 60 
