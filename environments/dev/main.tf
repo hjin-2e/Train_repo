@@ -3,11 +3,8 @@ module "networking" {
   project_name = var.project_name
   environment  = var.environment
 
-  cloudfront_domain_name = var.cloudfront_domain_name
-  cloudfront_zone_id     = var.cloudfront_zone_id
-  alb_dns_name           = var.alb_dns_name
-  alb_zone_id            = var.alb_zone_id
-  eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
+  # Route53 루트 이관 및 변수 기본값 적용에 따라 수동 도메인 연동 매핑 제거
+  eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -48,18 +45,21 @@ module "cognito" {
   environment  = var.environment
 }
 
-# EKS 생성 후 주석 해제
-# module "alb_controller" {
-#   source = "../../modules/infra/alb-controller"
-#
-#   project_name      = var.project_name
-#   environment       = var.environment
-#   aws_region        = var.aws_region
-#   vpc_id            = module.networking.vpc_id
-#
-#   cluster_name      = module.eks-cluster.cluster_name
-#   oidc_provider_arn = module.eks-cluster.oidc_provider_arn
-# }
+module "alb_controller" {
+  source = "../../modules/infra/alb-controller"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+  vpc_id       = module.networking.vpc_id
+
+  cluster_name      = module.eks-cluster.cluster_name
+  oidc_provider_arn = module.eks-cluster.oidc_provider_arn
+
+  ops_logs_bucket_id = module.logging.ops_logs_bucket_id
+  public_subnet_ids  = module.networking.public_subnet_ids
+  alb_sg_id          = module.networking.alb_sg_id
+}
 
 module "database" {
   source       = "../../modules/database"

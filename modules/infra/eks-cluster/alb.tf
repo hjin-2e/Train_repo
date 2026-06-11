@@ -19,24 +19,30 @@ resource "aws_lb" "main" {
   }
 }
 
-# HTTP → HTTPS 리다이렉트
+# HTTP Listener - Redirect to HTTPS if cert exists, otherwise forward to target group
 resource "aws_lb_listener" "front_http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    type             = var.acm_alb_certificate_arn != "" ? "redirect" : "forward"
+    target_group_arn = var.acm_alb_certificate_arn != "" ? null : aws_lb_target_group.app_tg.arn
+
+    dynamic "redirect" {
+      for_each = var.acm_alb_certificate_arn != "" ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   }
 }
 
-# HTTPS Listener
+# HTTPS Listener - Created only if ACM certificate ARN is provided
 resource "aws_lb_listener" "front_https" {
+  count             = var.acm_alb_certificate_arn != "" ? 1 : 0
   load_balancer_arn = aws_lb.main.arn
   port              = 443
   protocol          = "HTTPS"

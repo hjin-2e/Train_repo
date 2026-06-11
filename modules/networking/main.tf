@@ -18,8 +18,9 @@ resource "aws_subnet" "public_a" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.project_name}-public-a"
-    Environment = var.environment
+    Name                     = "${var.project_name}-public-a"
+    Environment              = var.environment
+    "kubernetes.io/role/elb" = "1"
   }
 }
 
@@ -31,8 +32,9 @@ resource "aws_subnet" "public_c" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.project_name}-public-c"
-    Environment = var.environment
+    Name                     = "${var.project_name}-public-c"
+    Environment              = var.environment
+    "kubernetes.io/role/elb" = "1"
   }
 }
 
@@ -43,8 +45,9 @@ resource "aws_subnet" "private_a" {
   availability_zone = "ap-northeast-2a"
 
   tags = {
-    Name        = "${var.project_name}-private-a"
-    Environment = var.environment
+    Name                              = "${var.project_name}-private-a"
+    Environment                       = var.environment
+    "kubernetes.io/role/internal-elb" = "1"
   }
 }
 
@@ -55,8 +58,9 @@ resource "aws_subnet" "private_c" {
   availability_zone = "ap-northeast-2c"
 
   tags = {
-    Name        = "${var.project_name}-private-c"
-    Environment = var.environment
+    Name                              = "${var.project_name}-private-c"
+    Environment                       = var.environment
+    "kubernetes.io/role/internal-elb" = "1"
   }
 }
 
@@ -209,7 +213,7 @@ resource "aws_db_subnet_group" "main" {
 # 레디스 서브넷
 resource "aws_elasticache_subnet_group" "main" {
   name       = "${var.project_name}-redis-subnet-group"
-  subnet_ids = [aws_subnet.db_a.id, aws_subnet.db_c.id] 
+  subnet_ids = [aws_subnet.db_a.id, aws_subnet.db_c.id]
 
   tags = {
     Name        = "${var.project_name}-redis-subnet-group"

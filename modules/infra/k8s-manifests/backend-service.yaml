@@ -2,27 +2,27 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
-  namespace: dev
+  namespace: default
   labels:
-    app: backend-app
+    app: train-backend
     tier: backend
 spec:
   type: ClusterIP
   ports:
     - port: 80       
-      targetPort: 8080 
+      targetPort: 80 # Nginx 기본 포트에 맞춰 80으로 변경
       protocol: TCP
   selector:
-    app: backend-app  
+    app: train-backend  
 ---
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
   name: backend-targetgroup-binding
-  namespace: dev
+  namespace: default
 spec:
-  # 타겟 그룹의 ARN
-  targetGroupArn: arn:aws:elasticloadbalancing:ap-northeast-2:123456789012:targetgroup/trail-dev-backend-tg/abc123xyz
+  # EKS 1단계 배포 완료 후 출력되는 실제 target group ARN으로 아래 값을 교체해야 합니다.
+  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:009152047332:targetgroup/team-train-20260611-dev-app-tg/a1916835a0e02a1c"
   
   serviceRef:
     name: backend-service

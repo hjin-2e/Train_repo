@@ -4,15 +4,14 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.50, < 6.0"
     }
-    # EKS 생성 후 주석 해제
-    # kubernetes = {
-    #   source  = "hashicorp/kubernetes"
-    #   version = ">= 3.0.0"
-    # }
-    # helm = {
-    #   source  = "hashicorp/helm"
-    #   version = "~> 2.0"
-    # }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.20.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12.0"
+    }
   }
 }
 
@@ -25,28 +24,28 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# EKS 생성 후 주석 해제
-# provider "kubernetes" {
-#   host                   = module.eks-cluster.cluster_endpoint
-#   cluster_ca_certificate = base64decode(module.eks-cluster.cluster_certificate_authority_data)
-#
-#   exec {
-#     api_version = "client.authentication.k8s.io/v1beta1"
-#     command     = "aws"
-#     args        = ["eks", "get-token", "--cluster-name", module.eks-cluster.cluster_name]
-#   }
-# }
+# EKS 생성 후 주석 해제 - 활성화
+provider "kubernetes" {
+  host                   = module.eks-cluster.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks-cluster.cluster_certificate_authority_data)
 
-# EKS 생성 후 주석 해제
-# provider "helm" {
-#   kubernetes {
-#     host                   = module.eks-cluster.cluster_endpoint
-#     cluster_ca_certificate = base64decode(module.eks-cluster.cluster_certificate_authority_data)
-#
-#     exec {
-#       api_version = "client.authentication.k8s.io/v1beta1"
-#       command     = "aws"
-#       args        = ["eks", "get-token", "--cluster-name", module.eks-cluster.cluster_name]
-#     }
-#   }
-# }
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", module.eks-cluster.cluster_name, "--profile", "team"]
+  }
+}
+
+# EKS 생성 후 주석 해제 - 활성화
+provider "helm" {
+  kubernetes {
+    host                   = module.eks-cluster.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks-cluster.cluster_certificate_authority_data)
+
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args        = ["eks", "get-token", "--cluster-name", module.eks-cluster.cluster_name, "--profile", "team"]
+    }
+  }
+}

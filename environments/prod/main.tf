@@ -3,10 +3,7 @@ module "networking" {
   project_name = var.project_name
   environment  = var.environment
 
-  cloudfront_domain_name = var.cloudfront_domain_name
-  cloudfront_zone_id     = var.cloudfront_zone_id
-  alb_dns_name           = var.alb_dns_name
-  alb_zone_id            = var.alb_zone_id
+  # Route53 루트 이관 및 변수 기본값 적용에 따라 수동 도메인 연동 매핑 제거
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
 
   providers = {
@@ -59,6 +56,11 @@ module "cognito" {
 #
 #   cluster_name      = module.eks-cluster.cluster_name
 #   oidc_provider_arn = module.eks-cluster.oidc_provider_arn
+#
+#   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
+#   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
+#   public_subnet_ids       = module.networking.public_subnet_ids
+#   alb_sg_id               = module.networking.alb_sg_id
 # }
 
 module "database" {

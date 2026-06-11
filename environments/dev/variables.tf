@@ -4,11 +4,16 @@ variable "aws_region" {
   default     = "ap-northeast-2"
 }
 
-
 variable "project_name" {
   description = "project name"
   type        = string
   default     = "team-train"
+}
+
+variable "github_repo" {
+  description = "GitHub repository name (e.g. owner/repo)"
+  type        = string
+  default     = "your-org/your-repo"
 }
 
 variable "environment" {
@@ -74,3 +79,4 @@ variable "azure_db_password" {
   type        = string
   sensitive   = true
 }
+

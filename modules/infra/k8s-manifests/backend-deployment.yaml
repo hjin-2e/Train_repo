@@ -19,7 +19,7 @@ spec:
       serviceAccountName: booking-sa 
       containers:
       - name: backend-container
-        image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-backend:latest
+        image: 009152047332.dkr.ecr.ap-northeast-2.amazonaws.com/train-backend:latest
         ports:
         - containerPort: 8080
         envFrom:

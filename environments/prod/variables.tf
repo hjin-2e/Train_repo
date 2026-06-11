@@ -10,6 +10,12 @@ variable "project_name" {
   default     = "team-train"
 }
 
+variable "github_repo" {
+  description = "GitHub repository name (e.g. owner/repo)"
+  type        = string
+  default     = "your-org/your-repo"
+}
+
 variable "environment" {
   description = "Target deployment environment"
   type        = string
@@ -85,4 +91,3 @@ variable "azure_db_password" {
   sensitive   = true
   default     = ""
 }
-

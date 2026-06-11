@@ -51,7 +51,7 @@ module "eks-cluster" {
   eks_managed_node_groups = {
     fixed_node_group = {
       ami_type       = "AL2023_x86_64_STANDARD"
-      instance_types = ["t3.medium"] 
+      instance_types = ["t3.large"] 
       min_size       = 2  
       max_size       = 8 
       desired_size   = 3  
@@ -72,9 +72,9 @@ module "eks-cluster" {
   }
 
   # 추후 ALB까지 배포 할 수 있도록
-  # cluster_endpoint_public_access           = true
-  # cluster_endpoint_public_access_cidrs     = var.developer_ips
-  # cluster_endpoint_private_access          = true
+  cluster_endpoint_public_access           = true
+  cluster_endpoint_public_access_cidrs     = var.developer_ips
+  cluster_endpoint_private_access          = true
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-eks-cluster"

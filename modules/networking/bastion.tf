@@ -11,7 +11,7 @@ resource "aws_instance" "bastion" {
   user_data = <<-EOF
     #!/bin/bash
     dnf update -y
-    dnf install -y mysql8.0
+    dnf install -y maria105
   EOF
 
   tags = {

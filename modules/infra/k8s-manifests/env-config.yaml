@@ -23,7 +23,6 @@ data:
   REDIS_HOST: "ElastiCache_Redis_Configuration_Endpoint_입력"
   REDIS_PORT: "6379"
 
-
 # DB_USER, DB_PASSWORD는 ESO(External Secrets Operator) 설치 후
 # AWS Secrets Manager에서 자동으로 K8s Secret(train-secret)을 생성함
 # external-secret.yaml 참고해주세요

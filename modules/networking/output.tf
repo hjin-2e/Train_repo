@@ -288,12 +288,12 @@ output "waf_log_group_name" {
 # Subnet Group outputs
 # ==================
 output "db_subnet_group_name" {
-  description = "The name of the DB Subnet Group" 
+  description = "The name of the DB Subnet Group"
   value       = aws_db_subnet_group.main.name
 }
 
 output "redis_subnet_group_name" {
-  description = "The name of the ElastiCache Redis Subnet Group" 
+  description = "The name of the ElastiCache Redis Subnet Group"
   value       = aws_elasticache_subnet_group.main.name
 }
 

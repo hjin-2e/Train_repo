@@ -39,16 +39,19 @@ resource "aws_cloudfront_distribution" "main" {
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
 
-  # ALB 오리진 (백엔드 API)
-  origin {
-    domain_name = var.alb_dns_name
-    origin_id   = "ALB-backend"
+  # ALB 오리진 (백엔드 API) - 주소 및 환경에 따라 동적 생성
+  dynamic "origin" {
+    for_each = (var.environment == "prod" || var.alb_dns_name != "") ? [1] : []
+    content {
+      domain_name = var.environment == "prod" ? "api.team-train.cloud" : var.alb_dns_name
+      origin_id   = "ALB-backend"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = var.environment == "prod" ? "https-only" : "http-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
     }
   }
 
@@ -81,25 +84,28 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 86400
   }
 
-  # API 경로 캐시 동작 (백엔드)
-  ordered_cache_behavior {
-    path_pattern           = "/api/*"
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "ALB-backend"
-    viewer_protocol_policy = "redirect-to-https"
+  # API 경로 캐시 동작 (백엔드가 존재할 때만 동적 구성)
+  dynamic "ordered_cache_behavior" {
+    for_each = (var.environment == "prod" || var.alb_dns_name != "") ? [1] : []
+    content {
+      path_pattern           = "/api/*"
+      allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = "ALB-backend"
+      viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values {
-      query_string = true
-      headers      = ["Authorization"]
-      cookies {
-        forward = "all"
+      forwarded_values {
+        query_string = true
+        headers      = ["Authorization"]
+        cookies {
+          forward = "all"
+        }
       }
-    }
 
-    min_ttl     = 0
-    default_ttl = 0
-    max_ttl     = 0
+      min_ttl     = 0
+      default_ttl = 0
+      max_ttl     = 0
+    }
   }
 
   # WAF 연동

@@ -132,6 +132,15 @@ resource "aws_security_group" "redis" {
     description     = "Allow Redis from EKS"
   }
 
+  # Bastion 접근 허용 (테스트용 임시 규칙)
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+    description     = "Allow Redis from Bastion"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -148,7 +157,7 @@ resource "aws_security_group" "redis" {
 
 # Bastion Security Group
 resource "aws_security_group" "bastion" {
-  name        = "${var.project_name}-bastion-sg"
+  name_prefix = "${var.project_name}-bastion-sg-"
   description = "Bastion Security Group (SSM only, no SSH)"
   vpc_id      = aws_vpc.main.id
 
@@ -173,6 +182,10 @@ resource "aws_security_group" "bastion" {
   tags = {
     Name        = "${var.project_name}-bastion-sg"
     Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

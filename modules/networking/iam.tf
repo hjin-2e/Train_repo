@@ -459,3 +459,70 @@ resource "aws_iam_role_policy_attachment" "dms_logs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms.name
 }
+
+# ==============================================================================
+# AWS DMS Default Service Roles (Required once per AWS Account)
+# ==============================================================================
+
+# 1. dms-vpc-role
+resource "aws_iam_role" "dms_vpc_role" {
+  name = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
+  role       = aws_iam_role.dms_vpc_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+}
+
+# 2. dms-cloudwatch-role
+resource "aws_iam_role" "dms_cloudwatch_role" {
+  name = "dms-cloudwatch-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dms_cloudwatch_role_attachment" {
+  role       = aws_iam_role.dms_cloudwatch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+}
+
+# 3. dms-access-for-endpoint
+resource "aws_iam_role" "dms_access_for_endpoint" {
+  name = "dms-access-for-endpoint"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "dms.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dms_access_for_endpoint_attachment" {
+  role       = aws_iam_role.dms_access_for_endpoint.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
+}
