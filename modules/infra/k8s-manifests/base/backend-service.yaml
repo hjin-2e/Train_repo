@@ -26,5 +26,5 @@ spec:
   targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:889951087651:targetgroup/team-train-dev-app-tg/2a9e8c2f0058a1a4" 
   
   serviceRef:
-    name: backend-service
-    port: 80              
+    name: train-backend-service
+    port: 8080              
