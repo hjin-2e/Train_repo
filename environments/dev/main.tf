@@ -89,7 +89,7 @@ module "frontend-pipeline" {
   frontend_bucket_name       = module.networking.s3_frontend_bucket
   cloudfront_distribution_id = module.networking.cloudfront_distribution_id
 
-  github_repo = "sum9191-ops/Front_Train"
+  github_repo = "sum9191-ops/*"
 
   create_github_oidc_provider = true
 }
@@ -99,7 +99,7 @@ module "backend-pipeline" {
   project_name = var.project_name
   environment  = var.environment
 
-  github_repo = "Chjjh605/Backend_Train"
+  github_repo = "Chjjh605/*"
 }
 
 # 내부 통신 알림
