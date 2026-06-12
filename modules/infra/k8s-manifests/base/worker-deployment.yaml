@@ -17,7 +17,10 @@ spec:
       serviceAccountName: booking-sa
       containers:
       - name: worker-container
-        image: $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/train-worker:latest
+        # TODO: terraform apply 후 실제 ECR 주소로 교체하세요.
+        # 형식: <ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/train-worker:latest
+        # GitOps CI가 업데이트하려면 backend-ci.yml의 kustomize edit set image 라인에 train-worker를 추가하세요.
+        image: 889951087651.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-dev-worker:latest
         envFrom:
         - configMapRef:
             name: train-config

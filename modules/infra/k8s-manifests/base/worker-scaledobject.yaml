@@ -15,7 +15,9 @@ spec:
   triggers:
   - type: aws-sqs-queue
     metadata:
-      queueURL: https://sqs.ap-northeast-2.amazonaws.com/$(ACCOUNT_ID)/reservation-queue
+      # TODO: terraform apply 후 실제 AWS 계정 ID로 교체하세요.
+      # 형식: https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/reservation-queue
+      queueURL: https://sqs.ap-northeast-2.amazonaws.com/889951087651/reservation-queue
       queueLength: "30"
       awsRegion: ap-northeast-2
       identityOwner: pod

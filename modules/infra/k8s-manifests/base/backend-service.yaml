@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: train-backend-service  # ingress.yaml이 참조하는 이름과 일치
+  namespace: default
+  labels:
+    app: train-backend
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: train-backend  # backend-deployment.yaml의 라벨과 일치
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: backend-targetgroup-binding
+  namespace: default
+spec:
+  # ⚠️ TODO: terraform apply 후 출력되는 'app_tg_arn' 값으로 교체 후 커밋하세요.
+  # 형식: arn:aws:elasticloadbalancing:ap-northeast-2:<ACCOUNT_ID>:targetgroup/...
+  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:889951087651:targetgroup/team-train-dev-app-tg/2a9e8c2f0058a1a4" 
+  
+  serviceRef:
+    name: backend-service
+    port: 80              

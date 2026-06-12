@@ -18,9 +18,14 @@ spec:
     spec:
       containers:
       - name: backend-container
-        image: nginx:alpine
+        image: team-train-dev-backend
         ports:
         - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: train-config
+        - secretRef:
+            name: train-secret
         resources:
           requests:
             cpu: "200m"

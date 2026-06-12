@@ -24,7 +24,7 @@ module "logging" {
   }
 }
 
-module "eks—cluster" {
+module "eks-cluster" {
   source        = "../../modules/infra/eks-cluster"
   project_name  = var.project_name
   environment   = var.environment
@@ -89,9 +89,17 @@ module "frontend-pipeline" {
   frontend_bucket_name       = module.networking.s3_frontend_bucket
   cloudfront_distribution_id = module.networking.cloudfront_distribution_id
 
-  github_repo = "your-org/your-repo"
+  github_repo = "sum9191-ops/Front_Train"
 
   create_github_oidc_provider = true
+}
+
+module "backend-pipeline" {
+  source       = "../../modules/infra/backend-pipeline"
+  project_name = var.project_name
+  environment  = var.environment
+
+  github_repo = "Chjjh605/Backend_Train"
 }
 
 # 내부 통신 알림
@@ -105,4 +113,34 @@ module "frontend-pipeline" {
 #   notification_email       = var.notification_email
 #   verified_email_or_domain = var.verified_email_or_domain
 #   depends_on               = [module.database]
+# }
+
+# ==============================================================================
+# Kustomize 환경변수(.env) 자동 생성 (ArgoCD/GitOps 연동용)
+# ==============================================================================
+resource "local_file" "backend_kustomize_env" {
+  filename = "../../modules/infra/k8s-manifests/overlays/${var.environment}/backend-config.env"
+  content  = <<-EOT
+    # 이 파일은 Terraform에 의해 자동 생성되었습니다. 직접 수정하지 마세요.
+    PORT=8080
+    ALLOWED_ORIGINS="https://$${module.networking.cloudfront_domain_name}"
+    AWS_REGION=${var.aws_region}
+    
+    # SQS 및 DB
+    SQS_QUEUE_URL="$${module.database.sqs_queue_url}"
+    DB_HOST="$${module.database.aurora_writer_endpoint}"
+    DB_PORT="3306"
+    DB_NAME="trail_db"
+    
+    REDIS_HOST="$${module.database.redis_primary_endpoint}"
+    REDIS_PORT="6379"
+  EOT
+}
+
+# EKS 생성 후 주석 해제 (ArgoCD 자동 설치 및 연동)
+# module "argocd" {
+#   source       = "../../modules/infra/argocd"
+#   project_name = var.project_name
+#   environment  = var.environment
+#   # 공개 레포지토리이므로 별도 토큰 없이 바로 연동됩니다.
 # }

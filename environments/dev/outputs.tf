@@ -28,3 +28,7 @@ output "pipeline_artifact_bucket_name" {
   value = module.frontend-pipeline.pipeline_artifact_bucket_name
 }
 
+output "github_actions_backend_role_arn" {
+  description = "Backend CI/CD 템플릿의 role-to-assume 값으로 사용하세요."
+  value       = module.backend-pipeline.github_actions_backend_role_arn
+}

@@ -187,10 +187,10 @@ output "lambda_role_arn" {
   value       = aws_iam_role.lambda.arn
 }
 
-output "dms_role_arn" {
-  description = "IAM Role ARN for Database Migration Service"
-  value       = aws_iam_role.dms.arn
-}
+# output "dms_role_arn" {
+#   description = "IAM Role ARN for Database Migration Service"
+#   value       = aws_iam_role.dms.arn
+# }
 
 # ==================
 # CloudTrail outputs

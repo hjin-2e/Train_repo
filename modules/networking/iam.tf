@@ -82,7 +82,7 @@ resource "aws_iam_policy" "secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-secret*"
+        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-credentials*"
       },
       {
         Effect = "Allow"
@@ -403,10 +403,11 @@ resource "aws_iam_role_policy" "lambda_policy" {
 # DMS Role
 # ==================
 # ==================
-# DMS Roles
-# AWS DMS가 자동으로 참조하는 고정 이름 역할 3개
+# DMS Roles (비활성화)
+# AWS DMS가 자동으로 참조하는 고정 이름 역할들입니다.
+# 이미 AWS 계정에 존재하기 때문에 주석 처리합니다.
 # ==================
-
+/*
 # 1. DMS VPC 관리 역할 (고정 이름 필수)
 resource "aws_iam_role" "dms_vpc_role" {
   name = "dms-vpc-role"
@@ -533,3 +534,4 @@ resource "aws_iam_role_policy" "dms_rds_policy" {
     ]
   })
 }
+*/

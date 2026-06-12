@@ -5,16 +5,19 @@ resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
   description = "Aurora MySQL 8.0 parameter group for DMS CDC and UTF8mb4"
 
   parameter {
-    name  = "binlog_format"
-    value = "ROW"
+    name         = "binlog_format"
+    value        = "ROW"
+    apply_method = "pending-reboot"
   }
   parameter {
-    name  = "binlog_row_image"
-    value = "full"
+    name         = "binlog_row_image"
+    value        = "full"
+    apply_method = "pending-reboot"
   }
   parameter {
-    name  = "binlog_checksum"
-    value = "NONE"
+    name         = "binlog_checksum"
+    value        = "NONE"
+    apply_method = "pending-reboot"
   }
   parameter {
     name         = "lower_case_table_names"
@@ -22,12 +25,14 @@ resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
     apply_method = "pending-reboot"
   }
   parameter {
-    name  = "character_set_server"
-    value = "utf8mb4"
+    name         = "character_set_server"
+    value        = "utf8mb4"
+    apply_method = "pending-reboot"
   }
   parameter {
-    name  = "collation_server"
-    value = "utf8mb4_0900_ai_ci"
+    name         = "collation_server"
+    value        = "utf8mb4_0900_ai_ci"
+    apply_method = "pending-reboot"
   }
 }
 
@@ -93,10 +98,10 @@ resource "aws_iam_role_policy_attachment" "rds_monitoring" {
 
 # aurora.tf 파일 맨 아래에 추가
 resource "aws_secretsmanager_secret" "db" {
-  name = "${var.project_name}-db-secret"
+  name = "${var.project_name}-db-credentials"
 
   tags = {
-    Name        = "${var.project_name}-db-secret"
+    Name        = "${var.project_name}-db-credentials"
     Environment = var.environment
   }
 }
