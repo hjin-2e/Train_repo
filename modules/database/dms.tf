@@ -3,7 +3,12 @@ resource "aws_dms_replication_instance" "dms_worker" {
   replication_instance_id    = "trail-dms-instance"
   replication_instance_class = var.dms_instance_class
   allocated_storage          = 20
-  publicly_accessible        = false # 퍼블릭 IP (Nat gateway타고 전달해야하기 때문에)
+  publicly_accessible        = false
+
+  # AZ 단일 장애 시 자동 페일오버 (AZ-a ↔ AZ-c)
+  # 서브넷 그룹이 private_a + private_c 두 AZ를 커버하므로 Standby를 반대 AZ에 자동 배치
+  # AZ 2개 모두 장애(AWS 전체 불가) 시에는 Azure MySQL로 수동 전환
+  multi_az = true
 
   vpc_security_group_ids      = [var.dms_sg_id]
   replication_subnet_group_id = var.dms_subnet_group_name
