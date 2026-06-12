@@ -108,7 +108,43 @@ module "eks-cluster" {
 }
 
 # ==============================================================================
-# 3. IAM 정책 생성 (Cluster Autoscaler 연동용)
+# 3. External Secrets Operator (ESO) IRSA 역할
+# ESO가 AWS Secrets Manager에서 시크릿을 가져오기 위한 IRSA 역할
+# networking/iam.tf에 넣을 경우 eks-cluster ↔ networking 순환참조 발생하므로 여기서 정의
+# ==============================================================================
+module "eso_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = ">= 5.50, < 6.0"
+
+  role_name = "${var.project_name}-${var.environment}-eso-role"
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks-cluster.oidc_provider_arn
+      namespace_service_accounts = ["default:external-secrets-sa"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "eso_secrets_access" {
+  name = "${var.project_name}-${var.environment}-eso-secrets-policy"
+  role = module.eso_irsa_role.iam_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-secret*"
+    }]
+  })
+}
+
+# ==============================================================================
+# 4. IAM 정책 생성 (Cluster Autoscaler 연동용)
 # ==============================================================================
 resource "aws_iam_policy" "eks_cluster_autoscaler" {
   name        = "${var.project_name}-${var.environment}-eks-ca-policy"

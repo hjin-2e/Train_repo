@@ -37,3 +37,8 @@ output "app_tg_arn" {
   description = "App Target Group ARN for TargetGroupBinding"
   value       = aws_lb_target_group.app_tg.arn
 }
+
+output "eso_role_arn" {
+  description = "IAM Role ARN for External Secrets Operator (ESO)"
+  value       = module.eso_irsa_role.iam_role_arn
+}
