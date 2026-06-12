@@ -14,4 +14,4 @@ generatorOptions:
 images:
 - name: team-train-dev-backend
   newName: 889951087651.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-dev-backend
-  newTag: 2ccc4449d69242aa1f808d84a6cdab531bfc52da
+  newTag: abae716cedd398e2ec0d586422f33c018054e3ba
