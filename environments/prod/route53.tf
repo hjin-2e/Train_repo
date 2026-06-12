@@ -54,10 +54,10 @@ resource "aws_route53_record" "api" {
 
 # 3. DB 서브 도메인 레코드 (Aurora MySQL 타겟팅 - 자동화)
 resource "aws_route53_record" "db" {
-  count   = var.environment == "prod" && var.environment == "prod" && contains(keys(module), "database") ? (module.database.aurora_writer_endpoint != "" ? 1 : 0) : 0
+  count   = var.environment == "prod" ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = "db.team-train.cloud"
   type    = "CNAME"
   ttl     = "60"
-  records = [module.database.aurora_writer_endpoint]                    # 🔴 database 모듈의 진짜 Aurora 도메인 참조
+  records = [module.database.aurora_writer_endpoint]
 }

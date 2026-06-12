@@ -2,6 +2,11 @@ module "networking" {
   source       = "../../modules/networking"
   project_name = var.project_name
   environment  = var.environment
+  aws_region   = var.aws_region
+
+  # Prod 환경: 고가용성(HA)을 위해 NAT Gateway 2개(Multi-AZ) 및 VPC 엔드포인트 활성화
+  single_nat_gateway   = false
+  enable_vpc_endpoints = true
 
   # Route53 루트 이관 및 변수 기본값 적용에 따라 수동 도메인 연동 매핑 제거
   eks_cluster_name       = "${var.project_name}-${var.environment}-eks"

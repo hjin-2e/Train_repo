@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
-  # prod만 도메인 연결 ✅
+  # prod만 도메인 연결 
   aliases = var.environment == "prod" ? [
     "team-train.cloud",
     "www.team-train.cloud"
@@ -113,7 +113,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   # SSL 인증서 (prod만 ACM, dev는 기본 인증서) 
   viewer_certificate {
-    acm_certificate_arn            = var.environment == "prod" ? aws_acm_certificate.main[0].arn : null
+    acm_certificate_arn            = var.environment == "prod" ? aws_acm_certificate.cloudfront[0].arn : null
     ssl_support_method             = var.environment == "prod" ? "sni-only" : null
     minimum_protocol_version       = var.environment == "prod" ? "TLSv1.2_2021" : null
     cloudfront_default_certificate = var.environment == "prod" ? false : true
@@ -138,10 +138,9 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # prod만 ACM 검증 후 생성
-  # depends_on = [
-  #   aws_acm_certificate_validation.main
-  # ]
+  # prod 환경은 ACM 검증 완료 후 CloudFront 생성 (인증서 미검증 상태로 배포 방지)
+  # count=0이면 빈 리스트로 평가되어 dev에서는 자동으로 의존성 없음
+  depends_on = [aws_acm_certificate_validation.cloudfront]
 
   tags = {
     Name        = "${var.project_name}-cf"

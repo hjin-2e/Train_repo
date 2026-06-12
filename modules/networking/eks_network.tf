@@ -121,7 +121,7 @@
 #     name      = "booking-sa"
 #     namespace = "default"
 #     annotations = {
-#       "eks.amazonaws.com/role-arn" = var.booking_pod_role_arn
+#       "eks.amazonaws.com/role-arn" = aws_iam_role.booking_pod.arn
 #     }
 #   }
 # }
@@ -132,7 +132,7 @@
 #     name      = "user-sa"
 #     namespace = "default"
 #     annotations = {
-#       "eks.amazonaws.com/role-arn" = var.user_pod_role_arn
+#       "eks.amazonaws.com/role-arn" = aws_iam_role.user_pod.arn
 #     }
 #   }
 # }
@@ -143,7 +143,7 @@
 #     name      = "payment-sa"
 #     namespace = "default"
 #     annotations = {
-#       "eks.amazonaws.com/role-arn" = var.payment_pod_role_arn
+#       "eks.amazonaws.com/role-arn" = aws_iam_role.payment_pod.arn
 #     }
 #   }
 # }

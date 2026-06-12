@@ -25,10 +25,10 @@ output "bastion_instance_id" {
   value       = module.networking.bastion_instance_id
 }
 
-output "bastion_public_ip" {
-  description = "Bastion Public IP"
-  value       = module.networking.bastion_public_ip
-}
+# output "bastion_public_ip" {
+#   description = "Bastion Public IP"
+#   value       = module.networking.bastion_public_ip
+# }
 
 # SSM 접속 명령어
 output "bastion_ssm_connect_command" {

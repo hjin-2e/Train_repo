@@ -399,66 +399,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
-# ==================
-# DMS Role
-# ==================
-resource "aws_iam_role" "dms" {
-  name = "${var.project_name}-dms-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "dms.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
 
-  tags = {
-    Name        = "${var.project_name}-dms-role"
-    Environment = var.environment
-  }
-}
-
-resource "aws_iam_role_policy" "dms_rds_policy" {
-  name = "${var.project_name}-dms-rds-policy"
-  role = aws_iam_role.dms.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "rds:DescribeDBInstances",
-          "rds:DescribeDBClusters",
-          "rds:DescribeDBSubnetGroups"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = aws_kms_key.aurora.arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "dms_vpc_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
-  role       = aws_iam_role.dms.name
-}
-
-resource "aws_iam_role_policy_attachment" "dms_logs_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
-  role       = aws_iam_role.dms.name
-}
 
 # ==============================================================================
 # AWS DMS Default Service Roles (Required once per AWS Account)
@@ -507,6 +449,8 @@ resource "aws_iam_role_policy_attachment" "dms_cloudwatch_role_attachment" {
 }
 
 # 3. dms-access-for-endpoint
+# 롤 이름은 AWS DMS가 자동으로 탐색하는 계정 레벨 서비스 롤이므로 유지
+# AmazonDMSRedshiftS3Role은 Redshift/S3 endpoint 전용이므로 미첨부 (Aurora→Azure MySQL 구성에 불필요)
 resource "aws_iam_role" "dms_access_for_endpoint" {
   name = "dms-access-for-endpoint"
 
@@ -520,9 +464,4 @@ resource "aws_iam_role" "dms_access_for_endpoint" {
       Action = "sts:AssumeRole"
     }]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "dms_access_for_endpoint_attachment" {
-  role       = aws_iam_role.dms_access_for_endpoint.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
 }

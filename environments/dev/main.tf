@@ -2,6 +2,11 @@ module "networking" {
   source       = "../../modules/networking"
   project_name = var.project_name
   environment  = var.environment
+  aws_region   = var.aws_region
+
+  # Dev 환경: 비용 절감을 위해 NAT Gateway 1개만 사용하고 VPC 엔드포인트 비활성화
+  single_nat_gateway   = true
+  enable_vpc_endpoints = false
 
   # Route53 루트 이관 및 변수 기본값 적용에 따라 수동 도메인 연동 매핑 제거
   eks_cluster_name = "${var.project_name}-${var.environment}-eks"

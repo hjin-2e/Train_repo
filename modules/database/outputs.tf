@@ -3,6 +3,16 @@ output "sqs_queue_url" {
   value = aws_sqs_queue.queue.url
 }
 
+output "sqs_queue_arn" {
+  description = "ARN of the SQS queue (used by notification module Lambda trigger)"
+  value       = aws_sqs_queue.queue.arn
+}
+
+output "sqs_queue_name" {
+  description = "Name of the SQS queue (used by notification module CloudWatch metric)"
+  value       = aws_sqs_queue.queue.name
+}
+
 # Aurora MySQL 클러스터 엔드포인트 주소
 output "aurora_writer_endpoint" {
   value       = aws_rds_cluster.aurora_cluster.endpoint

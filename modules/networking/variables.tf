@@ -166,3 +166,16 @@ variable "eks_cluster_name" {
 #   type        = list(string)
 #   default     = []
 # }
+
+variable "single_nat_gateway" {
+  description = "Whether to use a single NAT Gateway (true) or one per AZ (false)"
+  type        = bool
+  default     = true
+}
+
+variable "enable_vpc_endpoints" {
+  description = "Whether to enable VPC endpoints for AWS services in the VPC"
+  type        = bool
+  default     = true
+  
+}

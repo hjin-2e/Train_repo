@@ -33,9 +33,9 @@ output "db_subnet_ids" {
 # ==================
 # NAT Gateway
 # ==================
-output "nat_gateway_public_ip" {
-  description = "The public IP address of the NAT Gateway for external whitelist registration"
-  value       = aws_eip.nat.public_ip
+output "nat_gateway_public_ips" {
+  description = "The public IP addresses of the NAT Gateways for external whitelist registration"
+  value       = aws_eip.nat[*].public_ip
 }
 
 # ==================
@@ -83,12 +83,13 @@ output "dms_sg_id" {
 # ==================
 output "acm_certificate_arn" {
   description = "ACM Certificate ARN for CloudFront"
-  value       = var.environment == "prod" ? aws_acm_certificate.main[0].arn : ""
+  value       = var.environment == "prod" ? aws_acm_certificate.cloudfront[0].arn : ""
 }
 
 output "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB"
   value       = var.environment == "prod" ? aws_acm_certificate.alb[0].arn : ""
+
 }
 
 # ==================
@@ -120,10 +121,10 @@ output "waf_arn" {
 # ==================
 # Bastion outputs
 # ==================
-output "bastion_public_ip" {
-  description = "Bastion Server Public IP Address"
-  value       = aws_eip.bastion.public_ip
-}
+# output "bastion_public_ip" {
+#   description = "Bastion Server Public IP Address"
+#   value       = aws_eip.bastion.public_ip
+# }
 
 output "bastion_instance_id" {
   description = "Bastion EC2 Instance ID"
@@ -185,11 +186,6 @@ output "redis_kms_key_arn" {
 output "lambda_role_arn" {
   description = "IAM Role ARN for Lambda functions"
   value       = aws_iam_role.lambda.arn
-}
-
-output "dms_role_arn" {
-  description = "IAM Role ARN for Database Migration Service"
-  value       = aws_iam_role.dms.arn
 }
 
 # ==================
@@ -289,18 +285,18 @@ output "waf_log_group_name" {
 # ==================
 output "db_subnet_group_name" {
   description = "The name of the DB Subnet Group"
-  value       = aws_db_subnet_group.main.name
+  value       = aws_db_subnet_group.aurora.name
 }
 
 output "redis_subnet_group_name" {
   description = "The name of the ElastiCache Redis Subnet Group"
-  value       = aws_elasticache_subnet_group.main.name
+  value       = aws_elasticache_subnet_group.redis.name
 }
 
 #  DMS 서브넷 그룹 아웃풋 
 output "dms_replication_subnet_group_id" {
   description = "The ID of the DMS Replication Subnet Group"
-  value       = aws_dms_replication_subnet_group.main.replication_subnet_group_id
+  value       = aws_dms_replication_subnet_group.dms.replication_subnet_group_id
 }
 
 

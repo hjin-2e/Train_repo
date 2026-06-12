@@ -49,12 +49,12 @@ module "eks-cluster" {
 
   # HPA + Cluster Autoscaler(CA) 요구사항 반영
   eks_managed_node_groups = {
-    fixed_node_group = {
+    app = {
       ami_type       = "AL2023_x86_64_STANDARD"
-      instance_types = ["t3.large"] 
-      min_size       = 2  
-      max_size       = 8 
-      desired_size   = 3  
+      instance_types = ["t3.large"]
+      min_size       = 2
+      max_size       = 8
+      desired_size   = 3
 
       # 노드 역할 정책
       iam_role_additional_policies = {
