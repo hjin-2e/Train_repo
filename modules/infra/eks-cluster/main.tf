@@ -122,3 +122,16 @@ resource "aws_iam_policy" "eks_cluster_autoscaler" {
     ]
   })
 }
+
+# ==============================================================================
+# 4. ALB to Node Security Group Rule
+# ==============================================================================
+resource "aws_security_group_rule" "alb_to_node" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = module.eks-cluster.node_security_group_id
+  source_security_group_id = var.alb_sg_id
+  description              = "Allow ALB to access Node on 8080"
+}

@@ -20,48 +20,48 @@ module "lb_controller_role" {
 # ==============================================================================
 # 2. Helm을 이용해 EKS 워커 노드 내부에 ALB 컨트롤러 앱 최종 배포
 # ==============================================================================
-# resource "helm_release" "aws_load_balancer_controller" {
-#   name       = "aws-load-balancer-controller"
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-load-balancer-controller"
-#   namespace  = "kube-system"
-#   version    = "1.7.2"
+resource "helm_release" "aws_load_balancer_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+  version    = "1.7.2"
 
-#   set {
-#     name  = "clusterName"
-#     value = var.cluster_name
-#   }
+  set {
+    name  = "clusterName"
+    value = var.cluster_name
+  }
 
-#   set {
-#     name  = "serviceAccount.name"
-#     value = "aws-load-balancer-controller"
-#   }
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
 
-#   set {
-#     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-#     value = module.lb_controller_role.iam_role_arn
-#   }
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.lb_controller_role.iam_role_arn
+  }
 
-#   set {
-#     name  = "vpcId"
-#     value = var.vpc_id
-#   }
+  set {
+    name  = "vpcId"
+    value = var.vpc_id
+  }
 
-#   set {
-#     name  = "region"
-#     value = var.aws_region
-#   }
+  set {
+    name  = "region"
+    value = var.aws_region
+  }
 
-#   set {
-#     name  = "replicaCount"
-#     value = "2"
-#   }
-#   set {
-#     name  = "image.tag"
-#     value = "v2.7.2"
-#   }
-#   set {
-#     name  = "tolerations[0].key"
-#     value = "node-role.kubernetes.io/control-plane"
-#   }
-# }
+  set {
+    name  = "replicaCount"
+    value = "2"
+  }
+  set {
+    name  = "image.tag"
+    value = "v2.7.2"
+  }
+  set {
+    name  = "tolerations[0].key"
+    value = "node-role.kubernetes.io/control-plane"
+  }
+}
