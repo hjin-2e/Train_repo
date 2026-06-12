@@ -101,16 +101,17 @@ resource "local_file" "backend_kustomize_env" {
   content  = <<-EOT
     # 이 파일은 Terraform에 의해 자동 생성되었습니다. 직접 수정하지 마세요.
     PORT=8080
-    ALLOWED_ORIGINS="https://${var.project_name}.cloud,https://www.${var.project_name}.cloud"
+    ALLOWED_ORIGINS=https://${var.project_name}.cloud,https://www.${var.project_name}.cloud
+    AWS_REGION=${var.aws_region}
     
     # SQS 및 DB
-    SQS_QUEUE_URL="${module.database.sqs_queue_url}"
-    DB_HOST="${module.database.aurora_writer_endpoint}"
-    DB_PORT="3306"
-    DB_NAME="trail_db"
+    SQS_QUEUE_URL=${module.database.sqs_queue_url}
+    DB_HOST=${module.database.aurora_writer_endpoint}
+    DB_PORT=3306
+    DB_NAME=trail_db
     
-    REDIS_HOST="${module.database.redis_primary_endpoint}"
-    REDIS_PORT="6379"
+    REDIS_HOST=${module.database.redis_primary_endpoint}
+    REDIS_PORT=6379
   EOT
 }
 

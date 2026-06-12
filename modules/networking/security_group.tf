@@ -84,13 +84,13 @@ resource "aws_security_group" "aurora" {
   description = "Aurora Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # EKS 접근 허용
+  # EKS 및 VPC 내부 접근 허용
   ingress {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.eks.id]
-    description     = "Allow MySQL from EKS"
+    cidr_blocks     = [aws_vpc.main.cidr_block]
+    description     = "Allow MySQL from EKS and VPC"
   }
 
   # Bastion 접근 허용
@@ -136,13 +136,13 @@ resource "aws_security_group" "redis" {
   description = "Redis Security Group"
   vpc_id      = aws_vpc.main.id
 
-  # EKS에서 Redis 접근
+  # EKS 및 VPC 내부 접근 허용
   ingress {
     from_port       = 6379
     to_port         = 6379
     protocol        = "tcp"
-    security_groups = [aws_security_group.eks.id]
-    description     = "Allow Redis from EKS"
+    cidr_blocks     = [aws_vpc.main.cidr_block]
+    description     = "Allow Redis from EKS and VPC"
   }
 
   # Bastion에서 Redis 접근 (테스트용)
