@@ -29,10 +29,9 @@ module "logging" {
 }
 
 module "eks-cluster" {
-  source        = "../../modules/infra/eks-cluster"
-  project_name  = var.project_name
-  environment   = var.environment
-  developer_ips = var.developer_ips
+  source       = "../../modules/infra/eks-cluster"
+  project_name = var.project_name
+  environment  = var.environment
 
   vpc_id                  = module.networking.vpc_id
   subnet_ids              = module.networking.private_subnet_ids
@@ -40,6 +39,8 @@ module "eks-cluster" {
   alb_sg_id               = module.networking.alb_sg_id
   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
+  eks_bastion_role_arn    = module.networking.eks_bastion_role_arn
+  eks_bastion_sg_id       = module.networking.eks_bastion_sg_id
 
   depends_on = [module.logging]
 }

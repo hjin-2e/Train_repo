@@ -114,8 +114,8 @@
 # # ==================
 # # IRSA Service Account
 # # ==================
-# 
-# # Booking Service Account
+#
+# # Booking Service Account - EKS 생성 후 주석 해제 (실제 사용)
 # resource "kubernetes_service_account" "booking" {
 #   metadata {
 #     name      = "booking-sa"
@@ -125,8 +125,8 @@
 #     }
 #   }
 # }
-# 
-# # User Service Account
+#
+# # User Service Account - 서비스 분리 시점에 주석 해제
 # resource "kubernetes_service_account" "user" {
 #   metadata {
 #     name      = "user-sa"
@@ -136,8 +136,8 @@
 #     }
 #   }
 # }
-# 
-# # Payment Service Account
+#
+# # Payment Service Account - 서비스 분리 시점에 주석 해제
 # resource "kubernetes_service_account" "payment" {
 #   metadata {
 #     name      = "payment-sa"

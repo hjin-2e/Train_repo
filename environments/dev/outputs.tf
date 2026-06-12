@@ -38,3 +38,26 @@ output "cloudfront_domain_name" {
   value       = module.networking.cloudfront_domain_name
 }
 
+# ==============================================================================
+# Bastion outputs (DB & EKS)
+# ==============================================================================
+output "db_bastion_instance_id" {
+  description = "DB Bastion Instance ID for SSM connection"
+  value       = module.networking.bastion_instance_id
+}
+
+output "eks_bastion_instance_id" {
+  description = "EKS Bastion Instance ID for SSM connection"
+  value       = module.networking.eks_bastion_instance_id
+}
+
+output "db_bastion_ssm_connect_command" {
+  description = "Command to connect DB Bastion via SSM"
+  value       = "aws ssm start-session --target ${module.networking.bastion_instance_id} --region ap-northeast-2"
+}
+
+output "eks_bastion_ssm_connect_command" {
+  description = "Command to connect EKS Bastion via SSM"
+  value       = "aws ssm start-session --target ${module.networking.eks_bastion_instance_id} --region ap-northeast-2"
+}
+

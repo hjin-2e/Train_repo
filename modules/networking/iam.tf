@@ -130,7 +130,7 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
 
 # ==================
 # IRSA - Booking Pod
-# EKS 생성 후 주석 해제
+# EKS 생성 후 주석 해제 (현재 실제 사용 중인 유일한 Pod Role)
 # ==================
 # resource "aws_iam_role" "booking_pod" {
 #   name = "${var.project_name}-booking-pod-role"
@@ -179,7 +179,7 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
 
 # ==================
 # IRSA - User Pod
-# EKS 생성 후 주석 해제
+# 서비스 분리 시점에 주석 해제 (현재 booking-sa와 통합 운영)
 # ==================
 # resource "aws_iam_role" "user_pod" {
 #   name = "${var.project_name}-user-pod-role"
@@ -213,7 +213,7 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
 
 # ==================
 # IRSA - Payment Pod
-# EKS 생성 후 주석 해제
+# 서비스 분리 시점에 주석 해제 (현재 booking-sa와 통합 운영)
 # ==================
 # resource "aws_iam_role" "payment_pod" {
 #   name = "${var.project_name}-payment-pod-role"
@@ -465,3 +465,51 @@ resource "aws_iam_role" "dms_access_for_endpoint" {
     }]
   })
 }
+
+# ==============================================================================
+# 4. EKS Bastion SSM Role
+# ==============================================================================
+resource "aws_iam_role" "eks_bastion_ssm" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-eks-bastion-role"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "eks_bastion_ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.eks_bastion_ssm.name
+}
+
+# aws eks update-kubeconfig 실행에 필요한 최소 권한
+resource "aws_iam_role_policy" "eks_bastion_describe" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-describe"
+  role = aws_iam_role.eks_bastion_ssm.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["eks:DescribeCluster"]
+      Resource = "arn:aws:eks:ap-northeast-2:*:cluster/${var.project_name}-${var.environment}-eks"
+    }]
+  })
+}
+
+resource "aws_iam_instance_profile" "eks_bastion_ssm" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-profile"
+  role = aws_iam_role.eks_bastion_ssm.name
+}

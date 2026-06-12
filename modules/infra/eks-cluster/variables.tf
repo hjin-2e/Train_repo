@@ -10,11 +10,6 @@ variable "environment" {
   type        = string
 }
 
-variable "developer_ips" {
-  description = "Developer IP addresses"
-  type        = list(string)
-}
-
 variable "vpc_id" {
   description = "VPC ID from networking module"
   type        = string
@@ -30,6 +25,21 @@ variable "ops_logs_bucket_id" {
   type        = string
 }
 
+variable "alb_sg_id" {
+  description = "Security Group ID for ALB"
+  type        = string
+}
+
+variable "eks_bastion_role_arn" {
+  description = "IAM Role ARN of the EKS Bastion"
+  type        = string
+}
+
+variable "eks_bastion_sg_id" {
+  description = "Security Group ID of the EKS Bastion (to allow cluster API access on 443)"
+  type        = string
+}
+
 variable "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB HTTPS"
   type        = string
@@ -38,9 +48,4 @@ variable "acm_alb_certificate_arn" {
 variable "public_subnet_ids" {
   description = "List of public subnet IDs for ALB"
   type        = list(string)
-}
-
-variable "alb_sg_id" {
-  description = "Security Group ID for ALB"
-  type        = string
 }

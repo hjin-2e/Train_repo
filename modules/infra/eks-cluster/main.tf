@@ -45,6 +45,20 @@ module "eks-cluster" {
         }
       }
     }
+    # EKS Bastion에서 EKS를 원격 제어할 수 있도록 권한 매핑
+    bastion_access = {
+      kubernetes_groups = []
+      principal_arn     = var.eks_bastion_role_arn
+      
+      policy_associations = {
+        admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
   }
 
   # HPA + Cluster Autoscaler(CA) 요구사항 반영
@@ -71,10 +85,21 @@ module "eks-cluster" {
     }
   }
 
-  # 추후 ALB까지 배포 할 수 있도록
-  cluster_endpoint_public_access           = true
-  cluster_endpoint_public_access_cidrs     = var.developer_ips
-  cluster_endpoint_private_access          = true
+  # EKS 클러스터 외부 노출 전면 차단 (Bastion을 통해서만 접속)
+  cluster_endpoint_public_access  = false
+  cluster_endpoint_private_access = true
+
+  # EKS Bastion → API server 443 허용 (private endpoint는 cluster SG로 보호됨)
+  cluster_security_group_additional_rules = {
+    ingress_from_eks_bastion = {
+      description              = "Allow EKS Bastion to reach API server"
+      protocol                 = "tcp"
+      from_port                = 443
+      to_port                  = 443
+      type                     = "ingress"
+      source_security_group_id = var.eks_bastion_sg_id
+    }
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-eks-cluster"

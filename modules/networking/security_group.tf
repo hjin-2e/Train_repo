@@ -85,13 +85,13 @@ resource "aws_security_group" "aurora" {
     description     = "Allow MySQL from EKS"
   }
 
-  # Bastion 접근 허용
+  # DB Bastion 접근 허용
   ingress {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
-    description     = "Allow MySQL from Bastion"
+    security_groups = [aws_security_group.db_bastion.id]
+    description     = "Allow MySQL from DB Bastion"
   }
 
   # DMS 접근 허용 
@@ -132,13 +132,13 @@ resource "aws_security_group" "redis" {
     description     = "Allow Redis from EKS"
   }
 
-  # Bastion 접근 허용 (테스트용 임시 규칙)
+  # DB Bastion 접근 허용 (테스트용 임시 규칙)
   ingress {
     from_port       = 6379
     to_port         = 6379
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
-    description     = "Allow Redis from Bastion"
+    security_groups = [aws_security_group.db_bastion.id]
+    description     = "Allow Redis from DB Bastion"
   }
 
   egress {
@@ -155,10 +155,10 @@ resource "aws_security_group" "redis" {
   }
 }
 
-# Bastion Security Group
-resource "aws_security_group" "bastion" {
-  name_prefix = "${var.project_name}-bastion-sg-"
-  description = "Bastion Security Group (SSM only, no SSH)"
+# DB Bastion Security Group
+resource "aws_security_group" "db_bastion" {
+  name_prefix = "${var.project_name}-db-bastion-sg-"
+  description = "DB Bastion Security Group (SSM only, no SSH)"
   vpc_id      = aws_vpc.main.id
 
   # SSM Agent → AWS 엔드포인트 통신
@@ -180,7 +180,32 @@ resource "aws_security_group" "bastion" {
   }
 
   tags = {
-    Name        = "${var.project_name}-bastion-sg"
+    Name        = "${var.project_name}-db-bastion-sg"
+    Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# EKS Bastion Security Group
+resource "aws_security_group" "eks_bastion" {
+  name_prefix = "${var.project_name}-eks-bastion-sg-"
+  description = "EKS Bastion Security Group (SSM only, no Inbound)"
+  vpc_id      = aws_vpc.main.id
+
+  # SSM Agent and EKS API Server → HTTPS outbound
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS outbound for SSM Agent and EKS API"
+  }
+
+  tags = {
+    Name        = "${var.project_name}-eks-bastion-sg"
     Environment = var.environment
   }
 

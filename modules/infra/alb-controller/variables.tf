@@ -33,11 +33,6 @@ variable "ops_logs_bucket_id" {
   type        = string
 }
 
-variable "acm_alb_certificate_arn" {
-  description = "ACM Certificate ARN for ALB HTTPS"
-  type        = string
-  default     = ""
-}
 
 variable "public_subnet_ids" {
   description = "List of public subnet IDs for ALB"

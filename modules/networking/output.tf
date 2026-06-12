@@ -62,8 +62,13 @@ output "redis_sg_id" {
 }
 
 output "bastion_sg_id" {
-  description = "Security Group ID for Bastion Server"
-  value       = aws_security_group.bastion.id
+  description = "Security Group ID for DB Bastion Server"
+  value       = aws_security_group.db_bastion.id
+}
+
+output "eks_bastion_sg_id" {
+  description = "Security Group ID for EKS Bastion Server"
+  value       = aws_security_group.eks_bastion.id
 }
 
 output "bastion_ssm_role_arn" {
@@ -127,8 +132,18 @@ output "waf_arn" {
 # }
 
 output "bastion_instance_id" {
-  description = "Bastion EC2 Instance ID"
-  value       = aws_instance.bastion.id
+  description = "DB Bastion EC2 Instance ID"
+  value       = aws_instance.db_bastion.id
+}
+
+output "eks_bastion_instance_id" {
+  description = "EKS Bastion EC2 Instance ID"
+  value       = aws_instance.eks_bastion.id
+}
+
+output "eks_bastion_role_arn" {
+  description = "IAM Role ARN of the EKS Bastion"
+  value       = aws_iam_role.eks_bastion_ssm.arn
 }
 
 # ==================
