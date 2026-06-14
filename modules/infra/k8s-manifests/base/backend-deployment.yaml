@@ -21,6 +21,18 @@ spec:
         image: team-train-dev-backend
         ports:
         - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
         envFrom:
         - configMapRef:
             name: train-config
