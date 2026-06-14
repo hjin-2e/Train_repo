@@ -61,3 +61,26 @@ output "eks_bastion_ssm_connect_command" {
   value       = "aws ssm start-session --target ${module.networking.eks_bastion_instance_id} --region ap-northeast-2"
 }
 
+# ==============================================================================
+# Database & Event Queue outputs
+# ==============================================================================
+output "aurora_writer_endpoint" {
+  description = "RDS DB host endpoint"
+  value       = module.database.aurora_writer_endpoint
+}
+
+output "redis_primary_endpoint" {
+  description = "ElastiCache Redis primary endpoint"
+  value       = module.database.redis_primary_endpoint
+}
+
+output "sqs_queue_url" {
+  description = "AWS SQS Reservation queue URL"
+  value       = module.database.sqs_queue_url
+}
+
+output "mail_queue_url" {
+  description = "AWS SQS Mail queue URL"
+  value       = module.database.mail_queue_url
+}
+

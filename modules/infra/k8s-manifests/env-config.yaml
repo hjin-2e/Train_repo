@@ -13,6 +13,7 @@ data:
   # AWS 인프라 리전 및 SQS 정보
   AWS_REGION: "ap-northeast-2"
   SQS_QUEUE_URL: "AWS_SQS_Queue_URL_입력"
+  MAIL_QUEUE_URL: "AWS_MAIL_Queue_URL_입력"
 
   # 데이터베이스 연결 정보 (Aurora MySQL)
   DB_HOST: "Aurora_Cluster_Endpoint_입력"

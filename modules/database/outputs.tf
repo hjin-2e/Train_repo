@@ -28,3 +28,13 @@ output "db_secret_arn" {
   description = "ARN of the DB Secrets Manager secret"
   value       = aws_secretsmanager_secret.db.arn
 }
+
+# 메일 큐 아웃풋
+output "mail_queue_url" {
+  value = aws_sqs_queue.mail_queue.id
+}
+
+output "mail_queue_arn" {
+  description = "ARN of the SQS mail queue (used by notification module Lambda trigger)"
+  value       = aws_sqs_queue.mail_queue.arn
+}
