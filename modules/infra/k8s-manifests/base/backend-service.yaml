@@ -23,7 +23,7 @@ metadata:
 spec:
   # ⚠️ TODO: terraform apply 후 출력되는 'app_tg_arn' 값으로 교체 후 커밋하세요.
   # 형식: arn:aws:elasticloadbalancing:ap-northeast-2:<ACCOUNT_ID>:targetgroup/...
-  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:889951087651:targetgroup/team-train-dev-app-tg/2a9e8c2f0058a1a4" 
+  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:889951087651:targetgroup/team-train-dev-app-tg/920b48b70f95eb1c"
   
   serviceRef:
     name: train-backend-service
