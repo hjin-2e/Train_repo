@@ -32,3 +32,42 @@ output "github_actions_backend_role_arn" {
   description = "Backend CI/CD 템플릿의 role-to-assume 값으로 사용하세요."
   value       = module.backend-pipeline.github_actions_backend_role_arn
 }
+
+# ==================
+# Outputs for K8s Addons
+# ==================
+output "vpc_id" {
+  value = module.networking.vpc_id
+}
+output "cluster_name" {
+  value = module.eks-cluster.cluster_name
+}
+output "oidc_provider_arn" {
+  value = module.eks-cluster.oidc_provider_arn
+}
+output "ops_logs_bucket_id" {
+  value = module.logging.ops_logs_bucket_id
+}
+output "public_subnet_ids" {
+  value = module.networking.public_subnet_ids
+}
+
+output "oidc_provider" {
+  value = module.eks-cluster.oidc_provider
+}
+
+output "aurora_policy_arn" {
+  value = module.networking.aurora_policy_arn
+}
+
+output "sqs_policy_arn" {
+  value = module.networking.sqs_policy_arn
+}
+
+output "elasticache_policy_arn" {
+  value = module.networking.elasticache_policy_arn
+}
+
+output "secrets_policy_arn" {
+  value = module.networking.secrets_policy_arn
+}

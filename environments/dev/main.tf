@@ -46,21 +46,7 @@ module "cognito" {
   environment  = var.environment
 }
 
-# EKS 생성 후 주석 해체
-# module "alb_controller" {
-#   source = "../../modules/infra/alb-controller"
-#
-#   project_name            = var.project_name
-#   environment             = var.environment
-#   aws_region              = var.aws_region
-#   vpc_id                  = module.networking.vpc_id
-#   cluster_name            = module.eks-cluster.cluster_name
-#   oidc_provider_arn       = module.eks-cluster.oidc_provider_arn
-#   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id         # 추가
-#   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn # 추가
-#   public_subnet_ids       = module.networking.public_subnet_ids       # 추가
-#   alb_sg_id               = module.networking.alb_sg_id               # 추가
-# }
+
 
 module "database" {
   source       = "../../modules/database"
@@ -137,10 +123,4 @@ resource "local_file" "backend_kustomize_env" {
   EOT
 }
 
-# EKS 생성 후 주석 해제 (ArgoCD 자동 설치 및 연동)
-# module "argocd" {
-#   source       = "../../modules/infra/argocd"
-#   project_name = var.project_name
-#   environment  = var.environment
-#   # 공개 리포지토리이므로 깃 토큰 없이 바로 연동됩니다.
-# }
+

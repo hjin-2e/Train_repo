@@ -19,19 +19,42 @@ output "acm_alb_certificate_arn" {
 
 # ==================
 # Bastion SSM outputs
+
 # ==================
-output "bastion_instance_id" {
-  description = "Bastion Instance ID for SSM connection"
-  value       = module.networking.bastion_instance_id
+# Outputs for K8s Addons
+# ==================
+output "vpc_id" {
+  value = module.networking.vpc_id
+}
+output "cluster_name" {
+  value = module.eks-cluster.cluster_name
+}
+output "oidc_provider_arn" {
+  value = module.eks-cluster.oidc_provider_arn
+}
+output "ops_logs_bucket_id" {
+  value = module.logging.ops_logs_bucket_id
+}
+output "public_subnet_ids" {
+  value = module.networking.public_subnet_ids
 }
 
-output "bastion_public_ip" {
-  description = "Bastion Public IP"
-  value       = module.networking.bastion_public_ip
+output "oidc_provider" {
+  value = module.eks-cluster.oidc_provider
 }
 
-# SSM 접속 명령어
-output "bastion_ssm_connect_command" {
-  description = "Command to connect Bastion via SSM"
-  value       = "aws ssm start-session --target ${module.networking.bastion_instance_id} --region ap-northeast-2"
+output "aurora_policy_arn" {
+  value = module.networking.aurora_policy_arn
+}
+
+output "sqs_policy_arn" {
+  value = module.networking.sqs_policy_arn
+}
+
+output "elasticache_policy_arn" {
+  value = module.networking.elasticache_policy_arn
+}
+
+output "secrets_policy_arn" {
+  value = module.networking.secrets_policy_arn
 }

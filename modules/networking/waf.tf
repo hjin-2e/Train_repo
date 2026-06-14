@@ -146,6 +146,8 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
   log_destination_configs = [aws_cloudwatch_log_group.waf.arn]
   resource_arn            = aws_wafv2_web_acl.main.arn
 
+  depends_on = [aws_cloudwatch_log_resource_policy.waf]
+
   logging_filter {
     default_behavior = "DROP"
 
@@ -191,6 +193,9 @@ resource "aws_cloudwatch_log_resource_policy" "waf" {
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:*"
           }
         }
       }

@@ -48,19 +48,6 @@ module "cognito" {
   environment  = var.environment
 }
 
-# EKS 생성 후 주석 해제
-# module "alb_controller" {
-#   source = "../../modules/infra/alb-controller"
-#
-#   project_name      = var.project_name
-#   environment       = var.environment
-#   aws_region        = var.aws_region
-#   vpc_id            = module.networking.vpc_id
-#
-#   cluster_name      = module.eks-cluster.cluster_name
-#   oidc_provider_arn = module.eks-cluster.oidc_provider_arn
-# }
-
 module "database" {
   source       = "../../modules/database"
   project_name = var.project_name
@@ -114,10 +101,3 @@ resource "local_file" "backend_kustomize_env" {
     REDIS_PORT=6379
   EOT
 }
-
-# EKS 생성 후 주석 해제 (ArgoCD 자동 설치 및 연동)
-# module "argocd" {
-#   source       = "../../modules/infra/argocd"
-#   project_name = var.project_name
-#   environment  = var.environment
-# }

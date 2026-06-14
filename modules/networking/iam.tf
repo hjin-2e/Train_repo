@@ -3,6 +3,7 @@
 # ==================
 
 # Aurora 접근 정책
+# Resource를 프로젝트 클러스터로 한정 → 타 RDS 접근 차단
 resource "aws_iam_policy" "aurora_access" {
   name = "${var.project_name}-aurora-access"
 
@@ -13,10 +14,16 @@ resource "aws_iam_policy" "aurora_access" {
         Effect = "Allow"
         Action = [
           "rds:DescribeDBClusters",
-          "rds:DescribeDBInstances",
-          "rds-db:connect"
+          "rds:DescribeDBInstances"
         ]
-        Resource = "*"
+        # 계정 내 이 프로젝트 클러스터만 허용
+        Resource = "arn:aws:rds:ap-northeast-2:*:cluster:trail-aurora-cluster"
+      },
+      {
+        Effect = "Allow"
+        Action = ["rds-db:connect"]
+        # IAM DB 인증 연결 대상도 동일 클러스터로 한정
+        Resource = "arn:aws:rds-db:ap-northeast-2:*:dbuser:trail-aurora-cluster/*"
       },
       {
         Effect = "Allow"
@@ -31,6 +38,7 @@ resource "aws_iam_policy" "aurora_access" {
 }
 
 # SQS 접근 정책
+# Resource를 프로젝트 큐 이름 패턴으로 한정 → 타 SQS 접근 차단
 resource "aws_iam_policy" "sqs_access" {
   name = "${var.project_name}-sqs-access"
 
@@ -45,12 +53,15 @@ resource "aws_iam_policy" "sqs_access" {
         "sqs:ReceiveMessage",
         "sqs:DeleteMessage"
       ]
-      Resource = "*" # 배포 후 특정 SQS ARN으로 제한 예정
+      # 이 프로젝트 SQS 큐만 허용 (team-train- 접두사 패턴)
+      Resource = "arn:aws:sqs:ap-northeast-2:*:${var.project_name}-*"
     }]
   })
 }
 
 # ElastiCache 접근 정책
+# Describe 작업은 리소스 레벨 권한 미지원 → * 유지 (AWS 제약)
+# Action을 최소한으로 제한하는 것으로 보완
 resource "aws_iam_policy" "elasticache_access" {
   name = "${var.project_name}-elasticache-access"
 
@@ -62,7 +73,7 @@ resource "aws_iam_policy" "elasticache_access" {
         "elasticache:DescribeCacheClusters",
         "elasticache:DescribeReplicationGroups"
       ]
-      Resource = "*"
+      Resource = "*" # ElastiCache Describe는 AWS 정책상 리소스 지정 불가
     }]
   })
 }
@@ -82,7 +93,7 @@ resource "aws_iam_policy" "secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-credentials*"
+        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-secret*"
       },
       {
         Effect = "Allow"
@@ -128,127 +139,7 @@ resource "aws_iam_instance_profile" "bastion_ssm" {
   role = aws_iam_role.bastion_ssm.name
 }
 
-# ==================
-# IRSA - Booking Pod
-# EKS 생성 후 주석 해제
-# ==================
-# resource "aws_iam_role" "booking_pod" {
-#   name = "${var.project_name}-booking-pod-role"
-#
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Effect = "Allow"
-#       Principal = {
-#         Federated = var.eks_oidc_provider_arn
-#       }
-#       Action = "sts:AssumeRoleWithWebIdentity"
-#       Condition = {
-#         StringEquals = {
-#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:booking-sa"
-#         }
-#       }
-#     }]
-#   })
-#
-#   tags = {
-#     Name        = "${var.project_name}-booking-pod-role"
-#     Environment = var.environment
-#   }
-# }
-#
-# resource "aws_iam_role_policy_attachment" "booking_aurora" {
-#   policy_arn = aws_iam_policy.aurora_access.arn
-#   role       = aws_iam_role.booking_pod.name
-# }
-#
-# resource "aws_iam_role_policy_attachment" "booking_sqs" {
-#   policy_arn = aws_iam_policy.sqs_access.arn
-#   role       = aws_iam_role.booking_pod.name
-# }
-#
-# resource "aws_iam_role_policy_attachment" "booking_elasticache" {
-#   policy_arn = aws_iam_policy.elasticache_access.arn
-#   role       = aws_iam_role.booking_pod.name
-# }
-#
-# resource "aws_iam_role_policy_attachment" "booking_secrets" {
-#   policy_arn = aws_iam_policy.secrets_access.arn
-#   role       = aws_iam_role.booking_pod.name
-# }
 
-# ==================
-# IRSA - User Pod
-# EKS 생성 후 주석 해제
-# ==================
-# resource "aws_iam_role" "user_pod" {
-#   name = "${var.project_name}-user-pod-role"
-#
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Effect = "Allow"
-#       Principal = {
-#         Federated = var.eks_oidc_provider_arn
-#       }
-#       Action = "sts:AssumeRoleWithWebIdentity"
-#       Condition = {
-#         StringEquals = {
-#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:user-sa"
-#         }
-#       }
-#     }]
-#   })
-#
-#   tags = {
-#     Name        = "${var.project_name}-user-pod-role"
-#     Environment = var.environment
-#   }
-# }
-#
-# resource "aws_iam_role_policy_attachment" "user_aurora" {
-#   policy_arn = aws_iam_policy.aurora_access.arn
-#   role       = aws_iam_role.user_pod.name
-# }
-
-# ==================
-# IRSA - Payment Pod
-# EKS 생성 후 주석 해제
-# ==================
-# resource "aws_iam_role" "payment_pod" {
-#   name = "${var.project_name}-payment-pod-role"
-#
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Effect = "Allow"
-#       Principal = {
-#         Federated = var.eks_oidc_provider_arn
-#       }
-#       Action = "sts:AssumeRoleWithWebIdentity"
-#       Condition = {
-#         StringEquals = {
-#           format("%s:sub", var.eks_oidc_provider) = "system:serviceaccount:default:payment-sa"
-#         }
-#       }
-#     }]
-#   })
-#
-#   tags = {
-#     Name        = "${var.project_name}-payment-pod-role"
-#     Environment = var.environment
-#   }
-# }
-#
-# resource "aws_iam_role_policy_attachment" "payment_aurora" {
-#   policy_arn = aws_iam_policy.aurora_access.arn
-#   role       = aws_iam_role.payment_pod.name
-# }
-#
-# resource "aws_iam_role_policy_attachment" "payment_sqs" {
-#   policy_arn = aws_iam_policy.sqs_access.arn
-#   role       = aws_iam_role.payment_pod.name
-# }
 
 # ==================
 # CloudWatch Role
@@ -399,16 +290,14 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
-# ==================
-# DMS Role
-# ==================
-# ==================
-# DMS Roles (비활성화)
-# AWS DMS가 자동으로 참조하는 고정 이름 역할들입니다.
-# 이미 AWS 계정에 존재하기 때문에 주석 처리합니다.
-# ==================
-/*
-# 1. DMS VPC 관리 역할 (고정 이름 필수)
+
+
+
+# ==============================================================================
+# AWS DMS Default Service Roles (Required once per AWS Account)
+# ==============================================================================
+
+# 1. dms-vpc-role
 resource "aws_iam_role" "dms_vpc_role" {
   name = "dms-vpc-role"
 
@@ -422,11 +311,6 @@ resource "aws_iam_role" "dms_vpc_role" {
       Action = "sts:AssumeRole"
     }]
   })
-
-  tags = {
-    Name        = "dms-vpc-role"
-    Environment = var.environment
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
@@ -434,7 +318,7 @@ resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
-# 2. DMS CloudWatch 로그 역할 (고정 이름 필수)
+# 2. dms-cloudwatch-role
 resource "aws_iam_role" "dms_cloudwatch_role" {
   name = "dms-cloudwatch-role"
 
@@ -448,11 +332,6 @@ resource "aws_iam_role" "dms_cloudwatch_role" {
       Action = "sts:AssumeRole"
     }]
   })
-
-  tags = {
-    Name        = "dms-cloudwatch-role"
-    Environment = var.environment
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "dms_cloudwatch_role_attachment" {
@@ -460,7 +339,9 @@ resource "aws_iam_role_policy_attachment" "dms_cloudwatch_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
 
-# 3. DMS 엔드포인트 접근 역할 (고정 이름 필수)
+# 3. dms-access-for-endpoint
+# 롤 이름은 AWS DMS가 자동으로 탐색하는 계정 레벨 서비스 롤이므로 유지
+# AmazonDMSRedshiftS3Role은 Redshift/S3 endpoint 전용이므로 미첨부 (Aurora→Azure MySQL 구성에 불필요)
 resource "aws_iam_role" "dms_access_for_endpoint" {
   name = "dms-access-for-endpoint"
 
@@ -474,64 +355,52 @@ resource "aws_iam_role" "dms_access_for_endpoint" {
       Action = "sts:AssumeRole"
     }]
   })
-
-  tags = {
-    Name        = "dms-access-for-endpoint"
-    Environment = var.environment
-  }
 }
 
-resource "aws_iam_role_policy_attachment" "dms_access_for_endpoint_attachment" {
-  role       = aws_iam_role.dms_access_for_endpoint.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
-}
-
-# 4. DMS RDS 접근 역할 (Aurora KMS 복호화 포함)
-resource "aws_iam_role" "dms" {
-  name = "${var.project_name}-dms-role"
+# ==============================================================================
+# 4. EKS Bastion SSM Role
+# ==============================================================================
+resource "aws_iam_role" "eks_bastion_ssm" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Service = "dms.amazonaws.com"
+        Service = "ec2.amazonaws.com"
       }
       Action = "sts:AssumeRole"
     }]
   })
 
   tags = {
-    Name        = "${var.project_name}-dms-role"
+    Name        = "${var.project_name}-${var.environment}-eks-bastion-role"
     Environment = var.environment
   }
 }
 
-resource "aws_iam_role_policy" "dms_rds_policy" {
-  name = "${var.project_name}-dms-rds-policy"
-  role = aws_iam_role.dms.id
+resource "aws_iam_role_policy_attachment" "eks_bastion_ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.eks_bastion_ssm.name
+}
+
+# aws eks update-kubeconfig 실행에 필요한 최소 권한
+resource "aws_iam_role_policy" "eks_bastion_describe" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-describe"
+  role = aws_iam_role.eks_bastion_ssm.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "rds:DescribeDBInstances",
-          "rds:DescribeDBClusters",
-          "rds:DescribeDBSubnetGroups"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = aws_kms_key.aurora.arn
-      }
-    ]
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["eks:DescribeCluster"]
+      Resource = "arn:aws:eks:ap-northeast-2:*:cluster/${var.project_name}-${var.environment}-eks"
+    }]
   })
 }
-*/
+
+resource "aws_iam_instance_profile" "eks_bastion_ssm" {
+  name = "${var.project_name}-${var.environment}-eks-bastion-profile"
+  role = aws_iam_role.eks_bastion_ssm.name
+}

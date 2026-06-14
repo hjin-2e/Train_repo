@@ -98,7 +98,8 @@ resource "aws_iam_role_policy_attachment" "rds_monitoring" {
 
 # aurora.tf 파일 맨 아래에 추가
 resource "aws_secretsmanager_secret" "db" {
-  name = "${var.project_name}-db-credentials"
+  name                    = "${var.project_name}-db-credentials"
+  recovery_window_in_days = 0
 
   tags = {
     Name        = "${var.project_name}-db-credentials"

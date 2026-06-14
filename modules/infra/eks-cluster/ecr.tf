@@ -14,10 +14,10 @@ resource "aws_ecr_repository" "backend" {
     scan_on_push = true
   }
 }
-resource "aws_ecr_repository" "worker" {
-  name                 = "${var.project_name}-${var.environment}-worker"
-  image_tag_mutability = "MUTABLE"
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+# resource "aws_ecr_repository" "worker" {
+#   name                 = "${var.project_name}-${var.environment}-worker"
+#   image_tag_mutability = "MUTABLE"
+#   image_scanning_configuration {
+#     scan_on_push = true
+#   }
+# }
