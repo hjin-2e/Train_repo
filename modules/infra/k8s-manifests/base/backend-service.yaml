@@ -21,9 +21,9 @@ metadata:
   name: backend-targetgroup-binding
   namespace: default
 spec:
-  # ⚠️ TODO: terraform apply 후 출력되는 'app_tg_arn' 값으로 교체 후 커밋하세요.
-  # 형식: arn:aws:elasticloadbalancing:ap-northeast-2:<ACCOUNT_ID>:targetgroup/...
-  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:889951087651:targetgroup/team-train-dev-app-tg/920b48b70f95eb1c"
+  # ⚠️ 이 값은 Terraform에 의해 overlays/dev/targetgroupbinding-patch.yaml 에서 자동으로 덮어씌워집니다.
+  # 임시 플레이스홀더 값만 유지합니다.
+  targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:000000000000:targetgroup/placeholder/00000000"
   
   serviceRef:
     name: train-backend-service

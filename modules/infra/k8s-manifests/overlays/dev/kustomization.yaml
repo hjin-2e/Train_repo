@@ -15,3 +15,6 @@ images:
 - name: team-train-dev-backend
   newName: 889951087651.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-dev-backend
   newTag: 6ef30e7d36456fd2665d90ac1585f4475344d955
+
+patchesStrategicMerge:
+- targetgroupbinding-patch.yaml

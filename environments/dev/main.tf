@@ -123,4 +123,19 @@ resource "local_file" "backend_kustomize_env" {
   EOT
 }
 
-
+# ==============================================================================
+# TargetGroupBinding 패치 자동 생성 (ArgoCD 연동용)
+# ==============================================================================
+resource "local_file" "targetgroupbinding_patch" {
+  filename = "../../modules/infra/k8s-manifests/overlays/${var.environment}/targetgroupbinding-patch.yaml"
+  content  = <<-EOT
+# 이 파일은 Terraform에 의해 자동 생성되었습니다. 직접 수정하지 마세요.
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: backend-targetgroup-binding
+  namespace: default
+spec:
+  targetGroupARN: ${module.eks-cluster.app_tg_arn}
+  EOT
+}
