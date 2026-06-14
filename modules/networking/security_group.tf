@@ -13,14 +13,37 @@ resource "aws_security_group" "alb" {
 
   # CloudFront 엣지 노드에서 오는 HTTPS만 허용 (HTTP -> HTTPS 리다이렉트는 CloudFront에서 처리)
 
-  # CloudFront 엣지 노드에서 오는 HTTPS만 허용
-  # 0.0.0.0/0 제거 → ALB 직접 접근 차단 → WAF 우회 불가
+  # 환경별 CloudFront 통신 허용: prod는 443(HTTPS), dev는 80(HTTP)
+  # 0.0.0.0/0 외부 직접 접근 차단 → WAF 우회 불가
+  dynamic "ingress" {
+    for_each = var.environment == "prod" ? [1] : []
+    content {
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      description     = "Allow HTTPS from CloudFront for prod"
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = var.environment != "prod" ? [1] : []
+    content {
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      description     = "Allow HTTP from CloudFront for dev"
+    }
+  }
+
+  # 내부망 접근 허용: 베스천 호스트 등 VPC 내부 자원에서 테스트용 접근 허용
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-    description     = "Allow HTTPS from CloudFront only"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+    description = "Allow HTTP from VPC internal (Bastion, etc)"
   }
 
   egress {
