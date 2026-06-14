@@ -132,13 +132,23 @@ output "waf_arn" {
 # }
 
 output "bastion_instance_id" {
-  description = "DB Bastion EC2 Instance ID"
+  description = "DB Bastion EC2 Instance ID (AZ-a)"
   value       = aws_instance.db_bastion.id
 }
 
+output "bastion_instance_id_c" {
+  description = "DB Bastion EC2 Instance ID (AZ-c)"
+  value       = aws_instance.db_bastion_c.id
+}
+
 output "eks_bastion_instance_id" {
-  description = "EKS Bastion EC2 Instance ID"
+  description = "EKS Bastion EC2 Instance ID (AZ-a)"
   value       = aws_instance.eks_bastion.id
+}
+
+output "eks_bastion_instance_id_c" {
+  description = "EKS Bastion EC2 Instance ID (AZ-c)"
+  value       = aws_instance.eks_bastion_c.id
 }
 
 output "eks_bastion_role_arn" {

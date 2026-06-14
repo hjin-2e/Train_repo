@@ -1,23 +1,33 @@
+# CloudFront Managed Prefix List 참조
+# AWS가 관리하는 CloudFront 엣지 노드 IP 목록 (자동 업데이트)
+# 이 목록 이외의 IP는 ALB에 직접 접근 불가 → WAF 우회 차단
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 # ALB Security Group
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-alb-sg"
-  description = "ALB Security Group"
+  description = "ALB Security Group - CloudFront only"
   vpc_id      = aws_vpc.main.id
 
+  # CloudFront 엣지 노드에서 오는 HTTP만 허용 (HTTPS 리다이렉트용)
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow HTTP"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+    description     = "Allow HTTP from CloudFront only"
   }
 
+  # CloudFront 엣지 노드에서 오는 HTTPS만 허용
+  # 0.0.0.0/0 제거 → ALB 직접 접근 차단 → WAF 우회 불가
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow HTTPS"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+    description     = "Allow HTTPS from CloudFront only"
   }
 
   egress {

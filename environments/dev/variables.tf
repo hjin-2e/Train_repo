@@ -62,6 +62,7 @@ variable "db_admin_user" {
 variable "db_admin_password" {
   description = "admin user password"
   type        = string
+  sensitive   = true # terraform plan/apply 실행 시 콘솔 및 CI/CD 로그에 비밀번호 평문 노출 방지
 }
 
 variable "azure_db_endpoint" {

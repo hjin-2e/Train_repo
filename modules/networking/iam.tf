@@ -3,6 +3,7 @@
 # ==================
 
 # Aurora 접근 정책
+# Resource를 프로젝트 클러스터로 한정 → 타 RDS 접근 차단
 resource "aws_iam_policy" "aurora_access" {
   name = "${var.project_name}-aurora-access"
 
@@ -13,10 +14,16 @@ resource "aws_iam_policy" "aurora_access" {
         Effect = "Allow"
         Action = [
           "rds:DescribeDBClusters",
-          "rds:DescribeDBInstances",
-          "rds-db:connect"
+          "rds:DescribeDBInstances"
         ]
-        Resource = "*"
+        # 계정 내 이 프로젝트 클러스터만 허용
+        Resource = "arn:aws:rds:ap-northeast-2:*:cluster:trail-aurora-cluster"
+      },
+      {
+        Effect = "Allow"
+        Action = ["rds-db:connect"]
+        # IAM DB 인증 연결 대상도 동일 클러스터로 한정
+        Resource = "arn:aws:rds-db:ap-northeast-2:*:dbuser:trail-aurora-cluster/*"
       },
       {
         Effect = "Allow"
@@ -31,6 +38,7 @@ resource "aws_iam_policy" "aurora_access" {
 }
 
 # SQS 접근 정책
+# Resource를 프로젝트 큐 이름 패턴으로 한정 → 타 SQS 접근 차단
 resource "aws_iam_policy" "sqs_access" {
   name = "${var.project_name}-sqs-access"
 
@@ -45,12 +53,15 @@ resource "aws_iam_policy" "sqs_access" {
         "sqs:ReceiveMessage",
         "sqs:DeleteMessage"
       ]
-      Resource = "*" # 배포 후 특정 SQS ARN으로 제한 예정
+      # 이 프로젝트 SQS 큐만 허용 (team-train- 접두사 패턴)
+      Resource = "arn:aws:sqs:ap-northeast-2:*:${var.project_name}-*"
     }]
   })
 }
 
 # ElastiCache 접근 정책
+# Describe 작업은 리소스 레벨 권한 미지원 → * 유지 (AWS 제약)
+# Action을 최소한으로 제한하는 것으로 보완
 resource "aws_iam_policy" "elasticache_access" {
   name = "${var.project_name}-elasticache-access"
 
@@ -62,7 +73,7 @@ resource "aws_iam_policy" "elasticache_access" {
         "elasticache:DescribeCacheClusters",
         "elasticache:DescribeReplicationGroups"
       ]
-      Resource = "*"
+      Resource = "*" # ElastiCache Describe는 AWS 정책상 리소스 지정 불가
     }]
   })
 }

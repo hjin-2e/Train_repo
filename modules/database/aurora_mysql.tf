@@ -29,6 +29,19 @@ resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
     name  = "collation_server"
     value = "utf8mb4_0900_ai_ci"
   }
+
+  # Audit Logging — DB 직접 접근 감사 로그
+  # CONNECT: 로그인/로그아웃 기록 → 비정상 접근 탐지
+  # QUERY_DML: INSERT/UPDATE/DELETE → 데이터 변조 추적
+  # QUERY_DDL: CREATE/DROP/ALTER → 스키마 변경 추적
+  parameter {
+    name  = "server_audit_logging"
+    value = "ON"
+  }
+  parameter {
+    name  = "server_audit_events"
+    value = "CONNECT,QUERY_DML,QUERY_DDL"
+  }
 }
 
 # Aurora MySQL 클러스터
@@ -48,6 +61,9 @@ resource "aws_rds_cluster" "aurora_cluster" {
 
   # 파라미터 그룹을 클러스터에 연결
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cluster_pg.name
+
+  # Audit 로그를 CloudWatch Logs로 전송 (파라미터 그룹의 server_audit_logging과 함께 동작)
+  enabled_cloudwatch_logs_exports = ["audit"]
 
   skip_final_snapshot = true # 테스트용 삭제할 때 스냅샷 안 남기기
 }
