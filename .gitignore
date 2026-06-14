@@ -39,3 +39,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Terraform auto-generated K8s manifests
+modules/infra/k8s-manifests/overlays/**/*.env
+modules/infra/k8s-manifests/overlays/**/*-patch.yaml

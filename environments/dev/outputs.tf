@@ -19,7 +19,7 @@ output "app_tg_arn" {
   value = module.eks-cluster.app_tg_arn
 }
 output "cloudfront_domain_name" {
-  value = module.networking.cloudfront_domain_name
+  value = module.cdn.cloudfront_domain_name
 }
 output "github_actions_role_arn" {
   value = module.frontend-pipeline.github_actions_role_arn

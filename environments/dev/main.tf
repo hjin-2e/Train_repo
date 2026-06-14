@@ -34,6 +34,7 @@ module "eks-cluster" {
   subnet_ids              = module.networking.private_subnet_ids
   public_subnet_ids       = module.networking.public_subnet_ids
   alb_sg_id               = module.networking.alb_sg_id
+  eks_sg_id               = module.networking.eks_sg_id
   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
 
@@ -73,7 +74,7 @@ module "frontend-pipeline" {
   environment  = var.environment
 
   frontend_bucket_name       = module.networking.s3_frontend_bucket
-  cloudfront_distribution_id = module.networking.cloudfront_distribution_id
+  cloudfront_distribution_id = module.cdn.cloudfront_distribution_id
 
   github_repo = "hjin-2e/Front_Train"
 
@@ -109,7 +110,7 @@ resource "local_file" "backend_kustomize_env" {
   content  = <<-EOT
     # 이 파일은 Terraform에 의해 자동 생성되었습니다. 직접 수정하지 마세요.
     PORT=8080
-    ALLOWED_ORIGINS=https://$${module.networking.cloudfront_domain_name}
+    ALLOWED_ORIGINS=https://${module.cdn.cloudfront_domain_name}
     AWS_REGION=${var.aws_region}
     
     # SQS 및 DB
@@ -138,4 +139,35 @@ metadata:
 spec:
   targetGroupARN: ${module.eks-cluster.app_tg_arn}
   EOT
+}
+
+module "cdn" {
+  source = "../../modules/infra/cdn"
+
+  project_name                            = var.project_name
+  environment                             = var.environment
+  s3_frontend_bucket_id                   = module.networking.s3_frontend_bucket
+  s3_frontend_bucket_arn                  = module.networking.s3_frontend_bucket_arn
+  s3_frontend_bucket_regional_domain_name = module.networking.s3_frontend_bucket_regional_domain_name
+  alb_dns_name                            = module.eks-cluster.alb_dns_name
+  waf_arn                                 = module.networking.waf_arn
+
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+}
+
+moved {
+  from = module.networking.aws_cloudfront_distribution.main
+  to   = module.cdn.aws_cloudfront_distribution.main
+}
+
+moved {
+  from = module.networking.aws_cloudfront_origin_access_control.main
+  to   = module.cdn.aws_cloudfront_origin_access_control.main
+}
+
+moved {
+  from = module.networking.aws_s3_bucket_policy.frontend
+  to   = module.cdn.aws_s3_bucket_policy.frontend
 }

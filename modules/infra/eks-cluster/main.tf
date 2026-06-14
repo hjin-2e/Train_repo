@@ -56,6 +56,8 @@ module "eks-cluster" {
       max_size       = 8 
       desired_size   = 3  
 
+      vpc_security_group_ids = [var.eks_sg_id]
+
       # 노드 역할 정책
       iam_role_additional_policies = {
         AmazonEKSClusterAutoscalerPolicy    = aws_iam_policy.eks_cluster_autoscaler.arn

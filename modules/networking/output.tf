@@ -100,19 +100,19 @@ output "acm_alb_certificate_arn" {
 # ==================
 # CloudFront outputs
 # ==================
-output "cloudfront_domain_name" {
-  description = "CloudFront Distribution Domain Name"
-  value       = aws_cloudfront_distribution.main.domain_name
-}
-
-output "cloudfront_distribution_id" {
-  description = "CloudFront Distribution ID"
-  value       = aws_cloudfront_distribution.main.id
-}
-
 output "s3_frontend_bucket" {
   description = "S3 Bucket name for frontend"
   value       = aws_s3_bucket.frontend.bucket
+}
+
+output "s3_frontend_bucket_regional_domain_name" {
+  description = "S3 Bucket regional domain name for frontend"
+  value       = aws_s3_bucket.frontend.bucket_regional_domain_name
+}
+
+output "s3_frontend_bucket_arn" {
+  description = "S3 Bucket ARN for frontend"
+  value       = aws_s3_bucket.frontend.arn
 }
 
 # ==================

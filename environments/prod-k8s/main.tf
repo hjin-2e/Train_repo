@@ -31,4 +31,5 @@ module "eks_addons" {
   sqs_policy_arn         = data.terraform_remote_state.infra.outputs.sqs_policy_arn
   elasticache_policy_arn = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
   secrets_policy_arn     = data.terraform_remote_state.infra.outputs.secrets_policy_arn
+  aws_region             = var.aws_region
 }

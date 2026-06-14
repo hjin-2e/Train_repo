@@ -42,3 +42,9 @@ variable "secrets_policy_arn" {
   type        = string
   description = "IAM Policy ARN for Secrets Manager access"
 }
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region"
+  default     = "ap-northeast-2"
+}

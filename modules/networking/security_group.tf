@@ -46,6 +46,14 @@ resource "aws_security_group" "alb" {
     description = "Allow HTTP from VPC internal (Bastion, etc)"
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = formatlist("%s/32", aws_eip.nat[*].public_ip)
+    description = "Allow HTTP from NAT Gateway (for Bastion testing)"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -187,13 +195,21 @@ resource "aws_security_group" "db_bastion" {
   description = "DB Bastion Security Group (SSM only, no SSH)"
   vpc_id      = aws_vpc.main.id
 
-  # SSM Agent → AWS 엔드포인트 통신
+  # SSM Agent 및 일반 HTTP/HTTPS 통신
   egress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow HTTPS outbound for SSM Agent"
+    description = "Allow HTTPS outbound for SSM Agent and internet"
+  }
+
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP outbound for API testing"
   }
 
   # Bastion → Aurora DB 접근 (점프 서버 용도)

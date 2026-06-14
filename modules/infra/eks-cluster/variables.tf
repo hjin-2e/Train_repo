@@ -25,6 +25,11 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
+variable "eks_sg_id" {
+  description = "EKS Security Group ID from networking module"
+  type        = string
+}
+
 variable "ops_logs_bucket_id" {
   description = "S3 bucket ID for ALB access logs"
   type        = string
