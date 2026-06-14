@@ -6,11 +6,11 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/sum9191-ops/Train_repo.git'
+    repoURL: https://github.com/sum9191-ops/Train_repo.git
     targetRevision: HEAD
     path: modules/infra/k8s-manifests/overlays/dev
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
     namespace: default
   syncPolicy:
     automated:
