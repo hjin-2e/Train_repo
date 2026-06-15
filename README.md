@@ -202,3 +202,41 @@ cd ../Train_repo/environments/dev
 $env:AWS_PROFILE="team"
 terraform destroy -auto-approve
 ```
+
+---
+
+## ☁️ Azure Database for MySQL (DR 대상 DB) 수동 세팅 및 DBeaver 연동 가이드
+
+AWS 장애 발생 시 복구 대상(DR)인 Azure Database for MySQL 유연한 서버(Flexible Server)를 생성하고 초기화하기 위한 가이드입니다.
+
+### 1) Azure MySQL 방화벽(네트워크) 규칙 설정
+Azure Portal에서 만든 MySQL 인스턴스는 외부 접속이 기본적으로 차단되므로 아래와 같이 방화벽을 개방해 주어야 합니다.
+1. Azure Portal ➡ **[네트워크 (Networking)]** 메뉴로 이동합니다.
+2. **현재 클라이언트 IP 주소 추가 (+ Add current client IP address)** 버튼을 눌러 본인 컴퓨터 IP를 등록합니다.
+3. AWS DMS 및 기타 외부 통신 연동 테스트를 위해 임시로 방화벽 규칙을 추가합니다:
+   - 규칙 이름: `allow-all`
+   - 시작 IP: `0.0.0.0`
+   - 끝 IP: `255.255.255.255`
+4. 좌측 상단의 **[저장 (Save)]** 버튼을 클릭하여 적용합니다.
+
+### 2) DBeaver 접속 및 SSL 세부 설정
+Azure MySQL은 SSL 접속을 강제하므로 DBeaver에서 다음을 반드시 설정해 줍니다.
+1. DBeaver에서 새 데이터베이스 연결 만들기 ➡ **MySQL** 드라이버를 선택합니다.
+2. **Main** 탭 정보 기입:
+   - **Host**: `azuredb.mysql.database.azure.com` (본인이 생성한 서버 호스트 주소)
+   - **Username**: `azureadmin`
+   - **Password**: `Password123!` (또는 지정한 패스워드)
+3. **SSL** 탭 정보 기입 (필수):
+   - **`Use SSL`** 체크박스를 켭니다.
+   - **`SSL mode`** 드롭다운에서 **`REQUIRED`**를 선택합니다.
+4. **[Test Connection]**을 실행하여 성공하면 설정을 완료합니다.
+
+### 3) `trail_db` 데이터베이스(스키마) 생성
+DMS 동기화 작업 및 백엔드 연동이 정상 작동하려면 데이터베이스 서버 내에 스키마 공간이 사전에 존재해야 합니다.
+1. 접속한 커넥션을 마우스 우클릭 후 **[새 SQL 편집기]**를 엽니다.
+2. 아래 쿼리를 입력하고 실행(**Ctrl + Enter**)합니다:
+   ```sql
+   CREATE DATABASE trail_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+3. `Databases` 폴더를 클릭하고 **새로 고침 (F5)**하여 `trail_db`가 생성된 것을 최종 확인합니다.
+
