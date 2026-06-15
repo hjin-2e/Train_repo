@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - backend-deployment.yaml
   - backend-service.yaml
-  # cluster-autoscaler.yaml은 Helm으로 설치합니다 (cluster-autoscaler.yaml 파일 주석 참조)
+
   - hpa.yaml
   - secret-store.yaml
   - worker-deployment.yaml

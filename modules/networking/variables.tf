@@ -177,7 +177,7 @@ variable "enable_vpc_endpoints" {
   description = "Whether to enable VPC endpoints for AWS services in the VPC"
   type        = bool
   default     = true
-  
+
 }
 
 variable "ops_logs_bucket_domain_name" {

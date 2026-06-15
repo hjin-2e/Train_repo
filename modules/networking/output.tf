@@ -126,10 +126,7 @@ output "waf_arn" {
 # ==================
 # Bastion outputs
 # ==================
-# output "bastion_public_ip" {
-#   description = "Bastion Server Public IP Address"
-#   value       = aws_eip.bastion.public_ip
-# }
+
 
 output "bastion_instance_id" {
   description = "DB Bastion EC2 Instance ID (AZ-a)"

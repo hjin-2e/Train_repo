@@ -126,11 +126,7 @@ resource "aws_cloudtrail" "main" {
   is_multi_region_trail         = var.cloudtrail_multi_region
   enable_log_file_validation    = var.cloudtrail_enable_log_validation
 
-  # =========================================================================
-  # [비용 절감] CloudWatch 이중 전송 해제 (필요할 때만 주석을 풀고 사용하세요)
-  # =========================================================================
-  # cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
-  # cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail.arn
+
 
   # =========================================================================
   # [비용 최적화] 관리 이벤트(Management)만 남기고 데이터 이벤트(S3, Lambda) 제거
@@ -150,15 +146,3 @@ resource "aws_cloudtrail" "main" {
   ]
 }
 
-# =========================================================================
-# [비용 절감] CloudWatch 연동을 안 할 경우 아래 Log Group 리소스도 제외 가능합니다.
-# =========================================================================
-# resource "aws_cloudwatch_log_group" "cloudtrail" {
-#   name              = "/aws/cloudtrail/${var.project_name}"
-#   retention_in_days = var.cloudtrail_retention_days
-#
-#   tags = {
-#     Name        = "${var.project_name}-cloudtrail-logs"
-#     Environment = var.environment
-#   }
-# }
