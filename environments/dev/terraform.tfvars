@@ -9,8 +9,8 @@ developer_ips = ["0.0.0.0/0"]
 db_admin_user     = "admin"
 db_admin_password = "Password123!"
 azure_db_endpoint = "your-azure-db-name.mysql.database.azure.com" # Azure DB Endpoint 주소
-azure_db_user     = "azure_admin_user"                            # Azure DB ID
-azure_db_password = "azure_admin_password"                        # Azure DB PW
+azure_db_user     = "azureadmin"                                  # Azure DB ID
+azure_db_password = "Password123!"                                # Azure DB PW
 
 # 내부 알림용
 notification_email       = "hjin201123@gmail.com"
