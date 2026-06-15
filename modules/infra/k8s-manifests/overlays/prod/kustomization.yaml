@@ -2,20 +2,20 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../base
+- ../../base
 
 configMapGenerator:
-  - name: train-config
-    envs:
-      - backend-config.env
+- envs:
+  - backend-config.env
+  name: train-config
 
 generatorOptions:
   disableNameSuffixHash: true
 
 images:
-  - name: team-train-dev-backend
-    newName: 889951087651.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-prod-backend
-    newTag: latest
+- name: team-train-dev-backend
+  newName: 009152047332.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-prod-backend
+  newTag: 81ef41699ec7b0b80f753b40f7f05f52618209c3
 
 patchesStrategicMerge:
-  - targetgroupbinding-patch.yaml
+- targetgroupbinding-patch.yaml
