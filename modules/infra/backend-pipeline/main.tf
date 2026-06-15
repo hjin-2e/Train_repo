@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "github_actions_backend" {
-  name = "${var.project_name}-github-actions-backend-role"
+  name = "${var.project_name}-${var.environment}-github-actions-backend-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -31,7 +31,7 @@ resource "aws_iam_role" "github_actions_backend" {
 }
 
 resource "aws_iam_role_policy" "github_actions_backend_ecr" {
-  name = "${var.project_name}-github-actions-backend-ecr-policy"
+  name = "${var.project_name}-${var.environment}-github-actions-backend-ecr-policy"
   role = aws_iam_role.github_actions_backend.id
 
   policy = jsonencode({
@@ -60,8 +60,8 @@ resource "aws_iam_role_policy" "github_actions_backend_ecr" {
           "ecr:PutImage"
         ]
         Resource = [
-          "arn:aws:ecr:*:*:repository/${var.project_name}-${var.environment}-backend",
-          "arn:aws:ecr:*:*:repository/${var.project_name}-${var.environment}-worker"
+          "arn:aws:ecr:*:*:repository/${var.project_name}-*-backend",
+          "arn:aws:ecr:*:*:repository/${var.project_name}-*-worker"
         ]
       }
     ]

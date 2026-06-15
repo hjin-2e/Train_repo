@@ -55,3 +55,9 @@ variable "eks_bastion_role_arn" {
   type        = string
   default     = ""
 }
+
+variable "enable_bastion_access" {
+  description = "Enable EKS access entry for bastion host"
+  type        = bool
+  default     = true
+}

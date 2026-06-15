@@ -1,6 +1,6 @@
 # SQS Standard 큐 생성
 resource "aws_sqs_queue" "queue" {
-  name = "reservation-queue"
+  name = "${var.project_name}-reservation-queue"
 
   # 메시지 보존 기간
   message_retention_seconds = 345600
@@ -24,7 +24,7 @@ resource "aws_sqs_queue" "queue" {
 
 # 🚨 데드 레터 큐 (DLQ) 생성
 resource "aws_sqs_queue" "queue_dlq" {
-  name                       = "reservation-queue-dlq"
+  name                       = "${var.project_name}-reservation-queue-dlq"
   message_retention_seconds  = 1209600 # 격리된 메시지 분석을 위해 보존 기간을 길게 설정 (14일)
   visibility_timeout_seconds = 30
 
@@ -36,7 +36,7 @@ resource "aws_sqs_queue" "queue_dlq" {
 
 # SES 용 SQS 큐 생성
 resource "aws_sqs_queue" "mail_queue" {
-  name = "mail-queue"
+  name = "${var.project_name}-mail-queue"
 
   message_retention_seconds  = 345600
   visibility_timeout_seconds = 30
@@ -57,7 +57,7 @@ resource "aws_sqs_queue" "mail_queue" {
 
 # SES용 데드 레터 큐 (DLQ) 생성
 resource "aws_sqs_queue" "mail_queue_dlq" {
-  name                       = "mail-queue-dlq"
+  name                       = "${var.project_name}-mail-queue-dlq"
   message_retention_seconds  = 1209600 # 14일
   visibility_timeout_seconds = 30
 

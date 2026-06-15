@@ -72,6 +72,10 @@ output "secrets_policy_arn" {
   value = module.networking.secrets_policy_arn
 }
 
+output "cluster_autoscaler_policy_arn" {
+  value = module.eks-cluster.cluster_autoscaler_policy_arn
+}
+
 # ==============================================================================
 # Database & Event Queue outputs
 # ==============================================================================

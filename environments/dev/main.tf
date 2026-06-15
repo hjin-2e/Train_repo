@@ -144,6 +144,7 @@ module "cdn" {
   s3_frontend_bucket_regional_domain_name = module.networking.s3_frontend_bucket_regional_domain_name
   alb_dns_name                            = module.eks-cluster.alb_dns_name
   waf_arn                                 = module.networking.waf_arn
+  acm_certificate_arn                     = module.networking.acm_certificate_arn
   ops_logs_bucket_domain_name             = module.logging.ops_logs_bucket_domain_name
 
   providers = {

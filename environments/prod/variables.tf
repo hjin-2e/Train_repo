@@ -33,7 +33,7 @@ variable "db_admin_password" {
   description = "Database admin password"
   type        = string
   sensitive   = true
-  default     = ""
+  default     = "Password123!"
 }
 
 variable "aurora_endpoint" {
@@ -59,18 +59,18 @@ variable "azure_db_password" {
   description = "Azure database password"
   type        = string
   sensitive   = true
-  default     = ""
+  default     = "Admin123!@#"
 }
 
 variable "notification_email" {
   description = "Notification receiver email"
   type        = string
-  default     = ""
+  default     = "admin@example.com"
 }
 
 variable "verified_email_or_domain" {
   description = "Verified SES sender email or domain"
   type        = string
-  default     = ""
+  default     = "admin@example.com"
 }
 

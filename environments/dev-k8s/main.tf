@@ -31,9 +31,10 @@ module "eks_addons" {
   oidc_provider          = data.terraform_remote_state.infra.outputs.oidc_provider
   aurora_policy_arn      = data.terraform_remote_state.infra.outputs.aurora_policy_arn
   sqs_policy_arn         = data.terraform_remote_state.infra.outputs.sqs_policy_arn
-  elasticache_policy_arn = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
-  secrets_policy_arn     = data.terraform_remote_state.infra.outputs.secrets_policy_arn
-  aws_region             = var.aws_region
+  elasticache_policy_arn        = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
+  secrets_policy_arn            = data.terraform_remote_state.infra.outputs.secrets_policy_arn
+  cluster_autoscaler_policy_arn = data.terraform_remote_state.infra.outputs.cluster_autoscaler_policy_arn
+  aws_region                    = var.aws_region
 }
 
 module "monitoring" {
@@ -41,7 +42,7 @@ module "monitoring" {
 
   project_name = var.project_name
   environment  = var.environment
-  cluster_name = data.terraform_remote_state.infra.outputs.cluster_name
+  grafana_admin_password = var.grafana_admin_password
 
   depends_on = [module.alb_controller]
 }

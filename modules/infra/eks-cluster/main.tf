@@ -46,7 +46,7 @@ module "eks-cluster" {
         }
       }
     },
-    var.eks_bastion_role_arn != "" ? {
+    var.enable_bastion_access ? {
       bastion_access = {
         kubernetes_groups = []
         principal_arn     = var.eks_bastion_role_arn

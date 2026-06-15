@@ -72,7 +72,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # GitHub Actions가 수임할 IAM Role
 resource "aws_iam_role" "github_actions" {
-  name = "${var.project_name}-github-actions-role"
+  name = "${var.project_name}-${var.environment}-github-actions-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -107,7 +107,7 @@ resource "aws_iam_role" "github_actions" {
 
 # GitHub Actions Role에 부여할 정책: S3 아티팩트 버킷 업로드 권한만 최소 부여
 resource "aws_iam_role_policy" "github_actions" {
-  name = "${var.project_name}-github-actions-policy"
+  name = "${var.project_name}-${var.environment}-github-actions-policy"
   role = aws_iam_role.github_actions.id
 
   policy = jsonencode({
@@ -135,7 +135,7 @@ resource "aws_iam_role_policy" "github_actions" {
 #    CodeBuild가 프론트엔드 S3 동기화 및 CloudFront 무효화를 수행합니다.
 # ==============================================================================
 resource "aws_iam_role" "codebuild" {
-  name = "${var.project_name}-codebuild-frontend-role"
+  name = "${var.project_name}-${var.environment}-codebuild-frontend-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -157,7 +157,7 @@ resource "aws_iam_role" "codebuild" {
 }
 
 resource "aws_iam_role_policy" "codebuild" {
-  name = "${var.project_name}-codebuild-frontend-policy"
+  name = "${var.project_name}-${var.environment}-codebuild-frontend-policy"
   role = aws_iam_role.codebuild.id
 
   policy = jsonencode({
@@ -215,7 +215,7 @@ resource "aws_iam_role_policy" "codebuild" {
 #    CodePipeline이 S3에서 소스를 읽고 CodeBuild를 실행합니다.
 # ==============================================================================
 resource "aws_iam_role" "codepipeline" {
-  name = "${var.project_name}-codepipeline-frontend-role"
+  name = "${var.project_name}-${var.environment}-codepipeline-frontend-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -237,7 +237,7 @@ resource "aws_iam_role" "codepipeline" {
 }
 
 resource "aws_iam_role_policy" "codepipeline" {
-  name = "${var.project_name}-codepipeline-frontend-policy"
+  name = "${var.project_name}-${var.environment}-codepipeline-frontend-policy"
   role = aws_iam_role.codepipeline.id
 
   policy = jsonencode({

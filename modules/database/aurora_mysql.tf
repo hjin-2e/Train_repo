@@ -35,11 +35,14 @@ resource "aws_rds_cluster_parameter_group" "aurora_cluster_pg" {
     apply_method = "pending-reboot"
   }
 
-  # 감사 로그: DML/DDL/접속 이력 기록 → CloudWatch Logs로 전송
+  # Audit Logging — DB 직접 접근 감사 로그
+  # CONNECT: 로그인/로그아웃 기록 → 비정상 접근 탐지
+  # QUERY_DML: INSERT/UPDATE/DELETE → 데이터 변조 추적
+  # QUERY_DDL: CREATE/DROP/ALTER → 스키마 변경 추적
   parameter {
     name         = "server_audit_logging"
     value        = "ON"
-    apply_method = "immediate"
+    apply_method = "pending-reboot"
   }
   parameter {
     name         = "server_audit_events"

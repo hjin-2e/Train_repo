@@ -16,6 +16,24 @@ output "acm_alb_certificate_arn" {
 }
 
 
+output "app_tg_arn" {
+  value = module.eks-cluster.app_tg_arn
+}
+output "cloudfront_domain_name" {
+  value = module.cdn.cloudfront_domain_name
+}
+output "github_actions_role_arn" {
+  value = module.frontend-pipeline.github_actions_role_arn
+}
+output "pipeline_artifact_bucket_name" {
+  value = module.frontend-pipeline.pipeline_artifact_bucket_name
+}
+
+output "github_actions_backend_role_arn" {
+  description = "Backend CI/CD 템플릿의 role-to-assume 값으로 사용하세요."
+  value       = module.backend-pipeline.github_actions_backend_role_arn
+}
+
 
 # ==================
 # Bastion SSM outputs
@@ -61,4 +79,27 @@ output "secrets_policy_arn" {
 
 output "cluster_autoscaler_policy_arn" {
   value = module.eks-cluster.cluster_autoscaler_policy_arn
+}
+
+# ==============================================================================
+# Database & Event Queue outputs
+# ==============================================================================
+output "aurora_writer_endpoint" {
+  description = "RDS DB host endpoint"
+  value       = module.database.aurora_writer_endpoint
+}
+
+output "redis_primary_endpoint" {
+  description = "ElastiCache Redis primary endpoint"
+  value       = module.database.redis_primary_endpoint
+}
+
+output "sqs_queue_url" {
+  description = "AWS SQS Reservation queue URL"
+  value       = module.database.sqs_queue_url
+}
+
+output "mail_queue_url" {
+  description = "AWS SQS Mail queue URL"
+  value       = module.database.mail_queue_url
 }

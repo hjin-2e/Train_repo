@@ -27,36 +27,43 @@ variable "developer_ips" {
 variable "db_admin_user" {
   description = "admin user data"
   type        = string
+  default     = "admin"
 }
 
 variable "db_admin_password" {
   description = "admin user password"
   type        = string
+  default     = "Admin123!@#"
 }
 
 variable "azure_db_endpoint" {
   description = "azure database endpoint"
   type        = string
+  default     = "dummy.azure.endpoint"
 }
 
 variable "azure_db_user" {
   description = "azure database user"
   type        = string
+  default     = "admin"
 }
 
 variable "azure_db_password" {
   description = "azure database password"
   type        = string
   sensitive   = true
+  default     = "Admin123!@#"
 }
 
 # 내부 알림용
 variable "notification_email" {
   description = "CloudWatch Alarm Email"
   type        = string
+  default     = "dummy@example.com"
 }
 
 variable "verified_email_or_domain" {
   description = "SES Sender Email"
   type        = string
+  default     = "dummy@example.com"
 }
