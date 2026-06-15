@@ -62,12 +62,12 @@ graph TD
 > 처음부터 인프라를 새로 띄울 때는 EKS 클러스터가 존재하지 않는 상태에서 Helm 프로바이더(ALB Controller)가 먼저 API 서버 연결을 맺으려고 시도하여 `dial tcp` 연결 에러가 발생해 배포가 중단될 수 있습니다.
 > 이를 방지하기 위해 아래와 같이 **1차로 EKS 클러스터를 타겟팅 배포하고, 2차로 전체 배포**를 수행해야 안전하게 성공합니다.
 
-```powershell
+```cmd
 # 1. 테라폼 개발 환경 폴더로 이동
 cd ../Train_repo/environments/dev
 
 # 2. AWS 타겟 계정 프로필 환경변수 설정 (필수)
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 
 # 3. 테라폼 초기화
 terraform init
@@ -108,12 +108,12 @@ data:
 > 클러스터 내부에 ESO(External Secrets Operator)가 설치되어 있지 않은 경우, 백엔드/워커 파드가 의존하고 있는 `train-secret` 이라는 이름의 Secret을 찾을 수 없어 **`CreateContainerConfigError`** 오류가 발생합니다.
 > 이를 방지하기 위해 매니페스트를 배포하기 전에 아래 **임시 Secret 수동 생성 명령어(3번)**를 반드시 한 번 실행해 주어야 안전하게 기동됩니다.
 
-```powershell
+```cmd
 # 1. EKS 매니페스트 폴더로 이동
 cd ../Train_repo/modules/infra/k8s-manifests
 
 # 2. AWS EKS kubeconfig 갱신 (클러스터 인증 연동)
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 aws eks update-kubeconfig --name team-train-dev-eks --region ap-northeast-2 --profile team
 
 # 3. [에러 방지] 임시 비밀번호용 Secret 수동 생성 (ESO가 없을 때 필수)
@@ -132,17 +132,17 @@ kubectl apply -f .
 
 #### ① RDS MySQL 포트 포워딩 터널 열기 (터미널 1)
 AWS SSM Session Manager를 통해 로컬의 3306 포트를 원격 RDS와 터널링합니다. (테스트하는 동안 계속 켜두어야 합니다.)
-```powershell
+```cmd
 # 새 터미널을 열고 실행
-$env:AWS_PROFILE="team"
-$env:Path += ";C:\Program Files\Amazon\SessionManagerPlugin\bin"
-aws ssm start-session --target i-0f61ca719d678c627 --document-name AWS-StartPortForwardingSessionToRemoteHost --region ap-northeast-2 --parameters --% "{"host":["trail-aurora-cluster.cluster-xxxx.ap-northeast-2.rds.amazonaws.com"],"portNumber":["3306"],"localPortNumber":["3306"]}"
+set AWS_PROFILE=team
+set PATH=%PATH%;C:\Program Files\Amazon\SessionManagerPlugin\bin
+aws ssm start-session --target i-0f61ca719d678c627 --document-name AWS-StartPortForwardingSessionToRemoteHost --region ap-northeast-2 --parameters "{\"host\":[\"trail-aurora-cluster.cluster-xxxx.ap-northeast-2.rds.amazonaws.com\"],\"portNumber\":[\"3306\"],\"localPortNumber\":[\"3306\"]}"
 ```
 *(주의: 파라미터 내 `host` 값은 2단계에서 얻은 실제 Aurora Cluster Endpoint 주소로 교체해야 합니다.)*
 
 #### ② 로컬 Redis 컨테이너 기동 (터미널 2)
 Docker Compose를 사용하여 로컬 환경에 캐시용 단일 Redis 인스턴스를 띄웁니다.
-```powershell
+```cmd
 # 새 터미널을 열고 Backend_Train 폴더로 이동하여 실행
 cd ../Backend_Train
 docker-compose up -d redis
@@ -153,18 +153,18 @@ docker-compose up -d redis
 ### 5단계: 로컬 백엔드 API 및 워커 실행
 
 #### ① 백엔드 API 서버 기동 (터미널 3)
-```powershell
+```cmd
 # 새 터미널을 열고 Backend_Train 폴더로 이동하여 실행
 cd ../Backend_Train
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 npm run app
 ```
 
 #### ② SQS 폴링 워커 기동 (터미널 4)
-```powershell
+```cmd
 # 새 터미널을 열고 Backend_Train 폴더로 이동하여 실행
 cd ../Backend_Train
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 npm run worker
 ```
 
@@ -187,19 +187,19 @@ npm run worker
 
 #### ① Kubernetes 리소스 선제 삭제
 ALB 및 로드밸런서 타겟 그룹이 EKS 내부에서 정상 해제될 시간을 보장하기 위해 선제적으로 매니페스트를 삭제합니다.
-```powershell
+```cmd
 # EKS 매니페스트 폴더로 이동하여 실행
 cd ../Train_repo/modules/infra/k8s-manifests
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 kubectl delete -f . --ignore-not-found
 ```
 *(삭제 로그 완료 및 AWS 로드밸런서 콘솔에서 ALB가 완전히 사라진 것을 확인한 후 테라폼 삭제로 넘어가는 것이 안전합니다.)*
 
 #### ② 테라폼 인프라 파기 (Destroy)
-```powershell
+```cmd
 # 테라폼 개발 환경 폴더로 이동하여 실행
 cd ../Train_repo/environments/dev
-$env:AWS_PROFILE="team"
+set AWS_PROFILE=team
 terraform destroy -auto-approve
 ```
 
