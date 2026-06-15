@@ -179,3 +179,9 @@ variable "enable_vpc_endpoints" {
   default     = true
   
 }
+
+variable "ops_logs_bucket_domain_name" {
+  description = "The domain name of the ops-logs S3 bucket for CloudFront logs"
+  type        = string
+  default     = ""
+}

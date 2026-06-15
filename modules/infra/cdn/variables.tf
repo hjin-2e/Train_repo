@@ -39,3 +39,9 @@ variable "waf_arn" {
   type        = string
   default     = ""
 }
+
+variable "ops_logs_bucket_domain_name" {
+  description = "S3 bucket domain name for CloudFront logs"
+  type        = string
+  default     = ""
+}

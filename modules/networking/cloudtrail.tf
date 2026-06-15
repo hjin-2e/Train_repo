@@ -2,11 +2,11 @@
 # object_lock_enabled = true → 버킷 생성 시점에만 활성화 가능 (이후 변경 불가)
 # force_destroy 제거 → Object Lock 상태에선 어차피 삭제 불가이므로 불필요
 resource "aws_s3_bucket" "cloudtrail" {
-  bucket              = "${var.project_name}-cloudtrail-logs"
+  bucket              = "${var.project_name}-${var.environment}-cloudtrail-logs"
   object_lock_enabled = true
 
   tags = {
-    Name        = "${var.project_name}-cloudtrail-logs"
+    Name        = "${var.project_name}-${var.environment}-cloudtrail-logs"
     Environment = var.environment
   }
 }

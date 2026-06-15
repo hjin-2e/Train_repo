@@ -11,6 +11,12 @@ variable "environment" {
   type        = string
 }
 
+variable "create_s3_buckets" {
+  description = "Whether to create S3 buckets in this module"
+  type        = bool
+  default     = true
+}
+
 # ==================
 # 로그 보존 기간
 # ==================
@@ -28,3 +34,30 @@ variable "log_retention_days" {
 #   description = "WAF Web ACL ARN"
 #   type        = string
 # }
+
+# ==================
+# Fluent Bit & IRSA
+# ==================
+variable "cluster_name" {
+  description = "EKS Cluster Name"
+  type        = string
+  default     = ""
+}
+
+variable "oidc_provider_arn" {
+  description = "OIDC Provider ARN for IRSA"
+  type        = string
+  default     = ""
+}
+
+variable "oidc_provider" {
+  description = "OIDC Provider for IRSA"
+  type        = string
+  default     = ""
+}
+
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+  default     = "ap-northeast-2"
+}

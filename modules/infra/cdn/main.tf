@@ -58,6 +58,14 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
+  dynamic "logging_config" {
+    for_each = var.ops_logs_bucket_domain_name != "" ? [1] : []
+    content {
+      include_cookies = false
+      bucket          = var.ops_logs_bucket_domain_name
+      prefix          = "cloudfront/"
+    }
+  }
   # prod만 도메인 연결 
   aliases = var.environment == "prod" ? [
     "team-train.cloud",

@@ -18,10 +18,6 @@ module "logging" {
   environment  = var.environment
 
   log_retention_days = 7
-
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
 }
 
 module "eks-cluster" {
@@ -151,6 +147,7 @@ module "cdn" {
   s3_frontend_bucket_regional_domain_name = module.networking.s3_frontend_bucket_regional_domain_name
   alb_dns_name                            = module.eks-cluster.alb_dns_name
   waf_arn                                 = module.networking.waf_arn
+  ops_logs_bucket_domain_name             = module.logging.ops_logs_bucket_domain_name
 
   providers = {
     aws.us_east_1 = aws.us_east_1

@@ -17,6 +17,22 @@ module "argocd" {
   source       = "../../modules/infra/argocd"
   project_name = var.project_name
   environment  = var.environment
+
+  depends_on = [module.alb_controller]
+}
+
+module "logging" {
+  source = "../../modules/infra/logging"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  cluster_name       = data.terraform_remote_state.infra.outputs.cluster_name
+  aws_region         = var.aws_region
+  oidc_provider_arn  = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  oidc_provider      = data.terraform_remote_state.infra.outputs.oidc_provider
+  create_s3_buckets  = false
+
+  depends_on = [module.alb_controller]
 }
 
 module "eks_addons" {
@@ -32,4 +48,6 @@ module "eks_addons" {
   elasticache_policy_arn = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
   secrets_policy_arn     = data.terraform_remote_state.infra.outputs.secrets_policy_arn
   aws_region             = var.aws_region
+
+  depends_on = [module.alb_controller]
 }

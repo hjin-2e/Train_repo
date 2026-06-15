@@ -41,5 +41,6 @@ Thumbs.db
 *.swo
 
 # Terraform auto-generated K8s manifests
-modules/infra/k8s-manifests/overlays/**/*.env
-modules/infra/k8s-manifests/overlays/**/*-patch.yaml
+# (ArgoCD 배포를 위해 Github에 푸시되어야 하므로 주석 처리)
+# modules/infra/k8s-manifests/overlays/**/*.env
+# modules/infra/k8s-manifests/overlays/**/*-patch.yaml
