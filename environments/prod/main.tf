@@ -9,7 +9,7 @@ module "networking" {
   enable_vpc_endpoints = true
 
   # Route53 루트 이관 및 변수 기본값 적용에 따라 수동 도메인 연동 매핑 제거
-  eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
+  eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -96,7 +96,15 @@ module "frontend-pipeline" {
   frontend_bucket_name       = module.networking.s3_frontend_bucket
   cloudfront_distribution_id = module.networking.cloudfront_distribution_id
 
-  github_repo = "your-org/your-repo"
+  github_repo = "hjin-2e/Front_Train"
 
   create_github_oidc_provider = true
+}
+
+module "backend-pipeline" {
+  source       = "../../modules/infra/backend-pipeline"
+  project_name = var.project_name
+  environment  = var.environment
+
+  github_repo = "Chjjh605/Backend_Train"
 }

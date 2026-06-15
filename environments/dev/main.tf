@@ -94,9 +94,17 @@ module "frontend-pipeline" {
   frontend_bucket_name       = module.networking.s3_frontend_bucket
   cloudfront_distribution_id = module.networking.cloudfront_distribution_id
 
-  github_repo = "your-org/your-repo"
+  github_repo = "hjin-2e/Train_repo"
 
   create_github_oidc_provider = true
+}
+
+module "backend-pipeline" {
+  source       = "../../modules/infra/backend-pipeline"
+  project_name = var.project_name
+  environment  = var.environment
+
+  github_repo = "hjin-2e/Train_repo"
 }
 
 # 내부 통신 알림
