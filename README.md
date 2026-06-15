@@ -1,24 +1,46 @@
-## ⚙️ 테라폼 명령어 가이드
+## 🏗️ 1단계: AWS 뼈대 인프라 배포 (Terraform)
+가장 먼저 네트워크(VPC)와 쿠버네티스 클러스터(EKS), 그리고 데이터베이스(Aurora, Redis)를 AWS에 올립니다.
 
-개발 환경을 구축하고 관리하기 위한 주요 테라폼 명령어 모음입니다.
+* **위치**: `environments/prod` 폴더 안에서 실행
+* **사전 조건**: AWS Route53에 `team-train.cloud` 도메인이 정상적으로 등록(Hosted Zone 생성)되어 있어야 합니다. (ACM 인증서 발급을 위함)
+* **명령어**:
+  ```bash
+  cd environments/prod
+  terraform init
+  terraform apply
+  ```
+  *(또는 고객님이 설정하신 단축어 `tfp` 등을 사용)*
+* **결과**: VPC, EKS 클러스터(`team-train-prod-eks`), S3 버킷, CloudFront, Aurora DB, Redis 등이 전부 생성됩니다.
 
-```bash
-# 테라폼 초기화 및 공급자(Provider) 플러그인 설치
-terraform init
+---
 
-# 테라폼 설정 파일의 문법 및 오타 확인
-terraform validate
+## ☸️ 2단계: 쿠버네티스 핵심 애드온 배포 (Terraform)
+EKS 클러스터가 만들어졌으니, 클러스터 내부를 관리할 도구들(ArgoCD, ALB 컨트롤러 등)을 설치합니다.
 
-# 인프라 변경 사항 미리보기 (계획 확인)
-terraform plan
+* **위치**: `environments/prod-k8s` 폴더 안에서 실행
+* **사전 조건**: 1단계가 완전히 끝난 직후 진행해야 합니다.
+* **명령어**:
+  ```bash
+  cd ../prod-k8s
+  terraform init
+  terraform apply
+  ```
+* **결과**: 쿠버네티스 내부에 `ArgoCD`, `AWS Load Balancer Controller` 등이 자동으로 설치됩니다.
+  *(이때 테라폼 코드 내부에 ArgoCD와 깃허브를 연동하는 설정이 이미 포함되어 있기 때문에, 설치가 끝나자마자 ArgoCD가 깃허브의 매니페스트를 읽어와 자동으로 파드 배포를 시작합니다!)*
 
-# 실제 인프라 리소스 구축 및 배포
-terraform apply
 
-# 테라폼으로 구축한 모든 인프라 리소스 삭제
-terraform destroy
 
-```
+---
+
+## 💻 4단계: (선택) 프론트엔드/백엔드 소스코드 CI/CD
+인프라 세팅은 끝났습니다. 이제 백엔드나 프론트엔드 레포지토리에서 코드를 짜고 `main` 브랜치에 푸시(`git push`)하기만 하면 됩니다.
+
+* **백엔드**: GitHub Actions가 코드를 빌드하여 `team-train-prod-backend` ECR에 올리고, ArgoCD가 변경을 감지하여 새 파드(Pod)로 교체합니다.
+* **프론트엔드**: GitHub Actions가 React 코드를 빌드하여, 생성된 프론트엔드 S3 버킷에 정적 파일을 업로드하고 CloudFront 캐시를 무효화(Invalidation)합니다.
+
+> [!TIP]
+> **요약**: 처음에만 터미널에서 **[ 1단계(`prod`) apply 👉 2단계(`prod-k8s`) apply 👉 3단계(`argocd-app` 적용) ]** 순서대로 한 번씩 쳐 주시면, 그 이후부터는 깃허브 푸시만으로 모든 배포가 알아서 돌아갑니다!
+
 
 ## 🛠️ **배포 방법**
 팀 프로젝트 진행 시 코드를 동기화하고 배포하는 프로세스입니다. 아래 순서를 준수해 주세요.
