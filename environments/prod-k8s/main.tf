@@ -38,16 +38,17 @@ module "logging" {
 module "eks_addons" {
   source = "../../modules/infra/eks-addons"
 
-  project_name           = var.project_name
-  environment            = var.environment
-  cluster_name           = data.terraform_remote_state.infra.outputs.cluster_name
-  oidc_provider_arn      = data.terraform_remote_state.infra.outputs.oidc_provider_arn
-  oidc_provider          = data.terraform_remote_state.infra.outputs.oidc_provider
-  aurora_policy_arn      = data.terraform_remote_state.infra.outputs.aurora_policy_arn
-  sqs_policy_arn         = data.terraform_remote_state.infra.outputs.sqs_policy_arn
-  elasticache_policy_arn = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
-  secrets_policy_arn     = data.terraform_remote_state.infra.outputs.secrets_policy_arn
-  aws_region             = var.aws_region
+  project_name                  = var.project_name
+  environment                   = var.environment
+  cluster_name                  = data.terraform_remote_state.infra.outputs.cluster_name
+  oidc_provider_arn             = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  oidc_provider                 = data.terraform_remote_state.infra.outputs.oidc_provider
+  aurora_policy_arn             = data.terraform_remote_state.infra.outputs.aurora_policy_arn
+  sqs_policy_arn                = data.terraform_remote_state.infra.outputs.sqs_policy_arn
+  elasticache_policy_arn        = data.terraform_remote_state.infra.outputs.elasticache_policy_arn
+  secrets_policy_arn            = data.terraform_remote_state.infra.outputs.secrets_policy_arn
+  cluster_autoscaler_policy_arn = data.terraform_remote_state.infra.outputs.cluster_autoscaler_policy_arn
+  aws_region                    = var.aws_region
 
   depends_on = [module.alb_controller]
 }
@@ -55,9 +56,9 @@ module "eks_addons" {
 module "monitoring" {
   source = "../../modules/infra/monitoring"
 
-  project_name = var.project_name
-  environment  = var.environment
-  cluster_name = data.terraform_remote_state.infra.outputs.cluster_name
+  project_name           = var.project_name
+  environment            = var.environment
+  grafana_admin_password = var.grafana_admin_password
 
   depends_on = [module.alb_controller]
 }

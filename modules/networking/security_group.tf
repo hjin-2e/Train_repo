@@ -37,21 +37,28 @@ resource "aws_security_group" "alb" {
     }
   }
 
-  # 내부망 접근 허용: 베스천 호스트 등 VPC 내부 자원에서 테스트용 접근 허용
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
-    description = "Allow HTTP from VPC internal (Bastion, etc)"
+  # 내부망 접근 허용: dev 환경에서만 베스천/NAT GW 테스트 허용
+  # prod에서는 CloudFront prefix list만 허용 → WAF 우회 차단 유지
+  dynamic "ingress" {
+    for_each = var.environment != "prod" ? [1] : []
+    content {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = [aws_vpc.main.cidr_block]
+      description = "Allow HTTP from VPC internal (Bastion, etc) - dev only"
+    }
   }
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = formatlist("%s/32", aws_eip.nat[*].public_ip)
-    description = "Allow HTTP from NAT Gateway (for Bastion testing)"
+  dynamic "ingress" {
+    for_each = var.environment != "prod" ? [1] : []
+    content {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = formatlist("%s/32", aws_eip.nat[*].public_ip)
+      description = "Allow HTTP from NAT Gateway (for Bastion testing) - dev only"
+    }
   }
 
   egress {

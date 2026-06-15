@@ -1,11 +1,8 @@
 module "networking" {
-  source                 = "../../modules/networking"
-  project_name           = var.project_name
-  environment            = var.environment
-  cloudfront_domain_name = var.cloudfront_domain_name
-  cloudfront_zone_id     = var.cloudfront_zone_id
-  alb_zone_id            = var.alb_zone_id
-  eks_cluster_name       = "${var.project_name}-${var.environment}-eks"
+  source           = "../../modules/networking"
+  project_name     = var.project_name
+  environment      = var.environment
+  eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -33,8 +30,7 @@ module "eks-cluster" {
   eks_sg_id               = module.networking.eks_sg_id
   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
-
-  depends_on = [module.logging]
+  eks_bastion_role_arn    = module.networking.eks_bastion_role_arn
 }
 
 module "cognito" {

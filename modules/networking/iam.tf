@@ -16,14 +16,14 @@ resource "aws_iam_policy" "aurora_access" {
           "rds:DescribeDBClusters",
           "rds:DescribeDBInstances"
         ]
-        # 계정 내 이 프로젝트 클러스터만 허용
-        Resource = "arn:aws:rds:ap-northeast-2:*:cluster:trail-aurora-cluster"
+        # 계정 내 이 프로젝트 클러스터만 허용 (cluster_identifier는 aurora_mysql.tf와 일치해야 함)
+        Resource = "arn:aws:rds:${var.aws_region}:${data.aws_caller_identity.current.account_id}:cluster:${var.project_name}-aurora-cluster"
       },
       {
         Effect = "Allow"
         Action = ["rds-db:connect"]
         # IAM DB 인증 연결 대상도 동일 클러스터로 한정
-        Resource = "arn:aws:rds-db:ap-northeast-2:*:dbuser:trail-aurora-cluster/*"
+        Resource = "arn:aws:rds-db:${var.aws_region}:${data.aws_caller_identity.current.account_id}:dbuser:${var.project_name}-aurora-cluster/*"
       },
       {
         Effect = "Allow"
@@ -93,14 +93,8 @@ resource "aws_iam_policy" "secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-credentials*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt"
-        ]
-        Resource = aws_kms_key.aurora.arn
+        # SM 시크릿은 AWS 기본 관리형 키 사용 → KMS 별도 권한 불필요
+        Resource = "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.project_name}-db-credentials*"
       }
     ]
   })

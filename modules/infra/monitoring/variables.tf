@@ -8,7 +8,8 @@ variable "environment" {
   type        = string
 }
 
-variable "cluster_name" {
-  description = "EKS Cluster Name"
+variable "grafana_admin_password" {
+  description = "Grafana admin password"
   type        = string
+  sensitive   = true
 }

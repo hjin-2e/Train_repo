@@ -302,7 +302,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
 }
 
 resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.project_name}-${var.environment}-eks-ca-policy"
+  policy_arn = var.cluster_autoscaler_policy_arn
   role       = aws_iam_role.cluster_autoscaler.name
 }
 

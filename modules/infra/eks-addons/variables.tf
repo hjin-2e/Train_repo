@@ -48,3 +48,8 @@ variable "aws_region" {
   description = "AWS region"
   default     = "ap-northeast-2"
 }
+
+variable "cluster_autoscaler_policy_arn" {
+  type        = string
+  description = "IAM Policy ARN for Cluster Autoscaler (created by eks-cluster module)"
+}

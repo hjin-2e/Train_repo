@@ -1,19 +1,8 @@
 # ==============================================================================
 # 통합 운영 로그 버킷 (ops-logs)
 # ALB 액세스 로그, CloudFront 로그 등 인프라 운영 로그 통합 저장소
+# cloudtrail-logs 버킷은 modules/networking/cloudtrail.tf 에서 생성 (중복 제거)
 # ==============================================================================
-
-# 1. 통합 인프라/운영 로그 저장용 S3 버킷
-resource "aws_s3_bucket" "cloudtrail" {
-  count         = var.create_s3_buckets ? 1 : 0
-  bucket        = "${var.project_name}-${var.environment}-cloudtrail-logs"
-  force_destroy = true
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-cloudtrail-logs"
-    Environment = var.environment
-  }
-}
 
 # 1. 통합 인프라/운영 로그 저장용 S3 버킷
 resource "aws_s3_bucket" "ops_logs" {

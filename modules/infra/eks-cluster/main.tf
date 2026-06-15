@@ -29,23 +29,39 @@ module "eks-cluster" {
   # 클러스터 컨트롤 플레인 로깅 활성화
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  # Access Entry 설정 하드코딩 제거
-  access_entries = {
-    admin_access = {
-      kubernetes_groups = []
-      # 여기서 동적으로 현재 계정의 ID를 가져와서 사용
-      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" 
-      
-      policy_associations = {
-        admin_policy = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
+  # Access Entry 설정
+  access_entries = merge(
+    {
+      admin_access = {
+        kubernetes_groups = []
+        principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+
+        policy_associations = {
+          admin_policy = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
           }
         }
       }
-    }
-  }
+    },
+    var.eks_bastion_role_arn != "" ? {
+      bastion_access = {
+        kubernetes_groups = []
+        principal_arn     = var.eks_bastion_role_arn
+
+        policy_associations = {
+          admin_policy = {
+            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            access_scope = {
+              type = "cluster"
+            }
+          }
+        }
+      }
+    } : {}
+  )
 
   # HPA + Cluster Autoscaler(CA) 요구사항 반영
   eks_managed_node_groups = {

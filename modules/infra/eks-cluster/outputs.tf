@@ -37,3 +37,8 @@ output "app_tg_arn" {
   description = "App Target Group ARN for TargetGroupBinding"
   value       = aws_lb_target_group.app_tg.arn
 }
+
+output "cluster_autoscaler_policy_arn" {
+  description = "IAM Policy ARN for Cluster Autoscaler"
+  value       = aws_iam_policy.eks_cluster_autoscaler.arn
+}

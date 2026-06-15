@@ -49,3 +49,9 @@ variable "alb_sg_id" {
   description = "Security Group ID for ALB"
   type        = string
 }
+
+variable "eks_bastion_role_arn" {
+  description = "IAM Role ARN of EKS Bastion for kubectl access via EKS access entry"
+  type        = string
+  default     = ""
+}

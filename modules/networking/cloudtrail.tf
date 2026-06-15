@@ -1,27 +1,11 @@
 # CloudTrail 로그 저장용 S3 버킷
-# object_lock_enabled = true → 버킷 생성 시점에만 활성화 가능 (이후 변경 불가)
-# force_destroy 제거 → Object Lock 상태에선 어차피 삭제 불가이므로 불필요
 resource "aws_s3_bucket" "cloudtrail" {
-  bucket              = "${var.project_name}-${var.environment}-cloudtrail-logs"
-  object_lock_enabled = true
+  bucket        = "${var.project_name}-${var.environment}-cloudtrail-logs"
+  force_destroy = true
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-cloudtrail-logs"
     Environment = var.environment
-  }
-}
-
-# WORM 보존 정책 — 로그 위변조/삭제 방지
-# GOVERNANCE 모드: s3:BypassGovernanceRetention 권한이 없으면 365일간 삭제 불가
-# COMPLIANCE 모드는 루트도 삭제 불가 → 프로젝트 환경에서는 GOVERNANCE가 현실적
-resource "aws_s3_bucket_object_lock_configuration" "cloudtrail" {
-  bucket = aws_s3_bucket.cloudtrail.id
-
-  rule {
-    default_retention {
-      mode = "GOVERNANCE"
-      days = 365
-    }
   }
 }
 

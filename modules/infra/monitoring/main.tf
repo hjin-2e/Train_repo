@@ -13,7 +13,7 @@ resource "helm_release" "kube_prometheus_stack" {
   # 기본 설정 오버라이드
   set {
     name  = "grafana.adminPassword"
-    value = "admin" # 추후 Secret Manager나 외부 주입으로 변경 권장
+    value = var.grafana_admin_password
   }
 
   set {

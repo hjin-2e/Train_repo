@@ -15,3 +15,9 @@ variable "environment" {
   type        = string
   default     = "prod"
 }
+
+variable "grafana_admin_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+}
