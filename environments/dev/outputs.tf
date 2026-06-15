@@ -71,3 +71,26 @@ output "elasticache_policy_arn" {
 output "secrets_policy_arn" {
   value = module.networking.secrets_policy_arn
 }
+
+# ==============================================================================
+# Database & Event Queue outputs
+# ==============================================================================
+output "aurora_writer_endpoint" {
+  description = "RDS DB host endpoint"
+  value       = module.database.aurora_writer_endpoint
+}
+
+output "redis_primary_endpoint" {
+  description = "ElastiCache Redis primary endpoint"
+  value       = module.database.redis_primary_endpoint
+}
+
+output "sqs_queue_url" {
+  description = "AWS SQS Reservation queue URL"
+  value       = module.database.sqs_queue_url
+}
+
+output "mail_queue_url" {
+  description = "AWS SQS Mail queue URL"
+  value       = module.database.mail_queue_url
+}

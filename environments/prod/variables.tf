@@ -86,3 +86,15 @@ variable "azure_db_password" {
   default     = ""
 }
 
+variable "notification_email" {
+  description = "Notification receiver email"
+  type        = string
+  default     = ""
+}
+
+variable "verified_email_or_domain" {
+  description = "Verified SES sender email or domain"
+  type        = string
+  default     = ""
+}
+

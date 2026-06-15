@@ -93,7 +93,7 @@ resource "aws_iam_policy" "secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-secret*"
+        Resource = "arn:aws:secretsmanager:ap-northeast-2:*:secret:${var.project_name}-db-credentials*"
       },
       {
         Effect = "Allow"

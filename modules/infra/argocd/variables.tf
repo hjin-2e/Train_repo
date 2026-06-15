@@ -9,7 +9,7 @@ variable "environment" {
 }
 
 variable "gitops_repo_url" {
-  description = "ArgoCD가 감시할 깃허브 레포지토리 URL (예: https://github.com/sum9191-ops/Train_repo.git)"
+  description = "ArgoCD가 감시할 깃허브 레포지토리 URL (예: https://github.com/hjin-2e/Train_repo.git)"
   type        = string
-  default     = "https://github.com/sum9191-ops/Train_repo.git"
+  default     = "https://github.com/hjin-2e/Train_repo.git"
 }

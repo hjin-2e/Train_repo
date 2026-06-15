@@ -62,6 +62,7 @@ resource "aws_lambda_function" "notification_lambda" {
 }
 
 # SQS -> Lambda 이벤트 트리거 정의
+# 메일 발송용 SQS 큐(mail-queue)에 메시지가 적재되면 알림 Lambda가 SES를 통해 이메일을 발송합니다.
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = var.sqs_queue_arn
   function_name    = aws_lambda_function.notification_lambda.arn

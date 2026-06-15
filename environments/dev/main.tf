@@ -86,17 +86,17 @@ module "backend-pipeline" {
 }
 
 # 내부 통신 알림
-# module "notification" {
-#   source                   = "../../modules/infra/notification"
-#   project_name             = var.project_name
-#   environment              = var.environment
-#   aws_region               = var.aws_region
-#   sqs_queue_arn            = module.database.sqs_queue_arn
-#   sqs_queue_name           = module.database.sqs_queue_name
-#   notification_email       = var.notification_email
-#   verified_email_or_domain = var.verified_email_or_domain
-#   depends_on               = [module.database]
-# }
+module "notification" {
+  source                   = "../../modules/infra/notification"
+  project_name             = var.project_name
+  environment              = var.environment
+  aws_region               = var.aws_region
+  sqs_queue_arn            = module.database.mail_queue_arn
+  sqs_queue_name           = module.database.sqs_queue_name
+  notification_email       = var.notification_email
+  verified_email_or_domain = var.verified_email_or_domain
+  depends_on               = [module.database]
+}
 
 # ==============================================================================
 # Kustomize 환경변수(.env) 자동 생성 (ArgoCD/GitOps 연동용)
@@ -111,6 +111,7 @@ resource "local_file" "backend_kustomize_env" {
     
     # SQS 및 DB
     SQS_QUEUE_URL=${module.database.sqs_queue_url}
+    MAIL_QUEUE_URL=${module.database.mail_queue_url}
     DB_HOST=${module.database.aurora_writer_endpoint}
     DB_PORT=3306
     DB_NAME=trail_db
