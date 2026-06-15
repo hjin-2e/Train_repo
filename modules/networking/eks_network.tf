@@ -1,56 +1,7 @@
 # ==============================================================================
-# ⚠️ EKS 클러스터 생성 완료 후 주석 해제할 것
-# EKS Addon, RBAC, Service Account는 EKS가 먼저 있어야 적용 가능
+# ⚠️ EKS 클러스터 생성 완료 후 필요 시 주석 해제하여 사용할 것 (RBAC 설정)
+# (EKS Addon 및 Service Account는 EKS 모듈 및 K8s Manifest로 각각 이전됨)
 # ==============================================================================
-
-# # ==================
-# # VPC CNI 설정
-# # ==================
-# resource "aws_eks_addon" "vpc_cni" {
-#   cluster_name      = var.eks_cluster_name
-#   addon_name        = "vpc-cni"
-#   addon_version     = "v1.18.0-eksbuild.1"
-#   resolve_conflicts_on_create = "OVERWRITE"
-#   resolve_conflicts_on_update = "OVERWRITE"
-# 
-#   tags = {
-#     Name        = "${var.project_name}-vpc-cni"
-#     Environment = var.environment
-#   }
-# }
-# 
-# # ==================
-# # CoreDNS 설정
-# # ==================
-# resource "aws_eks_addon" "coredns" {
-#   cluster_name      = var.eks_cluster_name
-#   addon_name        = "coredns"
-#   addon_version     = "v1.11.1-eksbuild.4"
-#   resolve_conflicts_on_create = "OVERWRITE"
-#   resolve_conflicts_on_update = "OVERWRITE"
-# 
-#   tags = {
-#     Name        = "${var.project_name}-coredns"
-#     Environment = var.environment
-#   }
-# }
-# 
-# # ==================
-# # kube-proxy 설정
-# # ==================
-# resource "aws_eks_addon" "kube_proxy" {
-#   cluster_name      = var.eks_cluster_name
-#   addon_name        = "kube-proxy"
-#   addon_version     = "v1.30.0-eksbuild.1"
-#   resolve_conflicts_on_create = "OVERWRITE"
-#   resolve_conflicts_on_update = "OVERWRITE"
-# 
-#   tags = {
-#     Name        = "${var.project_name}-kube-proxy"
-#     Environment = var.environment
-#   }
-# }
-# 
 # # ==================
 # # RBAC 설정
 # # ==================
@@ -111,39 +62,4 @@
 #   }
 # }
 # 
-# # ==================
-# # IRSA Service Account
-# # ==================
-#
-# # Booking Service Account - EKS 생성 후 주석 해제 (실제 사용)
-# resource "kubernetes_service_account" "booking" {
-#   metadata {
-#     name      = "booking-sa"
-#     namespace = "default"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.booking_pod.arn
-#     }
-#   }
-# }
-#
-# # User Service Account - 서비스 분리 시점에 주석 해제
-# resource "kubernetes_service_account" "user" {
-#   metadata {
-#     name      = "user-sa"
-#     namespace = "default"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.user_pod.arn
-#     }
-#   }
-# }
-#
-# # Payment Service Account - 서비스 분리 시점에 주석 해제
-# resource "kubernetes_service_account" "payment" {
-#   metadata {
-#     name      = "payment-sa"
-#     namespace = "default"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.payment_pod.arn
-#     }
-#   }
-# }
+

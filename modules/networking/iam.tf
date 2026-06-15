@@ -523,4 +523,4 @@ resource "aws_iam_role_policy" "eks_bastion_describe" {
 resource "aws_iam_instance_profile" "eks_bastion_ssm" {
   name = "${var.project_name}-${var.environment}-eks-bastion-profile"
   role = aws_iam_role.eks_bastion_ssm.name
-}
+}

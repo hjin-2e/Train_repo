@@ -72,10 +72,10 @@ $env:AWS_PROFILE="team"
 # 3. 테라폼 초기화
 terraform init
 
-# 4. [1차 배포] 네트워크 및 EKS 클러스터 우선 생성 (약 10~15분 소요)
+# 4. [1차 배포] 네트워크 및 EKS 클러스터 우선 타겟 생성 (약 10~15분 소요)
 terraform apply -target=module.networking -target=module.logging -target=module.eks-cluster -auto-approve
 
-# 5. [2차 배포] 나머지 DB, ALB Controller, Cognito 등 잔여 자원 일괄 배포 완료 (약 3~5분 소요)
+# 5. [2차 배포] 나머지 DB, ALB Controller, Cognito 등 전체 인프라 완공
 terraform apply -auto-approve
 ```
 

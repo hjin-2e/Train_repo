@@ -183,3 +183,42 @@ resource "aws_iam_policy" "eks_cluster_autoscaler" {
     ]
   })
 }
+
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name                = module.eks-cluster.cluster_name
+  addon_name                  = "vpc-cni"
+  addon_version               = "v1.18.0-eksbuild.1"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  tags = {
+    Name        = "${var.project_name}-vpc-cni"
+    Environment = var.environment
+  }
+  depends_on = [module.eks-cluster]
+}
+
+resource "aws_eks_addon" "coredns" {
+  cluster_name                = module.eks-cluster.cluster_name
+  addon_name                  = "coredns"
+  addon_version               = "v1.11.1-eksbuild.4"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  tags = {
+    Name        = "${var.project_name}-coredns"
+    Environment = var.environment
+  }
+  depends_on = [module.eks-cluster]
+}
+
+resource "aws_eks_addon" "kube_proxy" {
+  cluster_name                = module.eks-cluster.cluster_name
+  addon_name                  = "kube-proxy"
+  addon_version               = "v1.30.0-eksbuild.1"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  tags = {
+    Name        = "${var.project_name}-kube-proxy"
+    Environment = var.environment
+  }
+  depends_on = [module.eks-cluster]
+}
