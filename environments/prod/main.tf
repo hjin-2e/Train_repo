@@ -172,3 +172,59 @@ moved {
   from = module.networking.aws_s3_bucket_policy.frontend
   to   = module.cdn.aws_s3_bucket_policy.frontend
 }
+
+# ==============================================================================
+# Route53 DNS 서비스 레코드
+# ==============================================================================
+data "aws_route53_zone" "primary" {
+  name         = "team-train.cloud"
+  private_zone = false
+}
+
+# 1. 루트 도메인 (team-train.cloud) -> CloudFront Alias
+resource "aws_route53_record" "main" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "team-train.cloud"
+  type    = "A"
+
+  alias {
+    name                   = module.cdn.cloudfront_domain_name
+    zone_id                = module.cdn.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# 2. www 서브도메인 (www.team-train.cloud) -> CloudFront Alias
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "www.team-train.cloud"
+  type    = "A"
+
+  alias {
+    name                   = module.cdn.cloudfront_domain_name
+    zone_id                = module.cdn.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# 3. API 서브도메인 (api.team-train.cloud) -> ALB Alias
+resource "aws_route53_record" "api" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "api.team-train.cloud"
+  type    = "A"
+
+  alias {
+    name                   = module.eks-cluster.alb_dns_name
+    zone_id                = module.eks-cluster.alb_zone_id
+    evaluate_target_health = true
+  }
+}
+
+# 4. DB 서브도메인 (db.team-train.cloud) -> Aurora MySQL Endpoint CNAME
+resource "aws_route53_record" "db" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "db.team-train.cloud"
+  type    = "CNAME"
+  ttl     = 60
+  records = [module.database.aurora_writer_endpoint]
+}
