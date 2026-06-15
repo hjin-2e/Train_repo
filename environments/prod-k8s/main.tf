@@ -51,3 +51,13 @@ module "eks_addons" {
 
   depends_on = [module.alb_controller]
 }
+
+module "monitoring" {
+  source = "../../modules/infra/monitoring"
+
+  project_name = var.project_name
+  environment  = var.environment
+  cluster_name = data.terraform_remote_state.infra.outputs.cluster_name
+
+  depends_on = [module.alb_controller]
+}

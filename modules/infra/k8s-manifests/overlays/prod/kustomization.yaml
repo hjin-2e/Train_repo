@@ -11,3 +11,11 @@ configMapGenerator:
 
 generatorOptions:
   disableNameSuffixHash: true
+
+images:
+  - name: team-train-dev-backend
+    newName: 889951087651.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-prod-backend
+    newTag: latest
+
+patchesStrategicMerge:
+  - targetgroupbinding-patch.yaml

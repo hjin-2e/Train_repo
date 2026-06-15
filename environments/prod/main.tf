@@ -19,10 +19,6 @@ module "logging" {
   environment  = var.environment
 
   log_retention_days = 30 # prod라서 env랑 다르게 수정했어요
-
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
 }
 
 module "eks-cluster" {
