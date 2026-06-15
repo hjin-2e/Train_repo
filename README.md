@@ -28,6 +28,20 @@ EKS 클러스터가 만들어졌으니, 클러스터 내부를 관리할 도구�
 * **결과**: 쿠버네티스 내부에 `ArgoCD`, `AWS Load Balancer Controller` 등이 자동으로 설치됩니다.
   *(이때 테라폼 코드 내부에 ArgoCD와 깃허브를 연동하는 설정이 이미 포함되어 있기 때문에, 설치가 끝나자마자 ArgoCD가 깃허브의 매니페스트를 읽어와 자동으로 파드 배포를 시작합니다!)*
 
+`Back_Train` 레포 → Settings → Secrets and variables → Actions:
+
+| Secret 이름 | 값 |
+|-----------|---|
+| `AWS_BACKEND_ROLE_ARN` | terraform output `github_actions_backend_role_arn` |
+| `GITOPS_PAT` | GitHub Personal Access Token (Train_repo에 write 권한) |
+
+`Front_Train` 레포 → Settings → Secrets and variables → Actions:
+
+| Secret 이름 | 값 |
+|-----------|---|
+| `AWS_GITHUB_ACTIONS_ROLE_ARN` | terraform output `github_actions_role_arn` |
+| `ARTIFACT_BUCKET` | terraform output `pipeline_artifact_bucket_name` |
+| `VITE_API_URL` | 임시로 `http://localhost:8080` (Phase 4 후 ALB 주소로 업데이트) |
 
 
 ---
