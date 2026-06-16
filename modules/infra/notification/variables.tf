@@ -32,3 +32,8 @@ variable "verified_email_or_domain" {
   description = "The verified email address or domain in SES to be used for sending emails"
   type        = string
 }
+
+variable "route53_zone_id" {
+  type        = string
+  description = "Route53 Hosted Zone ID"
+}

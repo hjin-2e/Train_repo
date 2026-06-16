@@ -33,6 +33,7 @@ resource "azurerm_subnet" "gateway" {
 }
 
 resource "azurerm_public_ip" "vpn_gw" {
+  count               = var.enable_vpn_gateway ? 1 : 0
   name                = "${var.project_name}-${var.environment}-vpngw-ip"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
@@ -41,6 +42,7 @@ resource "azurerm_public_ip" "vpn_gw" {
 }
 
 resource "azurerm_virtual_network_gateway" "main" {
+  count               = var.enable_vpn_gateway ? 1 : 0
   name                = "${var.project_name}-${var.environment}-vpngw"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
@@ -50,7 +52,7 @@ resource "azurerm_virtual_network_gateway" "main" {
   sku      = "VpnGw1"
 
   ip_configuration {
-    public_ip_address_id          = azurerm_public_ip.vpn_gw.id
+    public_ip_address_id          = azurerm_public_ip.vpn_gw[0].id
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.gateway.id
   }
@@ -60,7 +62,7 @@ resource "azurerm_virtual_network_gateway" "main" {
 
 # 터널 1
 resource "azurerm_local_network_gateway" "aws_tunnel1" {
-  count               = var.aws_vpn_tunnel1_address != "" ? 1 : 0
+  count               = var.enable_vpn_gateway && var.aws_vpn_tunnel1_address != "" ? 1 : 0
   name                = "${var.project_name}-${var.environment}-aws-lng-1"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
@@ -69,20 +71,20 @@ resource "azurerm_local_network_gateway" "aws_tunnel1" {
 }
 
 resource "azurerm_virtual_network_gateway_connection" "to_aws_tunnel1" {
-  count               = var.aws_vpn_tunnel1_address != "" ? 1 : 0
+  count               = var.enable_vpn_gateway && var.aws_vpn_tunnel1_address != "" ? 1 : 0
   name                = "${var.project_name}-${var.environment}-to-aws-1"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
   type                       = "IPsec"
-  virtual_network_gateway_id = azurerm_virtual_network_gateway.main.id
+  virtual_network_gateway_id = azurerm_virtual_network_gateway.main[0].id
   local_network_gateway_id   = azurerm_local_network_gateway.aws_tunnel1[0].id
   shared_key                 = var.aws_vpn_tunnel1_preshared_key
 }
 
 # 터널 2 (이중화 - 터널 1 장애 시 우회 경로)
 resource "azurerm_local_network_gateway" "aws_tunnel2" {
-  count               = var.aws_vpn_tunnel2_address != "" ? 1 : 0
+  count               = var.enable_vpn_gateway && var.aws_vpn_tunnel2_address != "" ? 1 : 0
   name                = "${var.project_name}-${var.environment}-aws-lng-2"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
@@ -91,13 +93,58 @@ resource "azurerm_local_network_gateway" "aws_tunnel2" {
 }
 
 resource "azurerm_virtual_network_gateway_connection" "to_aws_tunnel2" {
-  count               = var.aws_vpn_tunnel2_address != "" ? 1 : 0
+  count               = var.enable_vpn_gateway && var.aws_vpn_tunnel2_address != "" ? 1 : 0
   name                = "${var.project_name}-${var.environment}-to-aws-2"
   location            = azurerm_resource_group.vpn.location
   resource_group_name = azurerm_resource_group.vpn.name
 
   type                       = "IPsec"
-  virtual_network_gateway_id = azurerm_virtual_network_gateway.main.id
+  virtual_network_gateway_id = azurerm_virtual_network_gateway.main[0].id
   local_network_gateway_id   = azurerm_local_network_gateway.aws_tunnel2[0].id
   shared_key                 = var.aws_vpn_tunnel2_preshared_key
 }
+
+# AWS-Azure 간 자원 생성 시 발생하는 상호 IP 의존성(순환 참조) 문제를 해결하기 위해 
+# [1단계: VNet 및 게이트웨이 본체 생성 ➡️ 2단계: AWS 터널 주소 주입 후 LNG 및 IPsec 커넥션 완성] 형태로 배포 단계 격리
+resource "azurerm_subnet" "app" {
+  name                 = "${var.project_name}-${var.environment}-app-subnet"
+  resource_group_name  = azurerm_resource_group.vpn.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = [var.app_subnet_cidr]
+
+  delegation {
+    name = "app-service-delegation"
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "mysql" {
+  name                 = "${var.project_name}-${var.environment}-mysql-subnet"
+  resource_group_name  = azurerm_resource_group.vpn.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = [var.mysql_subnet_cidr]
+
+  delegation {
+    name = "mysql-delegation"
+    service_delegation {
+      name    = "Microsoft.DBforMySQL/flexibleServers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
+}
+
+resource "azurerm_private_dns_zone" "mysql" {
+  name                = "${var.project_name}.private.mysql.database.azure.com"
+  resource_group_name = azurerm_resource_group.vpn.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "mysql" {
+  name                  = "${var.project_name}-${var.environment}-mysql-dns-link"
+  resource_group_name   = azurerm_resource_group.vpn.name
+  private_dns_zone_name = azurerm_private_dns_zone.mysql.name
+  virtual_network_id    = azurerm_virtual_network.main.id
+}
+

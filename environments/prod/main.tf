@@ -22,6 +22,7 @@ module "networking" {
   azure_vnet_cidr      = var.azure_vnet_cidr
   azure_vpn_gateway_ip = "" # var.enable_azure_vpn ? data.azurerm_public_ip.vpn_gw[0].ip_address : ""
 
+
   providers = {
     aws.us_east_1 = aws.us_east_1
   }
@@ -127,6 +128,9 @@ module "notification" {
   notification_email       = var.notification_email
   verified_email_or_domain = var.verified_email_or_domain
   depends_on               = [module.database]
+
+  # 기존 Route53 혹은 VPC 모듈에서 나오는 호스트존 ID output 값을 연결
+  route53_zone_id = module.vpc.route53_zone_id
 }
 
 # ==============================================================================

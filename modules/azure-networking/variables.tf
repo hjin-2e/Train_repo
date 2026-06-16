@@ -55,3 +55,23 @@ variable "aws_vpn_tunnel2_preshared_key" {
   default     = ""
   sensitive   = true
 }
+
+variable "app_subnet_cidr" {
+  description = "CIDR block for Azure App Service subnet (delegated to Microsoft.Web/serverFarms)"
+  type        = string
+  default     = "10.1.1.0/24"
+}
+
+variable "mysql_subnet_cidr" {
+  description = "CIDR block for Azure MySQL Flexible Server subnet (delegated to Microsoft.DBforMySQL/flexibleServers)"
+  type        = string
+  default     = "10.1.2.0/24"
+}
+
+variable "enable_vpn_gateway" {
+  description = "Set to true to create the VPN Gateway and connections (prod-only recommended to save cost)"
+  type        = bool
+  default     = true
+}
+
+

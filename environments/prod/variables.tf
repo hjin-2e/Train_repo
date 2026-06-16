@@ -94,3 +94,25 @@ variable "enable_azure_vpn" {
   type        = bool
   default     = false
 }
+
+# Azure environments에서 출력된 값
+variable "azure_vpn_gateway_ip" {
+  description = "Azure VPN Gateway Public IP"
+  type        = string
+  default     = ""
+}
+
+
+# ==================
+# SES Email 발송
+# ==================
+variable "domain_name" {
+  type        = string
+  default     = "team-train.cloud"
+  description = "SES 이메일 발송에 사용할 도메인"
+}
+
+variable "route53_zone_id" {
+  type        = string
+  description = "Route53 Hosted Zone ID"
+}

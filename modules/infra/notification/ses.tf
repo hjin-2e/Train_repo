@@ -3,3 +3,17 @@
 resource "aws_ses_email_identity" "sender" {
   email = var.verified_email_or_domain
 }
+
+# SES 도메인 인증
+resource "aws_ses_domain_identity" "email_domain" {
+  domain = "team-train.cloud"
+}
+
+# Route53 DNS 레코드 자동 등록
+resource "aws_route53_record" "ses_verification" {
+  zone_id = var.route53_zone_id
+  name    = "_amazonses.${aws_ses_domain_identity.email_domain.id}"
+  type    = "TXT"
+  ttl     = "600"
+  records = [aws_ses_domain_identity.email_domain.verification_token]
+}
