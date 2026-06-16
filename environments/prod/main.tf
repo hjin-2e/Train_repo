@@ -117,6 +117,7 @@ resource "local_file" "backend_kustomize_env" {
     # Cognito
     COGNITO_USER_POOL_ID=${module.cognito.user_pool_id}
     COGNITO_CLIENT_ID=${module.cognito.user_pool_client_id}
+    USE_MOCK_AUTH=false
   EOT
 }
 
