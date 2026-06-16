@@ -112,7 +112,3 @@ variable "domain_name" {
   description = "SES 이메일 발송에 사용할 도메인"
 }
 
-variable "route53_zone_id" {
-  type        = string
-  description = "Route53 Hosted Zone ID"
-}

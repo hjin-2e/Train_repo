@@ -130,7 +130,7 @@ module "notification" {
   depends_on               = [module.database]
 
   # 기존 Route53 혹은 VPC 모듈에서 나오는 호스트존 ID output 값을 연결
-  route53_zone_id = module.vpc.route53_zone_id
+  route53_zone_id = data.aws_route53_zone.primary.zone_id
 }
 
 # ==============================================================================

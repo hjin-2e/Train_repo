@@ -28,28 +28,3 @@ variable "aws_vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "aws_vpn_tunnel1_address" {
-  description = "The public IP address of AWS VPN Tunnel 1"
-  type        = string
-  default     = ""
-}
-
-variable "aws_vpn_tunnel1_preshared_key" {
-  description = "The Pre-Shared Key for AWS VPN Tunnel 1"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
-variable "aws_vpn_tunnel2_address" {
-  description = "The public IP address of AWS VPN Tunnel 2 for redundancy"
-  type        = string
-  default     = ""
-}
-
-variable "aws_vpn_tunnel2_preshared_key" {
-  description = "The Pre-Shared Key for AWS VPN Tunnel 2 for redundancy"
-  type        = string
-  default     = ""
-  sensitive   = true
-}

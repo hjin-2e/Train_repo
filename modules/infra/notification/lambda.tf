@@ -64,44 +64,10 @@ resource "aws_lambda_function" "notification_lambda" {
 # SQS -> Lambda 이벤트 트리거 정의
 # 메일 발송용 SQS 큐(mail-queue)에 메시지가 적재되면 알림 Lambda가 SES를 통해 이메일을 발송합니다.
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
-  event_source_arn = var.sqs_queue_arn
-  function_name    = aws_lambda_function.notification_lambda.arn
-  batch_size       = 10
-  enabled          = true
+  event_source_arn        = var.sqs_queue_arn
+  function_name           = aws_lambda_function.notification_lambda.arn
+  batch_size              = 10
+  enabled                 = true
+  function_response_types = ["ReportBatchItemFailures"]
 }
 
-# Lambda가 SQS를 읽고 SES를 쓸 수 있게 허용하는 IAM 정책
-resource "aws_iam_policy" "lambda_ses_sqs_policy" {
-  name        = "team-train-lambda-notification-policy"
-  description = "Allow Lambda to access SQS and send emails via SES"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
-        ]
-        Resource = aws_sqs_queue.team_train_mail_queue.arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ses:SendEmail",
-          "ses:SendRawEmail"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-# SQS ➡️ Lambda 트리거 연결
-resource "aws_lambda_event_source_mapping" "sqs_to_lambda" {
-  event_source_arn = aws_sqs_queue.team_train_mail_queue.arn # 실제 SQS 리소스명
-  function_name    = aws_lambda_function.notification_lambda.arn # lambda_code/index.js를 실행할 람다 리소스명
-  batch_size       = 10
-}

@@ -1,3 +1,10 @@
+data "terraform_remote_state" "aws_prod" {
+  backend = "local"
+  config = {
+    path = "../prod/terraform.tfstate"
+  }
+}
+
 # 1. 가상 네트워크, VPN Gateway 및 Local Network Gateway (AWS 연동) 생성
 module "azure-networking" {
   source                        = "../../modules/azure-networking"
@@ -8,10 +15,10 @@ module "azure-networking" {
   
   # AWS에서 제공된 VPN 터널 정보 전달 (S2S IPsec 연결 활성화)
   aws_vpc_cidr                  = var.aws_vpc_cidr
-  aws_vpn_tunnel1_address       = var.aws_vpn_tunnel1_address
-  aws_vpn_tunnel1_preshared_key = var.aws_vpn_tunnel1_preshared_key
-  aws_vpn_tunnel2_address       = var.aws_vpn_tunnel2_address
-  aws_vpn_tunnel2_preshared_key = var.aws_vpn_tunnel2_preshared_key
+  aws_vpn_tunnel1_address       = try(data.terraform_remote_state.aws_prod.outputs.vpn_tunnel1_address, "")
+  aws_vpn_tunnel1_preshared_key = try(data.terraform_remote_state.aws_prod.outputs.vpn_tunnel1_preshared_key, "")
+  aws_vpn_tunnel2_address       = try(data.terraform_remote_state.aws_prod.outputs.vpn_tunnel2_address, "")
+  aws_vpn_tunnel2_preshared_key = try(data.terraform_remote_state.aws_prod.outputs.vpn_tunnel2_preshared_key, "")
 
   enable_vpn_gateway            = true
 }

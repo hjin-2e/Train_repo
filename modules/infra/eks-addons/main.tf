@@ -294,7 +294,7 @@ resource "helm_release" "keda" {
   create_namespace = true
 
   set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    name  = "serviceAccount.operator.annotations.eks\\.amazonaws\\.com/role-arn"
     value = aws_iam_role.keda_operator.arn
   }
 }
