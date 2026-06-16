@@ -113,6 +113,10 @@ resource "local_file" "backend_kustomize_env" {
     
     REDIS_HOST=${module.database.redis_primary_endpoint}
     REDIS_PORT=6379
+
+    # Cognito
+    COGNITO_USER_POOL_ID=${module.cognito.user_pool_id}
+    COGNITO_CLIENT_ID=${module.cognito.user_pool_client_id}
   EOT
 }
 
