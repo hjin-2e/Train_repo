@@ -64,7 +64,7 @@ module "eks-cluster" {
   )
 
   # Bastion 보안 그룹에서의 API Server (443) 접근 허용
-  cluster_security_group_additional_rules = var.enable_bastion_access && var.eks_bastion_sg_id != "" ? {
+  cluster_security_group_additional_rules = var.enable_bastion_access ? {
     ingress_bastion = {
       description              = "Allow Bastion to access EKS API"
       protocol                 = "tcp"
