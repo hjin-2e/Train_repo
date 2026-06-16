@@ -56,6 +56,12 @@ variable "eks_bastion_role_arn" {
   default     = ""
 }
 
+variable "eks_bastion_sg_id" {
+  description = "Security Group ID of EKS Bastion"
+  type        = string
+  default     = ""
+}
+
 variable "enable_bastion_access" {
   description = "Enable EKS access entry for bastion host"
   type        = bool

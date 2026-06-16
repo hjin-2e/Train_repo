@@ -74,6 +74,12 @@ variable "verified_email_or_domain" {
   default     = "admin@example.com"
 }
 
+variable "slack_webhook_url" {
+  description = "Slack Incoming Webhook URL for Application Error alerts"
+  type        = string
+  default     = ""
+}
+
 # ==================
 # Azure S2S VPN (DR 연동)
 # ==================
@@ -88,4 +94,3 @@ variable "enable_azure_vpn" {
   type        = bool
   default     = false
 }
-

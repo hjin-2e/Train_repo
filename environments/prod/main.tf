@@ -63,6 +63,7 @@ module "eks-cluster" {
   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
   eks_bastion_role_arn    = module.networking.eks_bastion_role_arn
+  eks_bastion_sg_id       = module.networking.eks_bastion_sg_id
 }
 
 module "cognito" {
@@ -144,6 +145,11 @@ resource "local_file" "backend_kustomize_env" {
     
     REDIS_HOST=${module.database.redis_primary_endpoint}
     REDIS_PORT=6379
+
+    # Cognito
+    COGNITO_USER_POOL_ID=${module.cognito.user_pool_id}
+    COGNITO_CLIENT_ID=${module.cognito.user_pool_client_id}
+    USE_MOCK_AUTH=false
   EOT
 }
 
@@ -251,4 +257,16 @@ resource "aws_route53_record" "db" {
   type    = "CNAME"
   ttl     = 60
   records = [module.database.aurora_writer_endpoint]
+}
+
+# ==============================================================================
+# Slack Alerting Module
+# ==============================================================================
+module "slack-alerting" {
+  source = "../../modules/infra/slack-alerting"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  aws_region        = var.aws_region
+  slack_webhook_url = var.slack_webhook_url
 }

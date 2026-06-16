@@ -79,13 +79,13 @@ resource "kubernetes_cluster_role_binding" "developer" {
 
   subject {
     kind      = "User"
-    name      = "hajin.lee"  # 이하진
+    name      = "hajin.lee" # 이하진
     api_group = "rbac.authorization.k8s.io"
   }
 
   subject {
     kind      = "User"
-    name      = "hanbi.lee"  # 이한비
+    name      = "hanbi.lee" # 이한비
     api_group = "rbac.authorization.k8s.io"
   }
 

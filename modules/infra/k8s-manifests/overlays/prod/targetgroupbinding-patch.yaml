@@ -5,4 +5,4 @@ metadata:
   name: backend-targetgroup-binding
   namespace: default
 spec:
-  targetGroupARN: arn:aws:elasticloadbalancing:ap-northeast-2:009152047332:targetgroup/team-train-prod-app-tg/fccca319da616fb1
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-northeast-2:009152047332:targetgroup/team-train-prod-app-tg/d6f73309b7a6e5d1

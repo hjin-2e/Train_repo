@@ -1,6 +1,6 @@
 output "cluster_name" {
   description = "The name of the EKS cluster"
-  value = module.eks-cluster.cluster_name
+  value       = module.eks-cluster.cluster_name
 }
 
 output "cluster_endpoint" {
