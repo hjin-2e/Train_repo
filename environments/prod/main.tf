@@ -5,11 +5,13 @@
 # 이름은 module.azure-networking의 출력을 참조하지 않고 동일한 명명 규칙을 직접 문자열로 구성합니다.
 # (module 출력을 참조하면 count와 무관하게 정적 의존성 엣지가 생겨 module.networking <-> module.azure-networking
 #  순환참조가 재발하므로, 두 모듈 간 그래프 연결을 의도적으로 끊어둔 것입니다.)
+/*
 data "azurerm_public_ip" "vpn_gw" {
   count               = var.enable_azure_vpn ? 1 : 0
   name                = "${var.project_name}-${var.environment}-vpngw-ip"
   resource_group_name = "${var.project_name}-${var.environment}-vpn-rg"
 }
+*/
 
 module "networking" {
   source           = "../../modules/networking"
@@ -18,7 +20,7 @@ module "networking" {
   eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   azure_vnet_cidr      = var.azure_vnet_cidr
-  azure_vpn_gateway_ip = var.enable_azure_vpn ? data.azurerm_public_ip.vpn_gw[0].ip_address : ""
+  azure_vpn_gateway_ip = "" # var.enable_azure_vpn ? data.azurerm_public_ip.vpn_gw[0].ip_address : ""
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -27,6 +29,7 @@ module "networking" {
 
 # Azure S2S VPN: DMS(Aurora -> Azure MySQL DR 복제)가 공개 인터넷이 아닌 사설 터널을 사용하도록 연결
 # 2단계 apply 필요 (modules/azure-networking/main.tf 상단 주석 참고)
+/*
 module "azure-networking" {
   source = "../../modules/azure-networking"
 
@@ -40,6 +43,7 @@ module "azure-networking" {
   aws_vpn_tunnel2_address       = module.networking.vpn_tunnel2_address
   aws_vpn_tunnel2_preshared_key = module.networking.vpn_tunnel2_preshared_key
 }
+*/
 
 module "logging" {
   source       = "../../modules/infra/logging"
