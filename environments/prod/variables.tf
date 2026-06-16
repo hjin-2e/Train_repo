@@ -74,3 +74,9 @@ variable "verified_email_or_domain" {
   default     = "admin@example.com"
 }
 
+variable "slack_webhook_url" {
+  description = "Slack Incoming Webhook URL for Application Error alerts"
+  type        = string
+  default     = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+}
+

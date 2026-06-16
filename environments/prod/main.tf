@@ -225,3 +225,15 @@ resource "aws_route53_record" "db" {
   ttl     = 60
   records = [module.database.aurora_writer_endpoint]
 }
+
+# ==============================================================================
+# Slack Alerting Module
+# ==============================================================================
+module "slack-alerting" {
+  source = "../../modules/infra/slack-alerting"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  aws_region        = var.aws_region
+  slack_webhook_url = var.slack_webhook_url
+}

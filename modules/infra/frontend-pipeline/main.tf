@@ -56,8 +56,8 @@ resource "aws_s3_bucket_versioning" "pipeline_artifact" {
 resource "aws_iam_openid_connect_provider" "github" {
   count = var.create_github_oidc_provider ? 1 : 0
 
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
   # GitHub OIDC의 공식 인증서 지문 (2개 모두 등록 권장)
   thumbprint_list = [
     "6938fd4d98bab03faadb97b34396831e3780aea1",
@@ -201,9 +201,9 @@ resource "aws_iam_role_policy" "codebuild" {
       },
       # CloudFront 캐시 무효화 (aws cloudfront create-invalidation)
       {
-        Sid    = "AllowCloudFrontInvalidation"
-        Effect = "Allow"
-        Action = ["cloudfront:CreateInvalidation"]
+        Sid      = "AllowCloudFrontInvalidation"
+        Effect   = "Allow"
+        Action   = ["cloudfront:CreateInvalidation"]
         Resource = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
       }
     ]

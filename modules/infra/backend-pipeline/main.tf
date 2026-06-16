@@ -38,9 +38,9 @@ resource "aws_iam_role_policy" "github_actions_backend_ecr" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowECRAuth"
-        Effect = "Allow"
-        Action = "ecr:GetAuthorizationToken"
+        Sid      = "AllowECRAuth"
+        Effect   = "Allow"
+        Action   = "ecr:GetAuthorizationToken"
         Resource = "*"
       },
       {

@@ -38,9 +38,9 @@ resource "aws_cognito_user_pool_client" "client" {
   user_pool_id = aws_cognito_user_pool.pool.id
 
   explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",  # ID/PW 방식 인증 허용
-    "ALLOW_REFRESH_TOKEN_AUTH",  # 토큰 갱신 허용
-    "ALLOW_USER_SRP_AUTH"        # 보안 강화 SRP 인증 방식 허용
+    "ALLOW_USER_PASSWORD_AUTH", # ID/PW 방식 인증 허용
+    "ALLOW_REFRESH_TOKEN_AUTH", # 토큰 갱신 허용
+    "ALLOW_USER_SRP_AUTH"       # 보안 강화 SRP 인증 방식 허용
   ]
 
   # 로그인 계정 존재 여부 방어

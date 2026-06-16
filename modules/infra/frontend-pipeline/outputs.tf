@@ -19,7 +19,7 @@ output "github_actions_role_arn" {
 GitHub Actions가 수임할 IAM Role ARN.
 GitHub Repository Secrets에 AWS_GITHUB_ACTIONS_ROLE_ARN 이름으로 등록하세요.
 EOT
-  value = aws_iam_role.github_actions.arn
+  value       = aws_iam_role.github_actions.arn
 }
 
 # ==================
