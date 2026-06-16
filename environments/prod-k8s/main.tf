@@ -49,8 +49,6 @@ module "eks_addons" {
   secrets_policy_arn            = data.terraform_remote_state.infra.outputs.secrets_policy_arn
   cluster_autoscaler_policy_arn = data.terraform_remote_state.infra.outputs.cluster_autoscaler_policy_arn
   aws_region                    = var.aws_region
-
-  depends_on = [module.alb_controller]
 }
 
 module "monitoring" {

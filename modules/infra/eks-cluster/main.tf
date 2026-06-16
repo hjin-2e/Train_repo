@@ -63,6 +63,18 @@ module "eks-cluster" {
     } : {}
   )
 
+  # Bastion 보안 그룹에서의 API Server (443) 접근 허용
+  cluster_security_group_additional_rules = var.enable_bastion_access && var.eks_bastion_sg_id != "" ? {
+    ingress_bastion = {
+      description              = "Allow Bastion to access EKS API"
+      protocol                 = "tcp"
+      from_port                = 443
+      to_port                  = 443
+      type                     = "ingress"
+      source_security_group_id = var.eks_bastion_sg_id
+    }
+  } : {}
+
   # HPA + Cluster Autoscaler(CA) 요구사항 반영
   eks_managed_node_groups = {
     fixed_node_group = {
@@ -71,6 +83,7 @@ module "eks-cluster" {
       min_size       = 2  
       max_size       = 8 
       desired_size   = 3  
+      disk_size      = 50 # 기본값 20GB에서 50GB로 증가 (저장소 부족 방지)
 
       vpc_security_group_ids = [var.eks_sg_id]
 

@@ -31,6 +31,7 @@ module "eks-cluster" {
   acm_alb_certificate_arn = module.networking.acm_alb_certificate_arn
   ops_logs_bucket_id      = module.logging.ops_logs_bucket_id
   eks_bastion_role_arn    = module.networking.eks_bastion_role_arn
+  eks_bastion_sg_id       = module.networking.eks_bastion_sg_id
 }
 
 module "cognito" {
