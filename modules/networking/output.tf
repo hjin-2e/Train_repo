@@ -88,13 +88,12 @@ output "dms_sg_id" {
 # ==================
 output "acm_certificate_arn" {
   description = "ACM Certificate ARN for CloudFront"
-  value       = var.environment == "prod" ? aws_acm_certificate.cloudfront[0].arn : ""
+  value       = one(aws_acm_certificate.cloudfront[*].arn)
 }
 
 output "acm_alb_certificate_arn" {
   description = "ACM Certificate ARN for ALB"
-  value       = var.environment == "prod" ? aws_acm_certificate.alb[0].arn : ""
-
+  value       = one(aws_acm_certificate.alb[*].arn)
 }
 
 # ==================
@@ -245,4 +244,34 @@ output "elasticache_policy_arn" {
 output "secrets_policy_arn" {
   description = "IAM Policy ARN for Secrets Manager access"
   value       = aws_iam_policy.secrets_access.arn
+}
+
+# ==================
+# S2S VPN outputs (Azure 측 Local Network Gateway/Connection 생성에 필요)
+# ==================
+output "vpc_cidr_block" {
+  description = "VPC CIDR block (Azure Local Network Gateway address_space에 사용)"
+  value       = aws_vpc.main.cidr_block
+}
+
+output "vpn_tunnel1_address" {
+  description = "AWS VPN Connection Tunnel 1 public IP"
+  value       = one(aws_vpn_connection.to_azure[*].tunnel1_address)
+}
+
+output "vpn_tunnel1_preshared_key" {
+  description = "AWS VPN Connection Tunnel 1 Pre-Shared Key"
+  value       = one(aws_vpn_connection.to_azure[*].tunnel1_preshared_key)
+  sensitive   = true
+}
+
+output "vpn_tunnel2_address" {
+  description = "AWS VPN Connection Tunnel 2 public IP (이중화용 두번째 터널)"
+  value       = one(aws_vpn_connection.to_azure[*].tunnel2_address)
+}
+
+output "vpn_tunnel2_preshared_key" {
+  description = "AWS VPN Connection Tunnel 2 Pre-Shared Key"
+  value       = one(aws_vpn_connection.to_azure[*].tunnel2_preshared_key)
+  sensitive   = true
 }

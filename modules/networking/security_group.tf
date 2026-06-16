@@ -278,14 +278,25 @@ resource "aws_security_group" "dms" {
     description = "Allow DMS internal communication"
   }
 
-  # Aurora + Azure MySQL 아웃바운드
-  # Azure DB IP 확정 후 수정 예정
+  # Aurora 아웃바운드 (Aurora가 위치한 db 서브넷만 허용 - 최소권한)
   egress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow outbound to Aurora and Azure DR Database"
+    cidr_blocks = [aws_subnet.db_a.cidr_block, aws_subnet.db_c.cidr_block]
+    description = "Allow outbound to Aurora (DB subnet only)"
+  }
+
+  # Azure MySQL 아웃바운드: S2S VPN 터널을 통한 사설 통신만 허용 (공개 인터넷 차단)
+  dynamic "egress" {
+    for_each = var.azure_vnet_cidr != "" ? [1] : []
+    content {
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      cidr_blocks = [var.azure_vnet_cidr]
+      description = "Allow outbound to Azure MySQL via S2S VPN"
+    }
   }
 
   tags = {

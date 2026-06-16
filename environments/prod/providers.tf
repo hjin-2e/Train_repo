@@ -5,6 +5,11 @@ terraform {
       version = ">= 5.50, < 6.0"
     }
 
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+
   }
 }
 
@@ -15,5 +20,9 @@ provider "aws" {
 provider "aws" {
   alias  = "us_east_1"
   region = "us-east-1"
+}
+
+provider "azurerm" {
+  features {}
 }
 

@@ -161,3 +161,18 @@ variable "ops_logs_bucket_domain_name" {
   type        = string
   default     = ""
 }
+
+# ==================
+# S2S VPN (Azure DR 연동)
+# ==================
+variable "azure_vnet_cidr" {
+  description = "Azure VNet CIDR block for S2S VPN routing (Aurora -> Azure DMS DR replication)"
+  type        = string
+  default     = ""
+}
+
+variable "azure_vpn_gateway_ip" {
+  description = "Azure VPN Gateway public IP. azure-networking 모듈을 먼저 apply 해서 얻은 IP를 입력 (2단계 apply)"
+  type        = string
+  default     = ""
+}

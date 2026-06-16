@@ -74,3 +74,18 @@ variable "verified_email_or_domain" {
   default     = "admin@example.com"
 }
 
+# ==================
+# Azure S2S VPN (DR 연동)
+# ==================
+variable "azure_vnet_cidr" {
+  description = "Azure VNet CIDR block for S2S VPN"
+  type        = string
+  default     = ""
+}
+
+variable "enable_azure_vpn" {
+  description = "Azure VPN Gateway IP 조회 활성화 여부. false: 1단계 (azure-networking 모듈만 먼저 apply), true: 2단계 (azurerm_public_ip를 Azure API에서 직접 조회해 AWS 측 Customer Gateway 생성)"
+  type        = bool
+  default     = false
+}
+

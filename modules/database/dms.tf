@@ -1,5 +1,11 @@
+# DMS는 DR(prod) 전용. dev에서는 생성하지 않음 (dms-vpc-role 등 계정 전역 IAM Role 중복 방지)
+locals {
+  dms_enabled = var.environment == "prod"
+}
+
 # DMS 복제 인스턴스
 resource "aws_dms_replication_instance" "dms_worker" {
+  count                      = local.dms_enabled ? 1 : 0
   replication_instance_id    = "trail-dms-instance"
   replication_instance_class = var.dms_instance_class
   allocated_storage          = 20
@@ -16,6 +22,7 @@ resource "aws_dms_replication_instance" "dms_worker" {
 
 # Source 엔드포인트 (출발지: 우리가 방금 만든 Aurora)
 resource "aws_dms_endpoint" "source_aurora" {
+  count         = local.dms_enabled ? 1 : 0
   endpoint_id   = "source-aurora-mysql"
   endpoint_type = "source"
   engine_name   = "mysql"
@@ -26,12 +33,14 @@ resource "aws_dms_endpoint" "source_aurora" {
   password      = var.db_admin_password
 }
 
-# Target 엔드포인트 (도착지: Azure MySQL - 주소는 변수)
+# Target 엔드포인트 (도착지: Azure MySQL)
+# S2S VPN 연결 시 azure_db_endpoint는 Azure VNet 내부 사설 IP/FQDN을 사용 (공개 엔드포인트 아님)
 resource "aws_dms_endpoint" "target_azure" {
+  count                       = local.dms_enabled ? 1 : 0
   endpoint_id                 = "target-azure-mysql"
   endpoint_type               = "target"
   engine_name                 = "mysql"
-  server_name                 = var.azure_db_endpoint # Azure에서 만든 DB 주소
+  server_name                 = var.azure_db_endpoint
   port                        = 3306
   ssl_mode                    = "require"
   database_name               = "trail_db"
@@ -42,11 +51,12 @@ resource "aws_dms_endpoint" "target_azure" {
 
 # 복제 작업 (Task) - 실시간 동기화(CDC)
 resource "aws_dms_replication_task" "aurora_to_azure" {
+  count                    = local.dms_enabled ? 1 : 0
   replication_task_id      = "trail-dr-replication-task"
   migration_type           = "full-load-and-cdc" # 기존 데이터 + 실시간 변경분 모두 복제
-  replication_instance_arn = aws_dms_replication_instance.dms_worker.replication_instance_arn
-  source_endpoint_arn      = aws_dms_endpoint.source_aurora.endpoint_arn
-  target_endpoint_arn      = aws_dms_endpoint.target_azure.endpoint_arn
+  replication_instance_arn = aws_dms_replication_instance.dms_worker[0].replication_instance_arn
+  source_endpoint_arn      = aws_dms_endpoint.source_aurora[0].endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.target_azure[0].endpoint_arn
 
   # 대상 DB(Azure)의 테이블 구조를 지우지 않고 데이터만 넣도록 강제 설정
   replication_task_settings = jsonencode({
