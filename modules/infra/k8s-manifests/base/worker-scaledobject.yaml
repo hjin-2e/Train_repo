@@ -1,15 +1,6 @@
 # [역할] SQS 대기열 길이 기반 Worker Pod 자동 스케일링
 # [방식] KEDA ScaledObject — SQS Trigger 사용
-# [IRSA] booking-sa ServiceAccount에 sqs:GetQueueAttributes 권한 필요
-apiVersion: keda.sh/v1alpha1
-kind: TriggerAuthentication
-metadata:
-  name: keda-aws-credentials
-  namespace: default
-spec:
-  podIdentity:
-    provider: aws
----
+# [IRSA] keda-operator 자체에 부여된 IAM Role을 사용하여 인증 (identityOwner: operator)
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -23,12 +14,10 @@ spec:
   cooldownPeriod: 60
   triggers:
   - type: aws-sqs-queue
-    authenticationRef:
-      name: keda-aws-credentials
     metadata:
       # TODO: terraform apply 후 실제 AWS 계정 ID로 교체하세요.
       # 형식: https://sqs.ap-northeast-2.amazonaws.com/<ACCOUNT_ID>/reservation-queue
       queueURL: https://sqs.ap-northeast-2.amazonaws.com/009152047332/team-train-reservation-queue
       queueLength: "30"
       awsRegion: ap-northeast-2
-      identityOwner: pod
+      identityOwner: operator

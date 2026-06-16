@@ -255,12 +255,48 @@ resource "kubernetes_service_account" "payment" {
 # ==============================================================================
 # Helm Releases for KEDA and External-Secrets
 # ==============================================================================
+# KEDA Operator용 IAM Role (IRSA)
+resource "aws_iam_role" "keda_operator" {
+  name = "${var.project_name}-${var.environment}-keda-operator-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = var.oidc_provider_arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          format("%s:sub", var.oidc_provider) = "system:serviceaccount:keda:keda-operator"
+        }
+      }
+    }]
+  })
+
+  tags = {
+    Name        = "${var.project_name}-keda-operator-role"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "keda_sqs" {
+  policy_arn = var.sqs_policy_arn
+  role       = aws_iam_role.keda_operator.name
+}
+
 resource "helm_release" "keda" {
   name             = "keda"
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   namespace        = "keda"
   create_namespace = true
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = aws_iam_role.keda_operator.arn
+  }
 }
 
 resource "helm_release" "external_secrets" {
