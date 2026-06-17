@@ -37,7 +37,7 @@ variable "db_admin_password" {
 # DMS 복제 인스턴스 사양
 variable "dms_instance_class" {
   type    = string
-  default = "dms.t3.micro" # dms.c5.large등 필요 시 늘리기
+  default = "dms.t3.medium" # dms.c5.large등 필요 시 늘리기
 }
 
 # Azure 정보

@@ -27,7 +27,7 @@ module "networking" {
   environment      = var.environment
   eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
-  azure_vnet_cidr      = var.azure_vnet_cidr
+  azure_vnet_cidr = var.azure_vnet_cidr
   # azure-prod apply 후 얻어지는 VPN Gateway IP 자동 할당
   azure_vpn_gateway_ip = try(data.terraform_remote_state.azure_prod.outputs.vpn_gateway_public_ip, "")
 

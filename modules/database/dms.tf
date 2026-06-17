@@ -34,7 +34,7 @@ resource "aws_dms_endpoint" "source_aurora" {
   database_name = "trail_db"
   username      = var.db_admin_user
   password      = var.db_admin_password
-  ssl_mode      = "require"
+  ssl_mode      = "none"
 }
 
 # Target 엔드포인트 (도착지: Azure MySQL)
@@ -47,7 +47,7 @@ resource "aws_dms_endpoint" "target_azure" {
   engine_name                 = "mysql"
   server_name                 = var.azure_db_endpoint
   port                        = 3306
-  ssl_mode                    = "require"
+  ssl_mode                    = "none"
   database_name               = "trail_db"
   username                    = var.azure_db_user
   password                    = var.azure_db_password

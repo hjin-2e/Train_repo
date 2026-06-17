@@ -39,6 +39,7 @@ resource "azurerm_public_ip" "vpn_gw" {
   resource_group_name = azurerm_resource_group.vpn.name
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = ["1", "2", "3"]
 }
 
 resource "azurerm_virtual_network_gateway" "main" {

@@ -35,6 +35,9 @@ module "azure-database" {
   mysql_private_dns_zone_id = module.azure-networking.mysql_private_dns_zone_id
   db_user                   = var.azure_db_user
   db_password               = var.azure_db_password
+
+  # VNet과 Private DNS Zone 링크가 완전히 생성된 후 MySQL 서버를 만들어야 에러가 나지 않음
+  depends_on = [module.azure-networking]
 }
 
 # 3. App Service 및 가상 네트워크(VNet) 통합 배포

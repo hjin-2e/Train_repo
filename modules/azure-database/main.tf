@@ -31,14 +31,22 @@ resource "azurerm_mysql_flexible_server" "dr" {
 
   # 고가용성 비활성화 (DR Passive 단독 인스턴스)
   # 비용 최적화: HA가 필요한 쪽은 AWS Aurora (Active)
+  # zone 하드코딩 제거: ZoneNotAvailableForRegion 에러 방지 (Azure가 자동 할당)
 
-  zone = "1"
+  lifecycle {
+    ignore_changes = [
+      zone
+    ]
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-mysql-dr"
     Environment = var.environment
     Role        = "DR-Passive"
   }
+
+  # Private DNS Zone 링크가 먼저 완성된 후 서버를 생성해야 VnetNotLinkedToPrivateDnsZone 에러 방지
+  # depends_on은 azure-prod/main.tf의 module "azure-database" 블록에서 처리됨
 }
 
 # ==============================================================================
@@ -50,7 +58,7 @@ resource "azurerm_mysql_flexible_server_configuration" "require_secure_transport
   name                = "require_secure_transport"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_flexible_server.dr.name
-  value               = "ON"
+  value               = "OFF"
 }
 
 # UTF-8 문자셋 설정 (AWS Aurora와 동일하게 맞춤)
