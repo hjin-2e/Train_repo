@@ -39,6 +39,5 @@ variable "azure_db_password" {
   description = "Azure MySQL 관리자 계정 비밀번호"
   type        = string
   sensitive   = true
-  default     = "Password123!"
 }
 

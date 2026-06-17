@@ -29,13 +29,6 @@ variable "db_admin_user" {
   default     = "admin"
 }
 
-variable "db_admin_password" {
-  description = "Database admin password"
-  type        = string
-  sensitive   = true
-  default     = "Password123!"
-}
-
 variable "aurora_endpoint" {
   description = "Aurora cluster endpoint"
   type        = string
@@ -55,13 +48,6 @@ variable "azure_db_user" {
   default     = ""
 }
 
-variable "azure_db_password" {
-  description = "Azure database password"
-  type        = string
-  sensitive   = true
-  default     = "Admin123!@#"
-}
-
 variable "notification_email" {
   description = "Notification receiver email"
   type        = string
@@ -74,15 +60,6 @@ variable "verified_email_or_domain" {
   default     = "admin@example.com"
 }
 
-variable "slack_webhook_url" {
-  description = "Slack Incoming Webhook URL for Application Error alerts"
-  type        = string
-  default     = ""
-}
-
-# ==================
-# Azure S2S VPN (DR 연동)
-# ==================
 variable "azure_vnet_cidr" {
   description = "Azure VNet CIDR block for S2S VPN"
   type        = string

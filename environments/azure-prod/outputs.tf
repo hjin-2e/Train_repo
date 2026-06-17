@@ -13,6 +13,11 @@ output "mysql_server_fqdn" {
   value       = module.azure-database.mysql_server_fqdn
 }
 
+output "mysql_database_name" {
+  description = "Azure MySQL에 생성된 데이터베이스 이름 (DMS table_mappings schema-name으로 사용)"
+  value       = module.azure-database.mysql_database_name
+}
+
 output "mysql_subnet_id" {
   description = "The dedicated subnet ID for Azure Database for MySQL, to be provided to the DB administrator"
   value       = module.azure-networking.mysql_subnet_id

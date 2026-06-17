@@ -1,3 +1,23 @@
+# azure-prod가 먼저 apply 된 경우 MySQL FQDN을 자동으로 읽어옴.
+# 첫 번째 apply(azure-prod state 없음)는 try()가 ""를 반환 → DMS 생성 건너뜀.
+# azure-prod apply 완료 후 두 번째 prod apply 시 DMS가 자동 생성됨.
+data "terraform_remote_state" "azure_prod" {
+  backend = "local"
+  config = {
+    path = "../azure-prod/terraform.tfstate"
+  }
+}
+
+# Secrets Manager에서 민감값 읽어옴 (비밀번호/토큰을 코드/tfvars에 평문으로 두지 않기 위함)
+# apply 전 콘솔 또는 CLI로 "team-train-prod-secrets" Secret을 먼저 생성해야 함
+data "aws_secretsmanager_secret_version" "prod" {
+  secret_id = "${var.project_name}-prod-secrets"
+}
+
+locals {
+  secrets = jsondecode(data.aws_secretsmanager_secret_version.prod.secret_string)
+}
+
 # Azure 리소스(VNet, VPN Gateway, LNG, Connection)는 environments/azure-prod 에서 전담 관리.
 # AWS 측 VPN Connection은 Azure Gateway가 콘솔에서 페어링된 뒤 활성화됨.
 # environments/azure-prod 의 terraform_remote_state 가 vpn_tunnel1/2 outputs 를 읽어 Azure LNG 를 구성함.
@@ -20,8 +40,13 @@ module "logging" {
   project_name = var.project_name
   environment  = var.environment
 
-  log_retention_days     = 30 # prod라서 env랑 다르게 수정했어요
+  log_retention_days     = 30
   cloudtrail_bucket_name = module.networking.cloudtrail_s3_bucket
+
+  # Fluent Bit IRSA 연동 (EKS Pod → CloudWatch Logs 전송)
+  cluster_name      = module.eks-cluster.cluster_name
+  oidc_provider_arn = module.eks-cluster.oidc_provider_arn
+  oidc_provider     = module.eks-cluster.oidc_provider
 }
 
 module "eks-cluster" {
@@ -60,10 +85,12 @@ module "database" {
   redis_sg_id             = module.networking.redis_sg_id
 
   db_admin_user     = var.db_admin_user
-  db_admin_password = var.db_admin_password
-  azure_db_endpoint = var.azure_db_endpoint
+  db_admin_password = local.secrets["db_admin_password"]
+  redis_auth_token  = local.secrets["redis_auth_token"]
+  # azure-prod state에서 자동으로 읽어옴. state가 없으면 ""(DMS 생성 건너뜀)
+  azure_db_endpoint = try(data.terraform_remote_state.azure_prod.outputs.mysql_server_fqdn, "")
   azure_db_user     = var.azure_db_user
-  azure_db_password = var.azure_db_password
+  azure_db_password = local.secrets["azure_db_password"]
 }
 
 module "frontend-pipeline" {
@@ -216,18 +243,8 @@ resource "aws_route53_record" "www" {
   }
 }
 
-# 3. API 서브도메인 (api.team-train.cloud) -> ALB Alias
-resource "aws_route53_record" "api" {
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "api.team-train.cloud"
-  type    = "A"
-
-  alias {
-    name                   = module.eks-cluster.alb_dns_name
-    zone_id                = module.eks-cluster.alb_zone_id
-    evaluate_target_health = true
-  }
-}
+# 3. API 서브도메인 (api.team-train.cloud) -> 콘솔에서 Route53 Failover 레코드로 수동 관리
+# PRIMARY: ALB DNS (Health Check 연결), SECONDARY: Azure App Service URL
 
 # 4. DB 서브도메인 (db.team-train.cloud) -> Aurora MySQL Endpoint CNAME
 resource "aws_route53_record" "db" {
@@ -247,5 +264,5 @@ module "slack-alerting" {
   project_name      = var.project_name
   environment       = var.environment
   aws_region        = var.aws_region
-  slack_webhook_url = var.slack_webhook_url
+  slack_webhook_url = local.secrets["slack_webhook_url"]
 }
