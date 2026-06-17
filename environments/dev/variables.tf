@@ -67,11 +67,11 @@ variable "azure_db_password" {
 variable "notification_email" {
   description = "CloudWatch Alarm Email"
   type        = string
-  default     = "dummy@example.com"
+  default     = "hajin0533@gmail.com"
 }
 
 variable "verified_email_or_domain" {
   description = "SES Sender Email"
   type        = string
-  default     = "dummy@example.com"
+  default     = "hajin0533@gmail.com"
 }

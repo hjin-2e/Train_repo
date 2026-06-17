@@ -58,13 +58,13 @@ variable "azure_db_user" {
 variable "notification_email" {
   description = "Notification receiver email"
   type        = string
-  default     = "admin@example.com"
+  default     = "hajin0533@gmail.com"
 }
 
 variable "verified_email_or_domain" {
   description = "Verified SES sender email or domain"
   type        = string
-  default     = "admin@example.com"
+  default     = "hajin0533@gmail.com"
 }
 
 variable "azure_vnet_cidr" {
