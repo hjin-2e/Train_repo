@@ -49,7 +49,7 @@ resource "azurerm_virtual_network_gateway" "main" {
 
   type     = "Vpn"
   vpn_type = "RouteBased"
-  sku      = "VpnGw1"
+  sku      = "VpnGw1AZ"
 
   ip_configuration {
     public_ip_address_id          = azurerm_public_ip.vpn_gw[0].id

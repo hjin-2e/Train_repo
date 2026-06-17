@@ -28,7 +28,8 @@ module "networking" {
   eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   azure_vnet_cidr      = var.azure_vnet_cidr
-  azure_vpn_gateway_ip = ""
+  # azure-prod apply 후 얻어지는 VPN Gateway IP 자동 할당
+  azure_vpn_gateway_ip = try(data.terraform_remote_state.azure_prod.outputs.vpn_gateway_public_ip, "")
 
   providers = {
     aws.us_east_1 = aws.us_east_1
@@ -246,6 +247,7 @@ resource "aws_route53_record" "www" {
 
 # 3. API 서브도메인 (api.team-train.cloud) -> 콘솔에서 Route53 Failover 레코드로 수동 관리
 # PRIMARY: ALB DNS (Health Check 연결), SECONDARY: Azure App Service URL
+
 
 # 4. DB 서브도메인 (db.team-train.cloud) -> Aurora MySQL Endpoint CNAME
 resource "aws_route53_record" "db" {
