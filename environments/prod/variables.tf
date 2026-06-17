@@ -89,18 +89,6 @@ variable "azure_vnet_cidr" {
   default     = ""
 }
 
-variable "enable_azure_vpn" {
-  description = "Azure VPN Gateway IP 조회 활성화 여부. false: 1단계 (azure-networking 모듈만 먼저 apply), true: 2단계 (azurerm_public_ip를 Azure API에서 직접 조회해 AWS 측 Customer Gateway 생성)"
-  type        = bool
-  default     = false
-}
-
-# Azure environments에서 출력된 값
-variable "azure_vpn_gateway_ip" {
-  description = "Azure VPN Gateway Public IP"
-  type        = string
-  default     = ""
-}
 
 
 # ==================

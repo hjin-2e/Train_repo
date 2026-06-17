@@ -10,12 +10,13 @@ module "azure-networking" {
   enable_vpn_gateway = false 
 }
 
-# 2. App Service 및 가상 네트워크(VNet) 통합 배포
+# 2. App Service 배포 (dev: B1 + VNet Integration 없음, VPN Gateway도 없으므로 불필요)
 module "azure-app-service" {
   source              = "../../modules/azure-app-service"
   project_name        = var.project_name
   environment         = var.environment
   azure_location      = var.azure_location
   resource_group_name = module.azure-networking.resource_group_name
-  app_subnet_id       = module.azure-networking.app_subnet_id
+  sku_name            = "B1"
+  # app_subnet_id 미전달 → null(기본값) → VNet Integration 비활성화
 }

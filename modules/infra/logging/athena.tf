@@ -95,6 +95,47 @@ resource "aws_iam_role_policy" "glue_s3_read" {
   })
 }
 
+# Glue 크롤러가 CloudTrail S3 버킷을 읽을 수 있도록 별도 정책 추가
+resource "aws_iam_role_policy" "glue_cloudtrail_s3_read" {
+  count = var.create_s3_buckets && var.cloudtrail_bucket_name != "" ? 1 : 0
+  name  = "GlueCloudTrailS3ReadPolicy"
+  role  = aws_iam_role.glue_crawler_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action   = ["s3:GetObject", "s3:ListBucket"]
+      Effect   = "Allow"
+      Resource = [
+        "arn:aws:s3:::${var.cloudtrail_bucket_name}",
+        "arn:aws:s3:::${var.cloudtrail_bucket_name}/*"
+      ]
+    }]
+  })
+}
+
+# CloudTrail 로그 Glue 크롤러 (API 호출 이력 Athena 쿼리용)
+resource "aws_glue_crawler" "cloudtrail_logs_crawler" {
+  count         = var.create_s3_buckets && var.cloudtrail_bucket_name != "" ? 1 : 0
+  name          = "${var.project_name}-${var.environment}-cloudtrail-crawler"
+  role          = aws_iam_role.glue_crawler_role[0].arn
+  database_name = aws_athena_database.logs_db[0].name
+
+  s3_target {
+    path = "s3://${var.cloudtrail_bucket_name}/AWSLogs/"
+  }
+
+  schema_change_policy {
+    delete_behavior = "LOG"
+    update_behavior = "UPDATE_IN_DATABASE"
+  }
+
+  tags = {
+    Name        = "cloudtrail-logs-crawler"
+    Environment = var.environment
+  }
+}
+
 # 5. Glue 크롤러 생성 (ALB 로그 경로 스캔)
 resource "aws_glue_crawler" "alb_logs_crawler" {
   count         = var.create_s3_buckets ? 1 : 0

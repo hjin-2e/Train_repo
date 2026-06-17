@@ -1,18 +1,6 @@
-# Azure VPN Gateway Public IP를 변수로 수동 입력하는 대신 Azure API에서 직접 조회.
-# enable_azure_vpn = false(1단계, 기본값)일 때는 조회하지 않음 -> module.azure-networking만 -target으로 먼저 apply.
-# enable_azure_vpn = true(2단계)로 재apply하면 이미 생성된 Public IP를 조회해 AWS Customer Gateway에 전달.
-#
-# 이름은 module.azure-networking의 출력을 참조하지 않고 동일한 명명 규칙을 직접 문자열로 구성합니다.
-# (module 출력을 참조하면 count와 무관하게 정적 의존성 엣지가 생겨 module.networking <-> module.azure-networking
-#  순환참조가 재발하므로, 두 모듈 간 그래프 연결을 의도적으로 끊어둔 것입니다.)
-/*
-data "azurerm_public_ip" "vpn_gw" {
-  count               = var.enable_azure_vpn ? 1 : 0
-  name                = "${var.project_name}-${var.environment}-vpngw-ip"
-  resource_group_name = "${var.project_name}-${var.environment}-vpn-rg"
-}
-*/
-
+# Azure 리소스(VNet, VPN Gateway, LNG, Connection)는 environments/azure-prod 에서 전담 관리.
+# AWS 측 VPN Connection은 Azure Gateway가 콘솔에서 페어링된 뒤 활성화됨.
+# environments/azure-prod 의 terraform_remote_state 가 vpn_tunnel1/2 outputs 를 읽어 Azure LNG 를 구성함.
 module "networking" {
   source           = "../../modules/networking"
   project_name     = var.project_name
@@ -20,38 +8,20 @@ module "networking" {
   eks_cluster_name = "${var.project_name}-${var.environment}-eks"
 
   azure_vnet_cidr      = var.azure_vnet_cidr
-  azure_vpn_gateway_ip = "" # var.enable_azure_vpn ? data.azurerm_public_ip.vpn_gw[0].ip_address : ""
-
+  azure_vpn_gateway_ip = ""
 
   providers = {
     aws.us_east_1 = aws.us_east_1
   }
 }
 
-# Azure S2S VPN: DMS(Aurora -> Azure MySQL DR 복제)가 공개 인터넷이 아닌 사설 터널을 사용하도록 연결
-# 2단계 apply 필요 (modules/azure-networking/main.tf 상단 주석 참고)
-/*
-module "azure-networking" {
-  source = "../../modules/azure-networking"
-
-  project_name = var.project_name
-  environment  = var.environment
-
-  azure_vnet_cidr               = var.azure_vnet_cidr != "" ? var.azure_vnet_cidr : "10.1.0.0/16"
-  aws_vpc_cidr                  = module.networking.vpc_cidr_block
-  aws_vpn_tunnel1_address       = module.networking.vpn_tunnel1_address
-  aws_vpn_tunnel1_preshared_key = module.networking.vpn_tunnel1_preshared_key
-  aws_vpn_tunnel2_address       = module.networking.vpn_tunnel2_address
-  aws_vpn_tunnel2_preshared_key = module.networking.vpn_tunnel2_preshared_key
-}
-*/
-
 module "logging" {
   source       = "../../modules/infra/logging"
   project_name = var.project_name
   environment  = var.environment
 
-  log_retention_days = 30 # prod라서 env랑 다르게 수정했어요
+  log_retention_days     = 30 # prod라서 env랑 다르게 수정했어요
+  cloudtrail_bucket_name = module.networking.cloudtrail_s3_bucket
 }
 
 module "eks-cluster" {

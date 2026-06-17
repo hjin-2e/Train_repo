@@ -61,3 +61,9 @@ variable "aws_region" {
   type        = string
   default     = "ap-northeast-2"
 }
+
+variable "cloudtrail_bucket_name" {
+  description = "CloudTrail 로그 S3 버킷 이름 (Athena Glue Crawler 스캔 대상, 미입력 시 CloudTrail Crawler 비활성화)"
+  type        = string
+  default     = ""
+}

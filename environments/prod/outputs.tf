@@ -103,3 +103,28 @@ output "mail_queue_url" {
   description = "AWS SQS Mail queue URL"
   value       = module.database.mail_queue_url
 }
+
+# ==================
+# S2S VPN outputs (environments/azure-prod 의 terraform_remote_state 가 읽음)
+# ==================
+output "vpn_tunnel1_address" {
+  description = "AWS VPN Connection Tunnel 1 public IP"
+  value       = module.networking.vpn_tunnel1_address
+}
+
+output "vpn_tunnel1_preshared_key" {
+  description = "AWS VPN Connection Tunnel 1 Pre-Shared Key"
+  value       = module.networking.vpn_tunnel1_preshared_key
+  sensitive   = true
+}
+
+output "vpn_tunnel2_address" {
+  description = "AWS VPN Connection Tunnel 2 public IP"
+  value       = module.networking.vpn_tunnel2_address
+}
+
+output "vpn_tunnel2_preshared_key" {
+  description = "AWS VPN Connection Tunnel 2 Pre-Shared Key"
+  value       = module.networking.vpn_tunnel2_preshared_key
+  sensitive   = true
+}
