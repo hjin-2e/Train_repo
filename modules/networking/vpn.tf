@@ -64,3 +64,13 @@ resource "aws_route" "private_c_to_azure" {
   destination_cidr_block = var.azure_vnet_cidr
   gateway_id             = aws_vpn_gateway.main[0].id
 }
+
+# ==============================================================================
+# DB 서브넷 라우팅 테이블에도 Azure VPN 라우트 추가
+# ==============================================================================
+resource "aws_route" "db_to_azure" {
+  count                  = var.azure_vpn_gateway_ip != "" && var.azure_vnet_cidr != "" ? 1 : 0
+  route_table_id         = aws_route_table.db.id
+  destination_cidr_block = var.azure_vnet_cidr
+  gateway_id             = aws_vpn_gateway.main[0].id
+}

@@ -269,7 +269,7 @@ resource "aws_security_group" "dms" {
   description = "DMS Security Group for Azure Disaster Recovery Backup"
   vpc_id      = aws_vpc.main.id
 
-  # DMS 내부 통신 허용 
+  # DMS 내부 통신 허용 (multi-AZ standby 간 통신)
   ingress {
     from_port   = 0
     to_port     = 0
@@ -287,7 +287,19 @@ resource "aws_security_group" "dms" {
     description = "Allow outbound to Aurora (DB subnet only)"
   }
 
-  # Azure MySQL 아웃바운드: S2S VPN 터널을 통한 사설 통신만 허용 (공개 인터넷 차단)
+  # DMS multi-AZ 인스턴스 간 내부 통신 (private 서브넷 대역)
+  # DMS Replication Instance가 private_a/c에 배치되므로
+  # Standby 인스턴스와의 하트비트/동기화를 위해 허용
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_subnet.private_a.cidr_block, aws_subnet.private_c.cidr_block]
+    description = "Allow DMS multi-AZ internal communication (private subnets)"
+  }
+
+  # Azure MySQL 아웃바욤드: S2S VPN 터널을 통한 사설 통신만 허용 (공개 인터넷 차단)
+  # 라우팅: DMS(private 서브넷) → VGW → S2S VPN 터널 → Azure VNet → MySQL(10.1.2.x)
   dynamic "egress" {
     for_each = var.azure_vnet_cidr != "" ? [1] : []
     content {
@@ -295,7 +307,7 @@ resource "aws_security_group" "dms" {
       to_port     = 3306
       protocol    = "tcp"
       cidr_blocks = [var.azure_vnet_cidr]
-      description = "Allow outbound to Azure MySQL via S2S VPN"
+      description = "Allow outbound to Azure MySQL via S2S VPN (private tunnel only)"
     }
   }
 
