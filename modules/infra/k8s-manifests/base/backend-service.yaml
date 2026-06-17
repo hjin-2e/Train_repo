@@ -21,6 +21,7 @@ metadata:
   name: backend-targetgroup-binding
   namespace: default
 spec:
+  targetType: ip
   # ⚠️ 이 값은 Terraform에 의해 overlays/dev/targetgroupbinding-patch.yaml 에서 자동으로 덮어씌워집니다.
   # 임시 플레이스홀더 값만 유지합니다.
   targetGroupARN: "arn:aws:elasticloadbalancing:ap-northeast-2:000000000000:targetgroup/placeholder/00000000"

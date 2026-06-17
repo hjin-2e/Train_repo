@@ -138,6 +138,7 @@ metadata:
   name: backend-targetgroup-binding
   namespace: default
 spec:
+  targetType: ip
   targetGroupARN: ${module.eks-cluster.app_tg_arn}
   EOT
 }
