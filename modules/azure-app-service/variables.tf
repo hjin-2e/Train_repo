@@ -19,9 +19,16 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "app_subnet_id" {
-  description = "The Azure Subnet ID for VNet Integration"
+variable "sku_name" {
+  description = "App Service Plan SKU (B1은 VNet Integration 미지원, S1 이상 필요)"
   type        = string
+  default     = "S1"
+}
+
+variable "app_subnet_id" {
+  description = "The Azure Subnet ID for VNet Integration (null = VNet Integration 비활성화)"
+  type        = string
+  default     = null
 }
 
 # DB 연결 정보

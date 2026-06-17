@@ -68,13 +68,9 @@ resource "azurerm_mysql_flexible_server_configuration" "collation_server" {
   value               = "utf8mb4_0900_ai_ci"
 }
 
-# lower_case_table_names (AWS Aurora와 동일 — 대소문자 구분 없이 테이블명 취급)
-resource "azurerm_mysql_flexible_server_configuration" "lower_case_table_names" {
-  name                = "lower_case_table_names"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_mysql_flexible_server.dr.name
-  value               = "1"
-}
+# lower_case_table_names 는 MySQL 8.0에서 read-only 파라미터 (서버 시작 시에만 설정 가능).
+# Terraform apply 시 "Variable 'lower_case_table_names' is a read only variable" 에러 발생.
+# Azure MySQL Flexible Server는 기본값 1(대소문자 무시)이므로 별도 설정 불필요.
 
 # ==============================================================================
 # Database 자체 생성 (trail_db)

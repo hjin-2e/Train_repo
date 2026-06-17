@@ -10,14 +10,23 @@ module "azure-networking" {
   enable_vpn_gateway = false 
 }
 
-# 2. App Service 및 가상 네트워크(VNet) 통합 배포
+# 2. App Service 배포 (dev: B1 + VNet Integration 없음, VPN Gateway도 없으므로 불필요)
 module "azure-app-service" {
   source              = "../../modules/azure-app-service"
   project_name        = var.project_name
   environment         = var.environment
   azure_location      = var.azure_location
   resource_group_name = module.azure-networking.resource_group_name
-  app_subnet_id       = module.azure-networking.app_subnet_id
+  sku_name            = "B1"
+  # app_subnet_id 미전달 → null(기본값) → VNet Integration 비활성화
+
+  # DB 연결 정보 (App Service 환경변수로 주입)
+  db_host     = module.azure-database.mysql_server_fqdn
+  db_port     = "3306"
+  db_user     = var.azure_db_user
+  db_password = var.azure_db_password
+  db_name     = module.azure-database.mysql_database_name
+}
 
 # 3. Azure MySQL Flexible Server (DR Passive DB)
 module "azure-database" {
@@ -30,12 +39,4 @@ module "azure-database" {
   mysql_private_dns_zone_id = module.azure-networking.mysql_private_dns_zone_id
   db_user                   = var.azure_db_user
   db_password               = var.azure_db_password
-}
-
-  # DB 연결 정보 (App Service 환경변수로 주입)
-  db_host             = module.azure-database.mysql_server_fqdn
-  db_port             = "3306"
-  db_user             = var.azure_db_user
-  db_password         = var.azure_db_password
-  db_name             = module.azure-database.mysql_database_name
 }
