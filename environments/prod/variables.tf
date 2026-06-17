@@ -42,6 +42,13 @@ variable "aurora_endpoint" {
   default     = ""
 }
 
+variable "redis_auth_token" {
+  description = "Redis authentication token"
+  type        = string
+  sensitive   = true
+  default     = "SecureRedisToken123!"
+}
+
 # Azure 관련
 variable "azure_db_endpoint" {
   description = "Azure database endpoint"

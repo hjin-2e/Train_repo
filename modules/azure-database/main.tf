@@ -10,19 +10,13 @@ resource "azurerm_mysql_flexible_server" "dr" {
   resource_group_name    = var.resource_group_name
   location               = var.azure_location
 
-  # VNet 프라이빗 통합 (Public 접근 차단)
   delegated_subnet_id    = var.mysql_subnet_id
   private_dns_zone_id    = var.mysql_private_dns_zone_id
-
-  # 계정 정보
+  
   administrator_login    = var.db_user
   administrator_password = var.db_password
-
-  # 엔진 버전 (AWS Aurora MySQL 8.0 호환)
   version                = "8.0.21"
-
-  # 비용 최적화 스펙 (DR Passive이므로 최소 사양)
-  sku_name               = var.db_sku_name
+  sku_name               = "B_Standard_B1ms"
 
   # 스토리지 (IOPS 자동 스케일링 활성화)
   storage {

@@ -41,10 +41,3 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
-
-# 인스턴스 사양
-variable "db_sku_name" {
-  description = "MySQL Flexible Server SKU (비용 최적화: B_Standard_B1ms, 성능 필요 시: GP_Standard_D2ds_v4)"
-  type        = string
-  default     = "B_Standard_B1ms"
-}
