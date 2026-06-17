@@ -34,13 +34,25 @@ resource "aws_dms_endpoint" "source_aurora" {
 }
 
 # Target 엔드포인트 (도착지: Azure MySQL)
-# S2S VPN 연결 시 azure_db_endpoint는 Azure VNet 내부 사설 IP/FQDN을 사용 (공개 엔드포인트 아님)
+# ==============================================================================
+# ⚠️  azure_db_endpoint 변수에는 반드시 FQDN이 아닌 Azure MySQL 사설 IP를 입력해야 함
+#
+# [실패 원인] FQDN(예: team-train-prod-mysql.mysql.database.azure.com) 입력 시:
+#   - DMS가 AWS VPC DNS(169.254.169.253)에 FQDN을 쿼리함
+#   - Azure Private DNS Zone은 VNet 내부 전용 → AWS VPC DNS가 해석 불가
+#   - 에러: "lookup ...mysql.database.azure.com: no such host"
+#
+# [해결] Azure Portal → MySQL Flexible Server → 개요 → 사설 IP 주소 확인 후 입력
+#   예: azure_db_endpoint = "10.1.2.4"  (Azure VNet mysql 서브넷 내 사설 IP)
+#
+# [라우팅 경로] DMS(private 서브넷) → VGW → S2S VPN 터널 → Azure VNet → MySQL
+# ==============================================================================
 resource "aws_dms_endpoint" "target_azure" {
   count                       = local.dms_enabled ? 1 : 0
   endpoint_id                 = "target-azure-mysql"
   endpoint_type               = "target"
   engine_name                 = "mysql"
-  server_name                 = var.azure_db_endpoint
+  server_name                 = var.azure_db_endpoint  # FQDN 아닌 사설 IP 입력 (위 주석 참고)
   port                        = 3306
   ssl_mode                    = "require"
   database_name               = "trail_db"
@@ -61,7 +73,7 @@ resource "aws_dms_replication_task" "aurora_to_azure" {
   # 대상 DB(Azure)의 테이블 구조를 지우지 않고 데이터만 넣도록 강제 설정
   replication_task_settings = jsonencode({
     TargetMetadata = {
-      TargetTablePrepMode = "DO_NOTHING"
+      TargetTablePrepMode = "TRUNCATE_BEFORE_LOAD"
     }
   })
 
