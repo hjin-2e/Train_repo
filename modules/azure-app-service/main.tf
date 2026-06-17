@@ -25,6 +25,17 @@ resource "azurerm_linux_web_app" "web_app" {
     "ENV"             = var.environment
     "PROJECT"         = var.project_name
     "WEBSITES_PORT"   = "8080"
+
+    # DB 연결 정보 (Azure MySQL Flexible Server)
+    "DB_HOST"         = var.db_host
+    "DB_PORT"         = var.db_port
+    "DB_USER"         = var.db_user
+    "DB_PASSWORD"     = var.db_password
+    "DB_NAME"         = var.db_name
+
+    # DR 모드 설정
+    # Azure 환경(DR)은 어떠한 경우에도 쓰기(예매/결제)가 불가하며 오직 '조회(읽기)' 전용으로 동작
+    "READ_ONLY_MODE"  = "true"
   }
 }
 

@@ -28,3 +28,17 @@ variable "aws_vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
+# Azure MySQL DR 계정 정보
+variable "azure_db_user" {
+  description = "Azure MySQL 관리자 계정 이름"
+  type        = string
+  default     = "azureadmin"
+}
+
+variable "azure_db_password" {
+  description = "Azure MySQL 관리자 계정 비밀번호"
+  type        = string
+  sensitive   = true
+  default     = "Password123!"
+}
+
