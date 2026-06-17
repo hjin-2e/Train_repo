@@ -58,6 +58,8 @@ module "database" {
   azure_db_endpoint = var.azure_db_endpoint
   azure_db_user     = var.azure_db_user
   azure_db_password = var.azure_db_password
+
+  redis_auth_token  = var.redis_auth_token
 }
 
 module "frontend-pipeline" {
@@ -114,6 +116,7 @@ resource "local_file" "backend_kustomize_env" {
     
     REDIS_HOST=${module.database.redis_primary_endpoint}
     REDIS_PORT=6379
+    REDIS_AUTH_TOKEN=${var.redis_auth_token}
     
     # Cognito
     COGNITO_USER_POOL_ID=${module.cognito.user_pool_id}
@@ -135,6 +138,7 @@ metadata:
   name: backend-targetgroup-binding
   namespace: default
 spec:
+  targetType: ip
   targetGroupARN: ${module.eks-cluster.app_tg_arn}
   EOT
 }

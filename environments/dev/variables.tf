@@ -23,6 +23,14 @@ variable "developer_ips" {
   default     = ["0.0.0.0/0"]
 }
 
+# Redis AUTH 토큰 (16자 이상 필수)
+variable "redis_auth_token" {
+  description = "Redis AUTH Token for ElastiCache"
+  type        = string
+  sensitive   = true
+  default     = "SecureRedisToken123!"
+}
+
 # DB 관련 변수 선언
 variable "db_admin_user" {
   description = "admin user data"

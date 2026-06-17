@@ -8,6 +8,11 @@ output "app_service_url" {
   value       = module.azure-app-service.app_service_default_hostname
 }
 
+output "mysql_server_fqdn" {
+  description = "Azure MySQL Flexible Server FQDN (DMS 타겟 엔드포인트 및 백엔드 DB_HOST로 사용)"
+  value       = module.azure-database.mysql_server_fqdn
+}
+
 output "mysql_subnet_id" {
   description = "The dedicated subnet ID for Azure Database for MySQL, to be provided to the DB administrator"
   value       = module.azure-networking.mysql_subnet_id

@@ -47,7 +47,7 @@ resource "aws_eks_addon" "kube_proxy" {
 # ==============================================================================
 
 # 개발자 Role (읽기 전용)
-resource "kubernetes_cluster_role" "developer" {
+resource "kubernetes_cluster_role_v1" "developer" {
   metadata {
     name = "developer-role"
   }
@@ -66,7 +66,7 @@ resource "kubernetes_cluster_role" "developer" {
 }
 
 # 개발자 ClusterRoleBinding
-resource "kubernetes_cluster_role_binding" "developer" {
+resource "kubernetes_cluster_role_binding_v1" "developer" {
   metadata {
     name = "developer-role-binding"
   }
@@ -74,7 +74,7 @@ resource "kubernetes_cluster_role_binding" "developer" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.developer.metadata[0].name
+    name      = kubernetes_cluster_role_v1.developer.metadata[0].name
   }
 
   subject {
@@ -153,7 +153,7 @@ resource "aws_iam_role_policy_attachment" "booking_secrets" {
   role       = aws_iam_role.booking_pod.name
 }
 
-resource "kubernetes_service_account" "booking" {
+resource "kubernetes_service_account_v1" "booking" {
   metadata {
     name      = "booking-sa"
     namespace = "default"
@@ -195,7 +195,7 @@ resource "aws_iam_role_policy_attachment" "user_aurora" {
   role       = aws_iam_role.user_pod.name
 }
 
-resource "kubernetes_service_account" "user" {
+resource "kubernetes_service_account_v1" "user" {
   metadata {
     name      = "user-sa"
     namespace = "default"
@@ -242,7 +242,7 @@ resource "aws_iam_role_policy_attachment" "payment_sqs" {
   role       = aws_iam_role.payment_pod.name
 }
 
-resource "kubernetes_service_account" "payment" {
+resource "kubernetes_service_account_v1" "payment" {
   metadata {
     name      = "payment-sa"
     namespace = "default"
@@ -369,3 +369,4 @@ resource "helm_release" "cluster_autoscaler" {
     value = aws_iam_role.cluster_autoscaler.arn
   }
 }
+
