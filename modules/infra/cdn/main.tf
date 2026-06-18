@@ -38,19 +38,17 @@ resource "aws_cloudfront_distribution" "main" {
     origin_access_control_id = aws_cloudfront_origin_access_control.main.id
   }
 
-  # ALB 오리진 (백엔드 API) - ALB DNS를 직접 오리진으로 사용
-  # api.team-train.cloud 서브도메인 없이 ALB DNS를 직접 지정 (Route53 레코드 불필요)
+  # ALB 오리진 (백엔드 API) - 주소 및 환경에 따라 동적 생성
   dynamic "origin" {
-    for_each = var.alb_dns_name != "" ? [1] : []
+    for_each = (var.environment == "prod" || var.alb_dns_name != "") ? [1] : []
     content {
-      domain_name = var.alb_dns_name
+      domain_name = var.environment == "prod" ? "api.team-train.cloud" : var.alb_dns_name
       origin_id   = "ALB-backend"
 
       custom_origin_config {
         http_port              = 80
         https_port             = 443
-        # ALB는 HTTP(80)로 수신, HTTPS는 CloudFront에서 종단 처리
-        origin_protocol_policy = "http-only"
+        origin_protocol_policy = var.environment == "prod" ? "https-only" : "http-only"
         origin_ssl_protocols   = ["TLSv1.2"]
       }
     }
@@ -93,9 +91,9 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 86400
   }
 
-  # API 경로 캐시 동작 (ALB 오리진이 있을 때만 동적 구성)
+  # API 경로 캐시 동작 (백엔드가 존재할 때만 동적 구성)
   dynamic "ordered_cache_behavior" {
-    for_each = var.alb_dns_name != "" ? [1] : []
+    for_each = (var.environment == "prod" || var.alb_dns_name != "") ? [1] : []
     content {
       path_pattern           = "/api/*"
       allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]

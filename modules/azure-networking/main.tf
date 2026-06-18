@@ -149,3 +149,33 @@ resource "azurerm_private_dns_zone_virtual_network_link" "mysql" {
   virtual_network_id    = azurerm_virtual_network.main.id
 }
 
+# ==============================================================================
+# 사용자 요청: MySQL 서브넷용 별도 NSG 생성
+# ==============================================================================
+resource "azurerm_resource_group" "mysql_nsg" {
+  name     = "team-train-prod-mysql-nsg"
+  location = "koreacentral"
+}
+
+resource "azurerm_network_security_group" "mysql" {
+  name                = "team-train-prod-mysql-nsg"
+  location            = azurerm_resource_group.mysql_nsg.location
+  resource_group_name = azurerm_resource_group.mysql_nsg.name
+
+  security_rule {
+    name                       = "Allow-MySQL-from-AWS"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3306"
+    source_address_prefix      = "10.0.0.0/16"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "mysql" {
+  subnet_id                 = azurerm_subnet.mysql.id
+  network_security_group_id = azurerm_network_security_group.mysql.id
+}

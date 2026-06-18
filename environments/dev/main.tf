@@ -83,6 +83,11 @@ module "backend-pipeline" {
   github_repo = "Chjjh605/Backend_Train"
 }
 
+data "aws_route53_zone" "primary" {
+  name         = "team-train.cloud"
+  private_zone = false
+}
+
 # 내부 통신 알림
 module "notification" {
   source                   = "../../modules/infra/notification"
@@ -93,6 +98,7 @@ module "notification" {
   sqs_queue_name           = module.database.sqs_queue_name
   notification_email       = var.notification_email
   verified_email_or_domain = var.verified_email_or_domain
+  route53_zone_id          = data.aws_route53_zone.primary.zone_id
   depends_on               = [module.database]
 }
 
