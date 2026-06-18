@@ -15,7 +15,7 @@ generatorOptions:
 images:
 - name: team-train-dev-backend
   newName: 009152047332.dkr.ecr.ap-northeast-2.amazonaws.com/team-train-prod-backend
-  newTag: 80aae2c0060340f767c72f757ffc449ae0104409
+  newTag: 5279896f9e1e6f1f4c50fd77382e3f394b7d9da0
 
 patchesStrategicMerge:
 - targetgroupbinding-patch.yaml
